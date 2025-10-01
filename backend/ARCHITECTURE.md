@@ -77,6 +77,7 @@ backend/
 │   │   ├── document/                 # Gestión de documentos
 │   │   ├── kyc/                      # Verificación KYC/AML
 │   │   └── admin/                    # Panel de administración
+|   |   └── signature/                # Firma digital
 │   │
 │   ├── config/                       # Configuraciones
 │   │   ├── data-source.ts            # Configuración TypeORM
