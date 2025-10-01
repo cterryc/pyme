@@ -11,7 +11,7 @@ export const AppDataSource = new DataSource({
     database: config.DB_NAME,
     ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
     synchronize: config.NODE_ENV === "development", // Auto-sync in dev only
-    logging: config.NODE_ENV === "development",
+    logging: false,
     entities: ["src/entities/**/*.ts"],
     migrations: ["src/migrations/**/*.ts"],
     subscribers: ["src/subscribers/**/*.ts"],

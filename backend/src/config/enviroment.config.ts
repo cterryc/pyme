@@ -26,7 +26,7 @@ const config: Config = {
     SUPABASE_STORAGE_BUCKET: process.env.SUPABASE_STORAGE_BUCKET || "credit-documents",
     
     // JWT
-    JWT_SECRET: process.env.JWT_SECRET || "change-this-secret",
+    JWT_SECRET: process.env.JWT_SECRET ?? "change-this-secret",
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
     SESSION_KEY: process.env.SESSION_KEY || "",
     
