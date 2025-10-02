@@ -1,9 +1,8 @@
-import { Header } from '@/components/Header'
-import { Link } from 'react-router-dom'
 import { HiOutlineTrendingUp, HiOutlineCalendar, HiOutlineCash, HiOutlineClipboardList } from 'react-icons/hi'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
+import { Link } from 'react-router-dom'
 export const Landing = () => {
-  const imagenTemp =
-    'https://images.unsplash.com/photo-1521247205284-f4f3c95fdb5a?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZWRpZmljaW8lMjBuZWdyb3xlbnwwfHwwfHx8MA%3D%3D'
   const avatarTemp = ''
   // const avatarTemp = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
 
@@ -11,7 +10,7 @@ export const Landing = () => {
     <>
       <Header avatar={avatarTemp} />
       <section
-        className={`min-h-[50vh] p-5 overflow-hidden bg-center bg-[url("${imagenTemp}")] flex flex-col justify-around text-white text-center`}
+        className={`min-h-[50vh] p-5 overflow-hidden bg-center bg-[url("assets/landing/portada.jpeg")] flex flex-col justify-around text-white text-center`}
       >
         <div className='max-w-200 w-full mx-auto'>
           <p className='text-3xl md:text-6xl font-bold mb-6'>Impulsa tu negocio con el crédito ideal</p>
@@ -176,21 +175,7 @@ export const Landing = () => {
           Comparar créditos
         </Link>
       </section>
-
-      <footer className='flex flex-col items-center gap-5 p-10 border-t-1 border-[rgba(199,199,199,1)] text-center'>
-        <ul className='flex gap-3'>
-          <li>
-            <Link to='/'>Política de Privacidad</Link>
-          </li>
-          <li>
-            <Link to='/'>Términos y condiciones</Link>
-          </li>
-          <li>
-            <Link to='/'>Contacto</Link>
-          </li>
-        </ul>
-        <p>@2025 Financia. Todos los derechos reservados.</p>
-      </footer>
+      <Footer />
     </>
   )
 }
