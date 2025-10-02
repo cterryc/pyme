@@ -7,17 +7,17 @@ import { CreditApplication } from "./CreditApplication.entity";
 
 @Entity("documents")
 export class Document extends BaseEntity {
+    @Index()
     @Column({
         type: "enum",
         enum: DocumentType,
     })
-    @Index()
     type!: DocumentType;
 
     @Column({ type: "varchar", length: 255 })
     fileName!: string;
 
-    @Column({ type: "varchar", length: 500 })
+    @Column({ type: "varchar", length: 2048 })
     fileUrl!: string; // Supabase Storage URL
 
     @Column({ type: "varchar", length: 500, nullable: true })
@@ -29,30 +29,28 @@ export class Document extends BaseEntity {
     @Column({ type: "bigint", nullable: true })
     fileSize?: number; // in bytes
 
+    @Index()
     @Column({
         type: "enum",
         enum: DocumentStatus,
         default: DocumentStatus.PENDING,
     })
-    @Index()
     status!: DocumentStatus;
 
     @Column({ type: "text", nullable: true })
     rejectionReason?: string;
 
     @Column({ type: "timestamp", nullable: true })
-    uploadedAt?: Date;
-
-    @Column({ type: "timestamp", nullable: true })
     reviewedAt?: Date;
 
-    @Column({ type: "varchar", length: 255 })
+    @Column({ type: "varchar", length: 255, nullable: true })
     digitalSignature!: string;
 
     @Column({ type: "timestamp", nullable: true })
     signedAt?: Date;
 
-    @Column({ type: "varchar", length: 64 })
+    @Index()
+    @Column({ type: "varchar", length: 64, nullable: true })
     contentHash!: string;
 
     @Column({ type: "varchar", length: 64, nullable: true })
@@ -69,6 +67,7 @@ export class Document extends BaseEntity {
     @JoinColumn({ name: "credit_application_id" })
     creditApplication?: CreditApplication;
 
+    @Index()
     @Column({ name: "credit_application_id", nullable: true })
     creditApplicationId?: string;
 
@@ -76,9 +75,11 @@ export class Document extends BaseEntity {
     @JoinColumn({ name: "company_id" })
     company!: Company;
 
+    @Index()
     @Column({ name: "company_id" })
     companyId!: string;
 
+    @Index()
     @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: "uploaded_by" })
     uploadedBy?: User;
@@ -90,6 +91,7 @@ export class Document extends BaseEntity {
     @JoinColumn({ name: "reviewed_by" })
     reviewedBy?: User;
 
+    @Index()
     @Column({ name: "reviewed_by", nullable: true })
     reviewedById?: string;
 }

@@ -5,11 +5,10 @@ import { Company } from "./Company.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
-    @Column({ type: "varchar", length: 255 })
-    @Index()
+    @Column({ unique: true, type: "varchar", length: 255 })
     email!: string;
 
-    @Column({ type: "varchar", length: 255 })
+    @Column({ type: "varchar", length: 255, select: false })
     password!: string;
 
     @Column({ type: "varchar", length: 100 })
