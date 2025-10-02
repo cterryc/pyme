@@ -1,9 +1,9 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn, Index } from "typeorm";
 import { BaseEntity } from "./BaseEntity";
-import { Company } from "./Company.entity";
 import { Document } from "./Document.entity";
 import { CreditApplicationStatus, KYCStatus } from "../constants/CreditStatus";
 import { User } from "./User.entity";
+import { Company } from "./Company.entity";
 
 @Entity("credit_applications")
 export class CreditApplication extends BaseEntity {
@@ -70,12 +70,6 @@ export class CreditApplication extends BaseEntity {
 
     @Column({ type: "jsonb", nullable: true })
     formData?: Record<string, any>; // Store dynamic form data
-
-    @Column({ type: "varchar", length: 255, nullable: true })
-    digitalSignature?: string; // URL or hash of digital signature
-
-    @Column({ type: "timestamp", nullable: true })
-    signedAt?: Date;
 
     // Relations
     @ManyToOne(() => Company, (company) => company.creditApplications, { onDelete: "CASCADE" })

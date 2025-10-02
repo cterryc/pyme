@@ -1,8 +1,9 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from "typeorm";
 import { BaseEntity } from "./BaseEntity";
-import { CreditApplication } from "./CreditApplication.entity";
-import { DocumentType, DocumentStatus } from "../constants/CreditStatus";
+import { CreditApplicationStatus, DocumentType, DocumentStatus, KYCStatus } from "../constants/CreditStatus";
 import { User } from "./User.entity";
+import { Company } from "./Company.entity";
+import { CreditApplication } from "./CreditApplication.entity";
 
 @Entity("documents")
 export class Document extends BaseEntity {
@@ -45,13 +46,38 @@ export class Document extends BaseEntity {
     @Column({ type: "timestamp", nullable: true })
     reviewedAt?: Date;
 
-    // Relations
-    @ManyToOne(() => CreditApplication, (application) => application.documents, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "credit_application_id" })
-    creditApplication!: CreditApplication;
+    @Column({ type: "varchar", length: 255 })
+    digitalSignature!: string;
 
-    @Column({ name: "credit_application_id" })
-    creditApplicationId!: string;
+    @Column({ type: "timestamp", nullable: true })
+    signedAt?: Date;
+
+    @Column({ type: "varchar", length: 64 })
+    contentHash!: string;
+
+    @Column({ type: "varchar", length: 64, nullable: true })
+    signatureHash?: string;
+
+    @Column({ type: "varchar", length: 50, nullable: true })
+    signatureAlgorithm?: string;
+
+    @Column({ type: "varchar", length: 64, nullable: true })
+    certificateThumbprint?: string;
+
+    // Relations
+    @ManyToOne(() => CreditApplication, (application) => application.documents, { onDelete: "CASCADE", nullable: true })
+    @JoinColumn({ name: "credit_application_id" })
+    creditApplication?: CreditApplication;
+
+    @Column({ name: "credit_application_id", nullable: true })
+    creditApplicationId?: string;
+
+    @ManyToOne(() => Company, (company) => company.documents, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "company_id" })
+    company!: Company;
+
+    @Column({ name: "company_id" })
+    companyId!: string;
 
     @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: "uploaded_by" })
