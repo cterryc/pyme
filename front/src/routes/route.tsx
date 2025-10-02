@@ -1,7 +1,7 @@
-import { createBrowserRouter } from "react-router-dom";
-import { Auth } from "@/pages/Auth";
-
+import { createBrowserRouter } from 'react-router-dom'
+import { Landing } from '../pages/Landing'
 
 export const mainRouter = createBrowserRouter([
-  { path: "/auth", element: <Auth /> },
+  { path: '/', element: <Landing /> }
+  // add pages
 ])
