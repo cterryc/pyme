@@ -58,7 +58,10 @@ export const Header = ({ avatar }: { avatar: string }) => {
           )}
         </div>
       ) : (
-        <button onClick={() => navigate('/Login')} className='bg-[var(--primary)]  p-2 px-4 text-white rounded-lg border border-[var(--primary)] font-medium hover:bg-white hover:text-[var(--primary)] cursor-pointer'>
+        <button
+          onClick={() => navigate('/Login')}
+          className='bg-[var(--primary)]  p-2 px-4 text-white rounded-lg border border-[var(--primary)] font-medium hover:bg-white hover:text-[var(--primary)] cursor-pointer'
+        >
           Iniciar sesión
         </button>
       )}
