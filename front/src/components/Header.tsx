@@ -25,7 +25,7 @@ export const Header = ({ avatar }) => {
           Contacto
         </Link>
       </nav>
-      {avatar ? (
+      {!avatar ? (
         <div className='relative'>
           <button
             className='h-[40px] flex gap-2 items-center hover:text-[var(--primary)] cursor-pointer'
