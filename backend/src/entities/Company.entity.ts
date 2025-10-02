@@ -2,6 +2,7 @@ import { Entity, Column, ManyToOne, OneToMany, JoinColumn, Index } from "typeorm
 import { BaseEntity } from "./BaseEntity";
 import { User } from "./User.entity";
 import { CreditApplication } from "./CreditApplication.entity";
+import { Document } from "./Document.entity";  // Asegúrate de importar Document aquí
 
 @Entity("companies")
 export class Company extends BaseEntity {
@@ -14,6 +15,9 @@ export class Company extends BaseEntity {
     @Column({ type: "varchar", length: 50, unique: true })
     @Index()
     taxId!: string; // RFC, CUIT, etc.
+
+    @Column({ type: "varchar", length: 255, nullable: true })
+    email?: string;
 
     @Column({ type: "varchar", length: 100, nullable: true })
     industry?: string;
@@ -61,4 +65,7 @@ export class Company extends BaseEntity {
 
     @OneToMany(() => CreditApplication, (application) => application.company)
     creditApplications?: CreditApplication[];
+
+    @OneToMany(() => Document, (document) => document.company)
+    documents?: Document[];
 }

@@ -9,8 +9,8 @@ export class User extends BaseEntity {
     @Index()
     email!: string;
 
-    @Column({ type: "varchar", length: 255, nullable: true })
-    password?: string;
+    @Column({ type: "varchar", length: 255 })
+    password!: string;
 
     @Column({ type: "varchar", length: 100 })
     firstName!: string;
