@@ -1,9 +1,9 @@
-import './App.css'
+import { Auth } from "@/pages/Auth";
 
 function App() {
   return (
     <>
-    <p>HOLA MUNDO</p>
+      <Auth />
     </>
   )
 }
