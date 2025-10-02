@@ -1,8 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "@/App";
+import { Auth } from "@/pages/Auth";
 
 
 export const mainRouter = createBrowserRouter([
-  { path: "/", element: <App /> },
-  // add pages
+  { path: "/auth", element: <Auth /> },
 ])
