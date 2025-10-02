@@ -8,7 +8,6 @@ import { Company } from "./Company.entity";
 @Entity("credit_applications")
 export class CreditApplication extends BaseEntity {
     @Column({ type: "varchar", length: 50, unique: true })
-    @Index()
     applicationNumber!: string;
 
     @Column({ type: "decimal", precision: 15, scale: 2 })
@@ -23,12 +22,12 @@ export class CreditApplication extends BaseEntity {
     @Column({ type: "int", default: 12 })
     termMonths!: number; // Loan term in months
 
+    @Index()
     @Column({
         type: "enum",
         enum: CreditApplicationStatus,
         default: CreditApplicationStatus.DRAFT,
     })
-    @Index()
     status!: CreditApplicationStatus;
 
     @Column({
@@ -76,6 +75,7 @@ export class CreditApplication extends BaseEntity {
     @JoinColumn({ name: "company_id" })
     company!: Company;
 
+    @Index()
     @Column({ name: "company_id" })
     companyId!: string;
 
@@ -83,6 +83,7 @@ export class CreditApplication extends BaseEntity {
     @JoinColumn({ name: "reviewed_by" })
     reviewedBy?: User;
 
+    @Index()
     @Column({ name: "reviewed_by", nullable: true })
     reviewedById?: string;
 

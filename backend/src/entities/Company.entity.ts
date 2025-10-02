@@ -13,7 +13,6 @@ export class Company extends BaseEntity {
     tradeName?: string;
 
     @Column({ type: "varchar", length: 50, unique: true })
-    @Index()
     taxId!: string; // RFC, CUIT, etc.
 
     @Column({ type: "varchar", length: 255, nullable: true })
