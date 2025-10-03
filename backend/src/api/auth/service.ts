@@ -14,35 +14,27 @@ export default class AuthService {
     this.userRepo = AppDataSource.getRepository(User);
   }
 
-  async register(payload: IRegisterPayload): Promise<IAuthResponse> { 
-    
-    const existingUser = await this.userRepo.findOne({ where: { email: payload.email } });
+  async register(payload: IRegisterPayload): Promise<IAuthResponse> {
+    const existingUser = await this.userRepo.findOne({
+      where: { email: payload.email },
+    });
     if (existingUser) {
       throw new HttpError(HttpStatus.BAD_REQUEST, "Email already in use");
     }
 
-
     const hashedPassword = await BcryptUtils.createHash(payload.password);
 
-    const newUser = this.userRepo.create({
-      email: payload.email,
+    const newUser = await this.userRepo.save({
+      ...payload,
       password: hashedPassword,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      phone: payload.phone,
     });
 
-    const savedUser = await this.userRepo.save(newUser);
+    const { id, email, role } = newUser;
 
-    const token = generateToken({
-            id: newUser.id,
-            email: newUser.email,
-            lastName: newUser.lastName,
-            firstName: newUser.firstName,
-            role: newUser.role,
-        });
+    const tokenPayload = { id, email, role };
+
+    const token = generateToken(tokenPayload);
 
     return { token };
   }
-
 }
