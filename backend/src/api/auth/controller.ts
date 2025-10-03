@@ -9,7 +9,10 @@ export default class AuthController {
 
     static register = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const payload: IRegisterPayload = req.body;
+            const { email, password } = req.body;
+
+            const payload: IRegisterPayload = { email, password };
+
             const result = await AuthController.authService.register(payload);
             res.status(HttpStatus.CREATED).json(apiResponse(true, result));
         } catch (err: any) {
