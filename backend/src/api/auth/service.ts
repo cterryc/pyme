@@ -19,7 +19,7 @@ export default class AuthService {
       where: { email: payload.email },
     });
     if (existingUser) {
-      throw new HttpError(HttpStatus.BAD_REQUEST, "Email already in use");
+      throw new HttpError(HttpStatus.BAD_REQUEST, "El email ya está en uso");
     }
 
     const hashedPassword = await BcryptUtils.createHash(payload.password);
