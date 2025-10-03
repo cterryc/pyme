@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineClipboardList, HiOutlineLogout } from 'react-icons/hi'
 import { useState } from 'react'
 
-export const Header = ({ avatar }) => {
+export const Header = ({ avatar }: { avatar: string }) => {
+  const navigate = useNavigate()
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false)
 
   return (
@@ -57,7 +58,7 @@ export const Header = ({ avatar }) => {
           )}
         </div>
       ) : (
-        <button className='bg-[var(--primary)]  p-2 px-4 text-white rounded-lg border border-[var(--primary)] font-medium hover:bg-white hover:text-[var(--primary)] cursor-pointer'>
+        <button onClick={() => navigate('/Login')} className='bg-[var(--primary)]  p-2 px-4 text-white rounded-lg border border-[var(--primary)] font-medium hover:bg-white hover:text-[var(--primary)] cursor-pointer'>
           Iniciar sesión
         </button>
       )}
