@@ -13,9 +13,7 @@ export default class AuthController {
             const result = await AuthController.authService.register(payload);
             res.status(HttpStatus.CREATED).json(apiResponse(true, result));
         } catch (err: any) {
-            const status = err.status || HttpStatus.SERVER_ERROR;
-            const response = apiResponse(false, err.message || "Registration failed");
-            res.status(status).json(response);
+            next(err);
         }
     };
 }
