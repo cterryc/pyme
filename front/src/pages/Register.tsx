@@ -11,9 +11,10 @@ export const Register = () => {
   const [passwordError, setPasswordError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.target)
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
 
     const formValues = {
       email: formData.get('email'),

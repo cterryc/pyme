@@ -4,7 +4,7 @@ import { AppDataSource } from "../../config/data-source";
 import { User } from "../../entities/User.entity";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
-import { IAuthResponse, IRegisterPayload } from "./interfaces";
+import { IAuthResponse, IRegisterPayload, ILoginPayload } from "./interfaces";
 import { generateToken } from "../../utils/jwt.utils";
 
 export default class AuthService {
@@ -35,6 +35,31 @@ export default class AuthService {
 
     const token = generateToken(tokenPayload);
 
+    return { token };
+  }
+
+  async login(payload: ILoginPayload): Promise<IAuthResponse> {
+    const user = await this.userRepo.findOne({
+      where: { email: payload.email },
+    });
+    if (!user) {
+      throw new HttpError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+    }
+    console.log("user service ==>", user);
+    const isPasswordValid = await BcryptUtils.isValidPassword(
+      user,
+      payload.password
+    );
+    if (!isPasswordValid) {
+      throw new HttpError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+    }
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      lastName: user.lastName,
+      firstName: user.firstName,
+      role: user.role,
+    });
     return { token };
   }
 }
