@@ -74,7 +74,7 @@ export const Register = () => {
             )}
           </div>
           <input
-            type='password'
+            type={showPassword ? 'text' : 'password'}
             placeholder='Confirmar contraseña'
             name='confirmPassword'
             className='border p-3 max-w-sm w-full rounded-md'
