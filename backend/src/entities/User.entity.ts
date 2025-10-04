@@ -11,11 +11,11 @@ export class User extends BaseEntity {
   @Column({ type: "varchar", length: 255, select: true })
   password!: string;
 
-  @Column({ type: "varchar", length: 100 })
-  firstName!: string;
+  @Column({ type: "varchar", length: 100, nullable: true })
+    firstName!: string;
 
-  @Column({ type: "varchar", length: 100 })
-  lastName!: string;
+  @Column({ type: "varchar", length: 100, nullable: true })
+    lastName!: string;
 
   @Column({ type: "varchar", length: 20, nullable: true })
   phone?: string;
