@@ -49,6 +49,7 @@ export const Header = ({ avatar }: { avatar: string }) => {
                   <HiOutlineClipboardList className='text-xl' /> Mis préstamos
                 </Link>
               </li>
+
               <li className='hover:text-[var(--primary)]'>
                 <Link to='/' className='flex gap-4 items-center'>
                   <HiOutlineLogout className='text-xl' /> Cerrar sesión
