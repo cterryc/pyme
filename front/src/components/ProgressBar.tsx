@@ -1,6 +1,16 @@
-export const ProgressBar = ({ percent, title, barHeight }: {percent: string, title: string, barHeight: string}) => {
+export const ProgressBar = ({
+  percent,
+  title,
+  barHeight,
+  padding = 0
+}: {
+  percent: number
+  title: string
+  barHeight: number
+  padding: number
+}) => {
   return (
-    <div className='w-full font-medium text-[var(--primary)]'>
+    <div className='w-full font-medium text-[var(--primary)]' style={{ padding: `${padding}px` }}>
       <div className='flex justify-between mb-2'>
         <p>{title}</p>
         <p>{percent}% completado</p>

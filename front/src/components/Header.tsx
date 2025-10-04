@@ -9,7 +9,7 @@ export const Header = ({ avatar }: { avatar: string }) => {
   return (
     <header className='flex justify-between px-3 md:px-10 h-[60px] items-center border-b-1 border-gray-400'>
       <Link to='/' className='flex items-center gap-6'>
-        <img src='assets/logo.png' className='h-[25px]' alt='' />
+        <img src='/assets/logo.png' className='h-[25px]' alt='' />
         <h1 className='font-medium text-2xl text-[var(--font-title-light)]'>Financia</h1>
       </Link>
       <nav className=' md:flex gap-6 hidden'>
@@ -26,7 +26,7 @@ export const Header = ({ avatar }: { avatar: string }) => {
           Contacto
         </Link>
       </nav>
-      {!avatar ? (
+      {avatar != '' ? (
         <div className='relative'>
           <button
             className='h-[40px] flex gap-2 items-center hover:text-[var(--primary)] cursor-pointer'
