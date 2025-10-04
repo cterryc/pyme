@@ -21,6 +21,8 @@ export const authRegister = async (data: RegisterFormData) => {
 
 export const authLogin = async (data: LoginFormData) => {
   try {
+    // await new Promise((resolve) => setTimeout(resolve, 2000))
+    // throw new Error("Simulación: credenciales inválidas")
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`,
       {
         method: "POST",
