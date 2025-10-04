@@ -19,7 +19,6 @@ export default class AuthController {
       res.status(status).json(response);
     }
   };
-}
 
   static register = async (req: Request, res: Response, next: NextFunction) => {
         try {
