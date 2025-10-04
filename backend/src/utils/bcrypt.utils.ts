@@ -1,7 +1,7 @@
 // LIBRARIES
 import bcrypt from "bcrypt";
 // INTERFACES
-import { IUser, UserLoginFields } from "../api/user/interfaces";
+import { ILoginPayload } from "../api/auth/interfaces";
 
 /**
  * Utility class for handling bcrypt password hashing and verification.
@@ -24,10 +24,8 @@ export class BcryptUtils {
    * @param password - The password to verify against the stored hash.
    * @returns `true` if the password matches the stored hash, `false` otherwise.
    */
-  static isValidPassword(user: UserLoginFields, password: string) {
-    console.log("user ==>", user, "password ==>", password);
+  static isValidPassword(user: ILoginPayload, password: string) {
     const isPasswordValid = bcrypt.compareSync(password, user.password);
-    console.log("isPasswordValid bcrypt.utils ==>", isPasswordValid);
     return isPasswordValid;
   }
 }

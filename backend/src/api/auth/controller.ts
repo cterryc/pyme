@@ -10,27 +10,26 @@ export default class AuthController {
   static login = async (req: Request, res: Response, next: NextFunction) => {
     // console.log("req.body Login ==>", req.body);
     try {
-      const payload: ILoginPayload = req.body;
+      const { email, password } = req.body;
+      const payload: ILoginPayload = { email, password };
+
       const result = await AuthController.authService.login(payload);
       res.status(HttpStatus.OK).json(apiResponse(true, result));
     } catch (err: any) {
-      const status = err.status || HttpStatus.SERVER_ERROR;
-      const response = apiResponse(false, err.message || "Login failed");
-      res.status(status).json(response);
+      next(err);
     }
   };
 
   static register = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { email, password } = req.body;
+    try {
+      const { email, password } = req.body;
 
-            const payload: IRegisterPayload = { email, password };
+      const payload: IRegisterPayload = { email, password };
 
-            const result = await AuthController.authService.register(payload);
-            res.status(HttpStatus.CREATED).json(apiResponse(true, result));
-        } catch (err: any) {
-            next(err);
-        }
-    };
+      const result = await AuthController.authService.register(payload);
+      res.status(HttpStatus.CREATED).json(apiResponse(true, result));
+    } catch (err: any) {
+      next(err);
+    }
+  };
 }
-
