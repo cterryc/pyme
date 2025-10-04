@@ -16,8 +16,3 @@ export interface IUser {
   updatedAt: Date | null;
   updatedBy: string | null;
 }
-
-export interface UserLoginFields {
-  email: string;
-  password: string;
-}
