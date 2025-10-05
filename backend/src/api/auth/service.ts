@@ -56,8 +56,6 @@ export default class AuthService {
     const token = generateToken({
       id: user.id,
       email: user.email,
-      lastName: user.lastName,
-      firstName: user.firstName,
       role: user.role,
     });
     return { token };

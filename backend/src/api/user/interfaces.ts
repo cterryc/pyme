@@ -1,13 +1,18 @@
-import  { UserRole }  from "../../constants/Roles";
+import { UserRole } from "../../constants/Roles";
 
 export interface IUser {
-  id : string;
+  id: string;
   userName: string;
   email: string;
   password: string;
-  address: { street: string; city: string; province: string; country: string } | null;
+  address: {
+    street: string;
+    city: string;
+    province: string;
+    country: string;
+  } | null;
   phone: string | null;
-  providerId : string | null;
+  providerId: string | null;
   googleId: string | null;
   role: UserRole;
   resetToken: string | null;
