@@ -22,7 +22,9 @@ export default class AuthController {
 
   static register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password } = req.body;
+      const { normalizedEmail, password } = req.body;
+
+      const email = normalizedEmail.toLowerCase().trim();
 
       const payload: IRegisterPayload = { email, password };
 
