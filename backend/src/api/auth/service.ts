@@ -15,8 +15,12 @@ export default class AuthService {
   }
 
   async register(payload: IRegisterPayload): Promise<IAuthResponse> {
+
+
+    const normalizedEmail = payload.email.toLowerCase().trim();
+
     const existingUser = await this.userRepo.findOne({
-      where: { email: payload.email },
+      where: { email: normalizedEmail },
     });
     if (existingUser) {
       throw new HttpError(HttpStatus.BAD_REQUEST, "El email ya está en uso");
@@ -26,6 +30,7 @@ export default class AuthService {
 
     const newUser = await this.userRepo.save({
       ...payload,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 
