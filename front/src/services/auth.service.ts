@@ -1,6 +1,7 @@
+import type { AuthSucessResponse } from '@/interfaces/auth.interface'
 import { type LoginFormData, type RegisterFormData } from '@/schemas/auth.schema'
 
-export const authRegister = async (data: RegisterFormData) => {
+export const authRegister = async (data: RegisterFormData): Promise<AuthSucessResponse> => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
       method: 'POST',
@@ -9,7 +10,7 @@ export const authRegister = async (data: RegisterFormData) => {
     })
 
     const result = await response.json()
-    if (!response.ok) throw new Error(result.message || 'Error registering user')
+    if (!response.ok) throw result;
     return result
   } catch (error) {
     console.error('[authRegister]: Error fetching data:', error)
@@ -17,7 +18,7 @@ export const authRegister = async (data: RegisterFormData) => {
   }
 }
 
-export const authLogin = async (data: LoginFormData) => {
+export const authLogin = async (data: LoginFormData): Promise<AuthSucessResponse> => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
       method: 'POST',
@@ -25,7 +26,7 @@ export const authLogin = async (data: LoginFormData) => {
       body: JSON.stringify(data)
     })
     const result = await response.json()
-    if (!response.ok) throw new Error(result.message || 'Error logging in user')
+    if (!response.ok) throw result;
     return result
   } catch (error) {
     console.error('[authLogin]: Error fetching data:', error)

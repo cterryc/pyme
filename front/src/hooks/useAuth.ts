@@ -1,41 +1,45 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { type LoginFormData, type RegisterFormData } from "@/schemas/auth.schema"
-import { authLogin, authRegister } from "@/services/auth.service"
+import { useMutation } from "@tanstack/react-query";
+import {
+  type LoginFormData,
+  type RegisterFormData,
+} from "@/schemas/auth.schema";
+import { authLogin, authRegister } from "@/services/auth.service";
+import {
+  type AuthSucessResponse,
+  type AuthErrorResponse,
+} from "@/interfaces/auth.interface";
 
-interface UseAuthProps {
-  onSuccess?: (data: ReturnType<typeof authRegister>) => void
-  onError?: (error: unknown) => void
+interface UseAuthRegisterProps {
+  onSuccess?: (data: AuthSucessResponse) => void;
+  onError?: (error: unknown) => void;
 }
-export const useAuth = ({ onSuccess, onError }: UseAuthProps) => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (data: RegisterFormData) => authRegister(data),
+export const useAuthRegister = ({
+  onSuccess,
+  onError,
+}: UseAuthRegisterProps) => {
+  return useMutation<AuthSucessResponse, AuthErrorResponse, RegisterFormData>({
+    mutationFn: async (data) => authRegister(data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["auth"] })
-      if (onSuccess) onSuccess(data)
+      if (onSuccess) onSuccess(data);
     },
     onError: (error) => {
-      console.error("[useAuth]: Error in mutation:", error)
-      if (onError) onError(error)
-    }
-  })
-}
+      if (onError) onError(error);
+    },
+  });
+};
 
 interface UseAuthLoginProps {
-  onSuccess?: (data: ReturnType<typeof authLogin>) => void
-  onError?: (error: unknown) => void
+  onSuccess?: (data: AuthSucessResponse) => void;
+  onError?: (error: unknown) => void;
 }
 export const useAuthLogin = ({ onSuccess, onError }: UseAuthLoginProps) => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (data: LoginFormData) => authLogin(data),
+  return useMutation<AuthSucessResponse, AuthErrorResponse, LoginFormData>({
+    mutationFn: async (data) => authLogin(data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["authLogin"] })
-      if (onSuccess) onSuccess(data)
+      if (onSuccess) onSuccess(data);
     },
     onError: (error) => {
-      console.error("[useAuthLogin]: Error in mutation:", error)
-      if (onError) onError(error)
-    }
-  })
-}
+      if (onError) onError(error);
+    },
+  });
+};

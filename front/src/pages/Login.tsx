@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,6 +27,7 @@ export const Login = () => {
     error
   } = useAuthLogin({
     onSuccess: (data) => {
+      localStorage.setItem("tokenPyme", data.payload.token);
       console.log('Login successful:', data)
       navigate('/')
     }
@@ -35,7 +36,7 @@ export const Login = () => {
   // methods
   const IconEye = hidePassword ? FaEye : FaEyeSlash
   const onSubmit = (data: LoginFormData) => {
-    // console.log(data)
+    //console.log(data)
     login(data)
   }
 
@@ -50,12 +51,22 @@ export const Login = () => {
             <h3 className='text-3xl font-bold text-black'>Inicia sesión en tu cuenta</h3>
             <p className='text-[#7d7d7e] text-sm mt-2'>
               No tienes una cuenta?
-              <span onClick={() => navigate('/Registro')} className='text-[#0095d5] pl-2 cursor-pointer'>
+              <Link to='/Registro' className='text-[#0095d5] pl-2 cursor-pointer'>
                 Regístrate
-              </span>
+              </Link>
             </p>
           </div>
-          {isError && <p className='text-red-500 text-xs my-2'>Error: {error.message}</p>}
+          {isError && error?.payload && (
+            Array.isArray(error.payload) ? (
+              <ul className="text-red-500 text-xs my-2">
+                {error.payload.map((err, i) => (
+                  <li key={i}>Error: {err.message}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-red-500 text-xs my-2">Error: {error.payload.message}</p>
+            )
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-0 ${!isError && 'mt-6'}`}>
             <div className='rounded-t-md border-b-0 border-2 border-gray-300'>
               <input
@@ -80,7 +91,8 @@ export const Login = () => {
               />
             </div>
             <p className='text-[#0095d5] text-right mt-4 cursor-pointer'>Olvidaste tu contraseña?</p>
-            <button className='bg-[#0095d5] text-white p-3 rounded-md mt-6 hover:bg-[#28a9d6] transition-colors cursor-pointer'>
+            <button className='bg-[#0095d5] text-white p-3 rounded-md mt-6 hover:bg-[#28a9d6] transition-colors 
+            cursor-pointer'>
               {isPending ? 'logueando...' : 'Iniciar Sesión'}
             </button>
           </form>
