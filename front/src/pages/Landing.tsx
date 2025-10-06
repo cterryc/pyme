@@ -2,9 +2,19 @@ import { HiOutlineTrendingUp, HiOutlineCalendar, HiOutlineCash, HiOutlineClipboa
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { decodeToken } from '@/helpers/decodeToken'
 export const Landing = () => {
   const avatarTemp = ''
   // const avatarTemp = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
+
+  useEffect(() => {
+    console.log(localStorage.getItem("tokenPyme"))
+    const token = localStorage.getItem("tokenPyme");
+    const user = decodeToken(token || '')
+    console.log(user || 'No autenticado')
+  }, [])
+  
 
   return (
     <>
