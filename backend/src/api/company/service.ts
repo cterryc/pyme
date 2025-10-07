@@ -42,12 +42,17 @@ export default class CompanyService {
     return toCompanyListDto(companies);
   }
 
-  // async getCompanyById(companyId: number): Promise<Company | null> {
-  //     return this.companyRepo.findOne({
-  //         where: { id: companyId },
-  //         relations: ["user", "creditApplications", "documents"], // Asegúrate de cargar las relaciones necesarias
-  //     });
-  // }
+  async getCompanyById(companyId: string, userId: string): Promise<responseCompanyDto | null> {
+      const company = await this.companyRepo.findOne({
+          where: { id: companyId, owner: { id: userId } }
+      });
+
+      if (!company) {
+        throw new HttpError(HttpStatus.NOT_FOUND, "La compania no existe.");
+      }
+
+      return toCompanyDto(company);
+  }
 
   // async updateCompany(companyId: string, companyData: Partial<Company>): Promise<Company | null> {
   //     const company = await this.companyRepo.findOne({ where: { id: parseInt(companyId, 10) } });
