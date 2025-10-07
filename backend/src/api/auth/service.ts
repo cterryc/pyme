@@ -44,13 +44,16 @@ export default class AuthService {
   }
 
   async login(payload: ILoginPayload): Promise<IAuthResponse> {
+
+    const normalizedEmail = payload.email.toLowerCase().trim();
+
     const user = await this.userRepo.findOne({
-      where: { email: payload.email },
+      where: { email: normalizedEmail },
     });
     if (!user) {
       throw new HttpError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
-    console.log("user service ==>", user);
+    
     const isPasswordValid = await BcryptUtils.isValidPassword(
       user,
       payload.password
