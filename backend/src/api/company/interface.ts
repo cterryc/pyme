@@ -1,7 +1,7 @@
-export interface ICompanyPayload {
+export interface responseCompanyDto {
     legalName: string;
     tradeName?: string;
-    phone: string;
+    phone?: string;
     email?: string;
     taxId: string;
     ownerId: string; 

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import HTTP_STATUS, { HttpStatus } from "../constants/HttpStatus";
-import HttpError from "../utils/HttpError.utils";
+import HTTP_STATUS from "../constants/HttpStatus";
 import apiResponse from "../utils/apiResponse.utils";
 import config from "../config/enviroment.config";
 

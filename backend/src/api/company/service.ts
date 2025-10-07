@@ -3,6 +3,8 @@ import { AppDataSource } from "../../config/data-source";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
 import { Company } from "../../entities/Company.entity";
+import { toCompanyDto, toCompanyListDto } from "./dto";
+import { responseCompanyDto } from "./interface";
 
 export default class CompanyService {
   private readonly companyRepo: Repository<Company>;
@@ -11,10 +13,7 @@ export default class CompanyService {
     this.companyRepo = AppDataSource.getRepository(Company);
   }
 
-  async createCompany(
-    companyData: Partial<Company>,
-    ownerUserId: string
-  ): Promise<Company> {
+  async createCompany(companyData: Partial<Company>, ownerUserId: string ): Promise<responseCompanyDto> {
     const exists = await this.companyRepo.findOne({
       where: { taxId: companyData.taxId },
     });
@@ -29,14 +28,18 @@ export default class CompanyService {
 
     const saved = await this.companyRepo.save(entity);
 
-    return saved;
+    const dtoCompany = toCompanyDto(saved);
+
+    return dtoCompany;
   }
 
-  async listCompanies(userId: string): Promise<Company[]> {
-    return this.companyRepo.find({
+  async listCompanies(userId: string): Promise<responseCompanyDto[]> {
+    const companies = await this.companyRepo.find({
       where: { owner: { id: userId }, deletedAt: IsNull() },
       order: { createdAt: "DESC" },
     });
+
+    return toCompanyListDto(companies);
   }
 
   // async getCompanyById(companyId: number): Promise<Company | null> {
