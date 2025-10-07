@@ -1,0 +1,24 @@
+import { Router } from "express";
+import CompanyController from "./controller";
+import schemaValidator from "../../middlewares/schemaValidators.middlewares";
+import { createCompanySchema } from "./validator";
+import authenticate from "../../middlewares/authenticate.middleware";
+
+const companyRouter = Router();
+
+// Protected routes
+companyRouter.post(
+  "/",
+  authenticate,
+  schemaValidator(createCompanySchema, null),
+  CompanyController.createCompany
+);
+
+companyRouter.get(
+    "/",
+    authenticate,
+    CompanyController.listCompanies
+);
+
+
+export default companyRouter;

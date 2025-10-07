@@ -8,7 +8,6 @@ export default class AuthController {
   private static authService = new AuthService();
 
   static login = async (req: Request, res: Response, next: NextFunction) => {
-    // console.log("req.body Login ==>", req.body);
     try {
       const { email, password } = req.body;
       const payload: ILoginPayload = { email, password };

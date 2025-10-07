@@ -15,8 +15,12 @@ export default class AuthService {
   }
 
   async register(payload: IRegisterPayload): Promise<IAuthResponse> {
+
+
+    const normalizedEmail = payload.email.toLowerCase().trim();
+
     const existingUser = await this.userRepo.findOne({
-      where: { email: payload.email },
+      where: { email: normalizedEmail },
     });
     if (existingUser) {
       throw new HttpError(HttpStatus.BAD_REQUEST, "El email ya está en uso");
@@ -26,6 +30,7 @@ export default class AuthService {
 
     const newUser = await this.userRepo.save({
       ...payload,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 
@@ -39,13 +44,16 @@ export default class AuthService {
   }
 
   async login(payload: ILoginPayload): Promise<IAuthResponse> {
+
+    const normalizedEmail = payload.email.toLowerCase().trim();
+
     const user = await this.userRepo.findOne({
-      where: { email: payload.email },
+      where: { email: normalizedEmail },
     });
     if (!user) {
       throw new HttpError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
-    console.log("user service ==>", user);
+    
     const isPasswordValid = await BcryptUtils.isValidPassword(
       user,
       payload.password

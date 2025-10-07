@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import HTTP_STATUS from "../constants/HttpStatus";
+import HTTP_STATUS, { HttpStatus } from "../constants/HttpStatus";
 import HttpError from "../utils/HttpError.utils";
 import apiResponse from "../utils/apiResponse.utils";
 import config from "../config/enviroment.config";
@@ -16,14 +16,8 @@ export default async function authenticate(
         !req.headers.authorization ||
         req.headers.authorization.indexOf("Bearer ") === -1
     ) {
-        const response = apiResponse(
-            false,
-            new HttpError(
-                HTTP_STATUS.UNAUTHORIZED,
-                "Token not provided",
-            )
-        );
-        res.status(HTTP_STATUS.UNAUTHORIZED).json(response);
+        const response =  {message: "El token de autenticación es obligatorio"};
+        res.status(HTTP_STATUS.UNAUTHORIZED).json(apiResponse(false, response));
         return;
     }
 
@@ -37,14 +31,8 @@ export default async function authenticate(
         res.locals.user = user;
         next();
     } catch (error) {
-        const response = apiResponse(
-            false,
-            new HttpError(
-                HTTP_STATUS.UNAUTHORIZED,
-                "Invalid token"
-            )
-        );
-        res.status(HTTP_STATUS.UNAUTHORIZED).json(response);
+        const response =  {message: "El token de autenticación no es válido"};
+        res.status(HTTP_STATUS.UNAUTHORIZED).json(apiResponse(false, response));
         return;
     }
 }
