@@ -54,8 +54,8 @@ export const Register = () => {
             <h3 className='text-3xl font-bold text-black'>Crea tu cuenta</h3>
             <p className='text-[#7d7d7e] text-sm mt-2'>
               No tienes una cuenta?
-              <Link to='/' className='text-[var(--primary)] pl-2 cursor-pointer'>
-                Regístrate
+              <Link to='/Login' className='text-[var(--primary)] pl-2 cursor-pointer'>
+                Iniciar Sesión
               </Link>
             </p>
           </div>
