@@ -3,6 +3,7 @@ import CompanyController from "./controller";
 import schemaValidator from "../../middlewares/schemaValidators.middlewares";
 import { createCompanySchema } from "./validator";
 import authenticate from "../../middlewares/authenticate.middleware";
+import { validateUuid } from "../../middlewares/validateParamId.middleware";
 
 const companyRouter = Router();
 
@@ -20,5 +21,12 @@ companyRouter.get(
     CompanyController.listCompanies
 );
 
+
+companyRouter.get(
+  "/:id",
+  validateUuid,
+  authenticate,
+  CompanyController.getCompanyById
+);
 
 export default companyRouter;
