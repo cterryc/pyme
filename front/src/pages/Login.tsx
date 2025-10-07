@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import { useAuthLogin } from '@/hooks/useAuth'
 import { loginSchema, type LoginFormData } from '@/schemas/auth.schema'
 
@@ -43,7 +44,7 @@ export const Login = () => {
   return (
     <div className='min-h-screen flex flex-col'>
       <div className='sticky top-0 z-50'>
-        <Header avatar='IniciarSesion' />
+        <Header avatar='' />
       </div>
       <section className='flex-grow flex items-center justify-center'>
         <section className='w-full max-w-md px-4'>
@@ -98,6 +99,7 @@ export const Login = () => {
           </form>
         </section>
       </section>
+      <Footer />
     </div>
   )
 }
