@@ -23,7 +23,7 @@ export class Company extends BaseEntity {
   @Column({ type: "varchar", length: 50, unique: true })
   taxId!: string; // RFC, CUIT, etc.
 
-  @Column({ type: "varchar", length: 255, nullable: true })
+  @Column({ type: "varchar", length: 255, nullable: true, unique: true })
   email?: string;
 
   @Column({ type: "varchar", length: 100, nullable: true })
