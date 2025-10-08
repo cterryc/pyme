@@ -1,4 +1,5 @@
 export interface responseCompanyDto {
+    id: string;
     legalName: string;
     tradeName?: string;
     phone?: string;
