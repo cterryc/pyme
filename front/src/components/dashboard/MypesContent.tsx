@@ -1,6 +1,7 @@
 import { SearchBar } from '../SearchBar'
 import { FilterDropdown } from '../FilterDropdown'
 import { DataTable } from '../DataTable'
+import { Select } from '../Select'
 import { useDashboard } from '../../context/DashboardContext'
 
 export const MypesContent = () => {
@@ -25,10 +26,24 @@ export const MypesContent = () => {
             key: 'acciones',
             label: 'ACCIONES',
             width: '10%',
-            render: () => (
-                <button className="text-blue-600 hover:text-blue-800 font-medium">
-                    Opciones
-                </button>
+            render: (_value: any, row: any) => (
+                <Select
+                    options={[
+                        { value: 'ver', label: 'Ver', icon: '👁️' },
+                        { value: 'editar', label: 'Editar', icon: '✏️' }
+                    ]}
+                    placeholder="Opciones"
+                    variant="button"
+                    size="sm"
+                    onSelect={(option) => {
+                        console.log(`Acción seleccionada: ${option.value} para cliente:`, row)
+                        if (option.value === 'ver') {
+                            console.log('Ver cliente:', row.nombre)
+                        } else if (option.value === 'editar') {
+                            console.log('Editar cliente:', row.nombre)
+                        }
+                    }}
+                />
             )
         }
     ]
