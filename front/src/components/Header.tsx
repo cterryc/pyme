@@ -59,12 +59,22 @@ export const Header = ({ avatar }: { avatar: string }) => {
           )}
         </div>
       ) : (
-        <button
-          onClick={() => navigate('/Login')}
-          className='bg-[var(--primary)]  p-2 px-4 text-white rounded-lg border border-[var(--primary)] font-medium hover:bg-white hover:text-[var(--primary)] cursor-pointer'
-        >
-          Iniciar sesión
-        </button>
+        <div className='flex gap-2'>
+          <button
+            onClick={() => navigate('/Login')}
+            className=' text-[#0095d5] outline-1 h-10 w-32 rounded-md hover:outline-1 transition-colors
+            cursor-pointer hover:bg-[#F0F0F2]'
+          >
+            Iniciar sesión
+          </button>
+          <button
+            onClick={() => navigate('/Registro')}
+            className='bg-[#0095d5] text-white outline-1 h-10 w-32 rounded-md hover:bg-[#28a9d6] transition-colors 
+            cursor-pointer'
+          >
+            Registrate
+          </button>
+        </div>
       )}
     </header>
   )
