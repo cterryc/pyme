@@ -6,6 +6,7 @@ import { responseCompanyDto } from './interface';
  */
 export function toCompanyDto(company: Company): responseCompanyDto {
     return {
+        id: company.id,
         legalName: company.legalName,
         tradeName: company.tradeName,
         phone: company.phone,
