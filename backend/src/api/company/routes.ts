@@ -1,7 +1,7 @@
 import { Router } from "express";
 import CompanyController from "./controller";
 import schemaValidator from "../../middlewares/schemaValidators.middlewares";
-import { createCompanySchema } from "./validator";
+import { createCompanySchema, updateCompanySchema } from "./validator";
 import authenticate from "../../middlewares/authenticate.middleware";
 import { validateUuid } from "../../middlewares/validateParamId.middleware";
 
@@ -27,6 +27,15 @@ companyRouter.get(
   validateUuid,
   authenticate,
   CompanyController.getCompanyById
+);
+
+
+companyRouter.patch(
+  "/:id",
+  validateUuid,
+  authenticate,
+  schemaValidator(updateCompanySchema, null),
+  CompanyController.updateCompany
 );
 
 export default companyRouter;
