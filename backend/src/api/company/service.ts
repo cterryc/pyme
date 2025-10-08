@@ -54,14 +54,14 @@ export default class CompanyService {
       return toCompanyDto(company);
   }
 
-  // async updateCompany(companyId: string, companyData: Partial<Company>): Promise<Company | null> {
-  //     const company = await this.companyRepo.findOne({ where: { id: parseInt(companyId, 10) } });
-  //     if (!company) {
-  //         return null;
-  //     }
-  //     this.companyRepo.merge(company, companyData);
-  //     return this.companyRepo.save(company);
-  // }
+  async updateCompany(companyId: string, companyData: Partial<Company>, userId: string): Promise<responseCompanyDto | null> {
+      const company = await this.companyRepo.findOne({ where: { id:companyId, owner: { id: userId } } });
+      if (!company) {
+          return null;
+      }
+      this.companyRepo.merge(company, companyData);
+      return this.companyRepo.save(company);
+  }
 
   // async deleteCompany(companyId: number): Promise<Company | null> {
   //     const company = await this.companyRepo.findOne({ where: { id: companyId } });
