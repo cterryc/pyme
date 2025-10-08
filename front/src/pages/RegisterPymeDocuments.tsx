@@ -22,6 +22,7 @@ export const RegisterPymeDocuments = () => {
   //   setPymeID(id)
 
   // }, [])
+  const navigate = useNavigate()
 
   const {
     mutate: pymeRegisterDocuments,
@@ -31,6 +32,12 @@ export const RegisterPymeDocuments = () => {
   } = usePymeRegisterDocuments({
     onSuccess: (data) => {
       console.log(data)
+      console.log('COMO RESPUESTA OK => NAVIGATE(/idPyme)')
+      navigate(`/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
+    },
+    onError: (data) => {
+      console.log(data)
+      //Toast.error con data.payload.message
     }
   })
 
@@ -42,7 +49,6 @@ export const RegisterPymeDocuments = () => {
   } = useForm<RegisterPymeDocumentsFormData>({
     resolver: zodResolver(registerPymeDocumentsSchema)
   })
-  const navigate = useNavigate()
   useEffect(() => {
     const signedPDFToSend: Array<{ data: ArrayBuffer; sign: ArrayBuffer }> = []
     signedPDFs.forEach((signedPDF) => {

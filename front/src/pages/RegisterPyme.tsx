@@ -11,8 +11,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 // import type { SignedPDF } from '@/interfaces/sign.interface'
 import { usePymeRegister } from '@/hooks/usePyme'
 import { ImSpinner9 } from 'react-icons/im'
+import { useNavigate } from 'react-router-dom'
 
 export const RegisterPyme = () => {
+  const navigate = useNavigate()
+
   const maxStep = 3
   const [step, setStep] = useState(0) //useState(4)
   // const [isOwner, setIsOwner] = useState(false)
@@ -28,6 +31,7 @@ export const RegisterPyme = () => {
   } = usePymeRegister({
     onSuccess: (data) => {
       console.log(data)
+      navigate(`/Dashboard/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
     }
   })
 
@@ -98,12 +102,12 @@ export const RegisterPyme = () => {
     <>
       <Header avatar={''} />
       {/* TEMPORAL */}
-      {isError && (
+      {/* {isError && (
         <div className='text-5xl text-red-500'>
           <p>{error.error}</p>
           <p>{error.message}</p>
         </div>
-      )}
+      )} */}
       {/* TEMPORAL */}
 
       <section className='w-full max-w-7xl py-5 my-10 m-auto text-center'>
