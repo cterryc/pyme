@@ -5,20 +5,20 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { registerPymeSchema, type RegisterPymeFormData } from '@/schemas/pyme.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { TbTrashX } from 'react-icons/tb'
-import { SignDocuments } from '@/components/SignDocuments'
-import { SignSingleDocument } from '@/components/SignSingleDocument'
-import type { SignedPDF } from '@/interfaces/sign.interface'
+// import { TbTrashX } from 'react-icons/tb'
+// import { SignDocuments } from '@/components/SignDocuments'
+// import { SignSingleDocument } from '@/components/SignSingleDocument'
+// import type { SignedPDF } from '@/interfaces/sign.interface'
 import { usePymeRegister } from '@/hooks/usePyme'
 import { ImSpinner9 } from 'react-icons/im'
 
 export const RegisterPyme = () => {
-  const maxStep = 4
+  const maxStep = 3
   const [step, setStep] = useState(0) //useState(4)
-  const [isOwner, setIsOwner] = useState(false)
-  const [notarialPDF, setNotarialPDF] = useState<File | null>(null)
-  const [signedPDFs, setSignedPDFs] = useState<Array<SignedPDF>>([])
-  const [notarialSignedPDF, setNotarialSignedPDF] = useState<SignedPDF | null>(null)
+  // const [isOwner, setIsOwner] = useState(false)
+  // const [notarialPDF, setNotarialPDF] = useState<File | null>(null)
+  // const [signedPDFs, setSignedPDFs] = useState<Array<SignedPDF>>([])
+  // const [notarialSignedPDF, setNotarialSignedPDF] = useState<SignedPDF | null>(null)
 
   const {
     mutate: pymeRegister,
@@ -33,7 +33,7 @@ export const RegisterPyme = () => {
 
   const {
     register: registerPyme,
-    setValue,
+    // setValue,
     handleSubmit,
     formState: { errors }
   } = useForm<RegisterPymeFormData>({
@@ -46,23 +46,23 @@ export const RegisterPyme = () => {
     }
   }, [errors, setStep])
 
-  useEffect(() => {
-    const signedPDFToSend: Array<{ data: ArrayBuffer; sign: ArrayBuffer }> = []
-    signedPDFs.forEach((signedPDF) => {
-      // const data:{ data: ArrayBuffer; sign: ArrayBuffer } = {}
-      const value = { data: signedPDF.pdfBytes, sign: signedPDF.imageBytes }
-      signedPDFToSend.push(value)
-    })
-    setValue('pymeData.documents', signedPDFToSend)
-  }, [notarialSignedPDF, signedPDFs, setValue])
+  // useEffect(() => {
+  //   const signedPDFToSend: Array<{ data: ArrayBuffer; sign: ArrayBuffer }> = []
+  //   signedPDFs.forEach((signedPDF) => {
+  //     // const data:{ data: ArrayBuffer; sign: ArrayBuffer } = {}
+  //     const value = { data: signedPDF.pdfBytes, sign: signedPDF.imageBytes }
+  //     signedPDFToSend.push(value)
+  //   })
+  //   setValue('pymeData.documents', signedPDFToSend)
+  // }, [notarialSignedPDF, signedPDFs, setValue])
 
   const onSubmit = (data: RegisterPymeFormData) => {
-    if (!data.isOwner && notarialSignedPDF == null) {
-      alert('Debes adjuntar y firmar el poder notarial')
-      return
-    }
+    // if (!data.isOwner && notarialSignedPDF == null) {
+    //   alert('Debes adjuntar y firmar el poder notarial')
+    //   return
+    // }
+    // console.log(data.pymeData.documents)
     console.log(data)
-    console.log(data.pymeData.documents)
     pymeRegister(data)
   }
 
@@ -83,16 +83,16 @@ export const RegisterPyme = () => {
   //   console.log('FIRMAR PDF NOTARIAL')
   // }
 
-  const handleSignedDocuments = (newSignedPDFs: Array<SignedPDF>) => {
-    const currentSignedPDFs = [...signedPDFs]
-    newSignedPDFs.forEach((newPDF) => {
-      if (!currentSignedPDFs.find((pdf) => pdf.name == newPDF.name)) {
-        currentSignedPDFs.push(newPDF)
-      }
-    })
-    setSignedPDFs(currentSignedPDFs)
-    // console.log('LOS PDFS FIRMADOS ACTUALMENTE SON : ', currentSignedPDFs)
-  }
+  // const handleSignedDocuments = (newSignedPDFs: Array<SignedPDF>) => {
+  //   const currentSignedPDFs = [...signedPDFs]
+  //   newSignedPDFs.forEach((newPDF) => {
+  //     if (!currentSignedPDFs.find((pdf) => pdf.name == newPDF.name)) {
+  //       currentSignedPDFs.push(newPDF)
+  //     }
+  //   })
+  //   setSignedPDFs(currentSignedPDFs)
+  //   // console.log('LOS PDFS FIRMADOS ACTUALMENTE SON : ', currentSignedPDFs)
+  // }
 
   return (
     <>
@@ -110,7 +110,7 @@ export const RegisterPyme = () => {
         <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Registra de PYME</h2>
         <p>Completa la información para crear el perfil de tu empresa.</p>
 
-        <ProgressBar percent={(100 / maxStep) * step} title='Progreso' barHeight={10} padding={30} />
+        <ProgressBar percent={Math.floor(100 / maxStep) * step} title='Progreso' barHeight={10} padding={30} />
 
         {Object.keys(errors).length > 0 && <p className='text-red-500 text-xl'>Hay errores en el formulario</p>}
 
@@ -426,7 +426,7 @@ export const RegisterPyme = () => {
               </div>
             </div>
           )}
-          {step == 4 && (
+          {/* {step == 4 && (
             <div>
               <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
                 Documentación
@@ -508,7 +508,7 @@ export const RegisterPyme = () => {
                 <SignDocuments onSignDocument={handleSignedDocuments} />
               </div>
             </div>
-          )}
+          )} */}
 
           <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
             <button
@@ -534,7 +534,7 @@ export const RegisterPyme = () => {
             )}
           </div>
         </form>
-        {notarialPDF != null && notarialSignedPDF == null && (
+        {/* {notarialPDF != null && notarialSignedPDF == null && (
           <SignSingleDocument
             pdfFile={notarialPDF}
             onSuccess={(signedPDF) => {
@@ -545,7 +545,7 @@ export const RegisterPyme = () => {
               console.log(newSignedPDFFiles)
             }}
           />
-        )}
+        )} */}
         {isPending && (
           <div className='fixed w-[100vw] top-[0] left-[0] h-[100vh] bg-[rgba(0,0,0,.9)]'>
             <div className='flex flex-col gap-15 items-center text-5xl mt-30 text-white'>
