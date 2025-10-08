@@ -47,6 +47,9 @@ const config: Config = {
   // KYC/AML (Optional)
   KYC_API_KEY: process.env.KYC_API_KEY || "",
   KYC_API_URL: process.env.KYC_API_URL || "",
+
+  // Breo APi Key
+  BREVO_API_KEY: process.env.BREVO_API_KEY || "",
 };
 
 export default config;

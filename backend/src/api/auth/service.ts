@@ -13,6 +13,7 @@ import {
 } from "./interfaces";
 import { generateToken } from "../../utils/jwt.utils";
 import { htmlWelcomeContent } from "./helpers";
+import config from "../../config/enviroment.config";
 
 export default class AuthService {
   private readonly userRepo: Repository<User>;
@@ -81,8 +82,7 @@ export default class AuthService {
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-        "api-key":
-          "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",
+        "api-key": config.BREVO_API_KEY,
       },
       body: JSON.stringify({
         sender: { name: "Code", email: "nc.equipo21@gmail.com" },
