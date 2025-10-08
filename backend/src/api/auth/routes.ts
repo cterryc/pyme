@@ -3,9 +3,10 @@ import AuthController from "./controller";
 import {
   userRegisterPayloadValidator,
   userLoginPayloadValidator,
+  userUpdatePayloadValidator,
 } from "./validator";
 import schemaValidator from "../../middlewares/schemaValidators.middlewares";
-//import { authenticate } from "../../middleware/authenticate.middleware";
+import authenticate from "../../middlewares/authenticate.middleware";
 
 const authRouter = Router();
 
@@ -23,6 +24,11 @@ authRouter.post(
 );
 
 // Protected routes
-//authRouter.get("/profile", authenticate, AuthController.getProfile);
+authRouter.patch(
+  "/profile",
+  authenticate,
+  schemaValidator(userUpdatePayloadValidator, null),
+  AuthController.updateUser
+);
 
 export default authRouter;

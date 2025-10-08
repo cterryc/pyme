@@ -1,4 +1,4 @@
-import { IsNull, Repository } from "typeorm";
+import { IsNull, Not, Repository } from "typeorm";
 import { AppDataSource } from "../../config/data-source";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
@@ -13,12 +13,36 @@ export default class CompanyService {
     this.companyRepo = AppDataSource.getRepository(Company);
   }
 
-  async createCompany(companyData: Partial<Company>, ownerUserId: string ): Promise<responseCompanyDto> {
+  async createCompany(
+    companyData: Partial<Company>,
+    ownerUserId: string
+  ): Promise<responseCompanyDto> {
+    const whereConditions: Array<{ taxId?: string; email?: string }> = [
+      { taxId: companyData.taxId },
+    ];
+
+    if (companyData.email) {
+      whereConditions.push({ email: companyData.email });
+    }
+
     const exists = await this.companyRepo.findOne({
-      where: { taxId: companyData.taxId },
+      where: whereConditions,
     });
+
     if (exists) {
-      throw new HttpError(HttpStatus.BAD_REQUEST, "La compañía con ese taxId ya fue creada.");
+      if (exists.taxId === companyData.taxId) {
+        throw new HttpError(
+          HttpStatus.BAD_REQUEST,
+          "La compañía con ese RUC/taxId ya fue registrada."
+        );
+      }
+      if (companyData.email && exists.email === companyData.email) {
+        throw new HttpError(
+          HttpStatus.BAD_REQUEST,
+          "El correo electrónico ya está asociado a otra compañía."
+        );
+      }
+      throw new HttpError(HttpStatus.BAD_REQUEST, "La compañía ya existe.");
     }
 
     const entity = this.companyRepo.create({
@@ -33,7 +57,7 @@ export default class CompanyService {
     return dtoCompany;
   }
 
-  async listCompanies(userId: string): Promise<responseCompanyDto[]> {
+  async listCompaniesByUserId(userId: string): Promise<responseCompanyDto[]> {
     const companies = await this.companyRepo.find({
       where: { owner: { id: userId }, deletedAt: IsNull() },
       order: { createdAt: "DESC" },
@@ -42,35 +66,83 @@ export default class CompanyService {
     return toCompanyListDto(companies);
   }
 
-  async getCompanyById(companyId: string, userId: string): Promise<responseCompanyDto | null> {
-      const company = await this.companyRepo.findOne({
-          where: { id: companyId, owner: { id: userId } }
-      });
+  async getCompanyById(
+    companyId: string,
+    userId: string
+  ): Promise<responseCompanyDto | null> {
+    const company = await this.companyRepo.findOne({
+      where: { id: companyId, owner: { id: userId } },
+    });
 
-      if (!company) {
-        throw new HttpError(HttpStatus.NOT_FOUND, "La compania no existe.");
-      }
+    if (!company) {
+      throw new HttpError(HttpStatus.NOT_FOUND, "La compania no existe.");
+    }
 
-      return toCompanyDto(company);
+    return toCompanyDto(company);
   }
 
-  // async updateCompany(companyId: string, companyData: Partial<Company>): Promise<Company | null> {
-  //     const company = await this.companyRepo.findOne({ where: { id: parseInt(companyId, 10) } });
-  //     if (!company) {
-  //         return null;
-  //     }
-  //     this.companyRepo.merge(company, companyData);
-  //     return this.companyRepo.save(company);
-  // }
+  async updateCompany(
+    companyId: string,
+    companyData: Partial<Company>,
+    userId: string
+  ): Promise<responseCompanyDto | null> {
+    const company = await this.companyRepo.findOne({
+      where: { id: companyId, owner: { id: userId } },
+    });
+    if (!company) {
+      return null;
+    }
 
-  // async deleteCompany(companyId: number): Promise<Company | null> {
-  //     const company = await this.companyRepo.findOne({ where: { id: companyId } });
-  //     if (!company) {
-  //         return null;
-  //     }
-  //     await this.companyRepo.remove(company);
-  //     return company;
-  // }
+    const whereConditions = [];
+
+    if (companyData.taxId && companyData.taxId !== company.taxId) {
+      whereConditions.push({ taxId: companyData.taxId });
+    }
+
+    if (companyData.email && companyData.email !== company.email) {
+      whereConditions.push({ email: companyData.email });
+    }
+
+    if (whereConditions.length > 0) {
+      const isDuplicated = await this.companyRepo.findOne({
+        where: whereConditions.map((condition) => ({
+          ...condition,
+          id: Not(companyId),
+        })),
+      });
+
+      if (isDuplicated) {
+        if (isDuplicated.taxId === companyData.taxId) {
+          throw new HttpError(
+            HttpStatus.BAD_REQUEST,
+            "El RUC/taxId ya pertenece a otra compañía."
+          );
+        }
+        if (isDuplicated.email === companyData.email) {
+          throw new HttpError(
+            HttpStatus.BAD_REQUEST,
+            "El correo electrónico ya está en uso por otra compañía."
+          );
+        }
+      }
+    }
+    this.companyRepo.merge(company, companyData);
+    return this.companyRepo.save(company);
+  }
+
+  async deleteCompanyByUser(
+    companyId: string,
+    userId: string
+  ): Promise<Company | null> {
+    const company = await this.companyRepo.findOne({
+      where: { id: companyId, owner: { id: userId } },
+    });
+    if (!company) {
+      return null;
+    }
+    await this.companyRepo.softDelete({ id: company.id });
+    return company;
+  }
 
   // async getAllCompanies(): Promise<Company[]> {
   //     return this.companyRepo.find({ relations: ["user", "creditApplications", "documents"] });
