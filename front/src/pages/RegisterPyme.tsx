@@ -5,10 +5,13 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { registerPymeSchema, type RegisterPymeData } from '@/schemas/pyme.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useUserAuthenticate } from '@/hooks/useUser'
 
 export const RegisterPyme = () => {
   const maxStep = 3
   const [step, setStep] = useState(0)
+
+  const { getUser } = useUserAuthenticate()
   const {
     register: registerPyme,
     handleSubmit,
@@ -42,7 +45,7 @@ export const RegisterPyme = () => {
 
   return (
     <>
-      <Header avatar={''} />
+      <Header avatar={getUser || ''} />
       <section className='w-full max-w-7xl py-5 my-10 m-auto text-center'>
         <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Registra de PYME</h2>
         <p>Completa la información para crear el perfil de tu empresa.</p>
