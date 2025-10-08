@@ -8,7 +8,7 @@ import { SignSingleDocument } from '@/components/SignSingleDocument'
 import type { SignedPDF } from '@/interfaces/sign.interface'
 import { usePymeRegisterDocuments } from '@/hooks/usePyme'
 import { registerPymeDocumentsSchema, type RegisterPymeDocumentsFormData } from '@/schemas/pyme.schema'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ImSpinner9 } from 'react-icons/im'
 
 export const RegisterPymeDocuments = () => {
@@ -16,6 +16,12 @@ export const RegisterPymeDocuments = () => {
   const [notarialPDF, setNotarialPDF] = useState<File | null>(null)
   const [signedPDFs, setSignedPDFs] = useState<Array<SignedPDF>>([])
   const [notarialSignedPDF, setNotarialSignedPDF] = useState<SignedPDF | null>(null)
+  const { id: pymeID } = useParams<{ id: string }>()
+
+  // useEffect(() => {
+  //   setPymeID(id)
+
+  // }, [])
 
   const {
     mutate: pymeRegisterDocuments,
@@ -70,6 +76,13 @@ export const RegisterPymeDocuments = () => {
   return (
     <>
       <Header avatar={''} />
+      <button
+        onClick={() => {
+          console.log(pymeID)
+        }}
+      >
+        TEST ONLY
+      </button>
       <section className='w-full max-w-7xl py-5 my-10 m-auto text-center'>
         <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Adjunta documentos de la PYME</h2>
         <p>Completa con la documentación necesaria para poder solicitar un crédito</p>

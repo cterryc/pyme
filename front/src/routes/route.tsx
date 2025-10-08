@@ -30,7 +30,7 @@ export const mainRouter = createBrowserRouter([
     element: <RegisterPyme />
   },
   {
-    path: '/Dashboard/RegistroDocumentosPyme',
+    path: '/Dashboard/RegistroDocumentosPyme/:id',
     element: <RegisterPymeDocuments />
   }
 

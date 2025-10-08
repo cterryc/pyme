@@ -126,85 +126,73 @@ export const RegisterPyme = () => {
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.legalName')}
+                    {...registerPyme('legalName')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Nombre legal de la empresa'
-                    style={{ borderColor: errors.pymeData?.legalName ? 'red' : '' }}
+                    style={{ borderColor: errors.legalName ? 'red' : '' }}
                   />
-                  {errors.pymeData?.legalName && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.legalName.message}</p>
-                  )}
+                  {errors.legalName && <p className='text-red-500 text-center'>{errors.legalName.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Nombre comercial</p>
 
                   <input
-                    {...registerPyme('pymeData.tradeName')}
+                    {...registerPyme('tradeName')}
                     type='text'
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Nombre comercial de la empresa'
-                    style={{ borderColor: errors.pymeData?.tradeName ? 'red' : '' }}
+                    style={{ borderColor: errors.tradeName ? 'red' : '' }}
                   />
-                  {errors.pymeData?.tradeName && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.tradeName.message}</p>
-                  )}
+                  {errors.tradeName && <p className='text-red-500 text-center'>{errors.tradeName.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>CUIT</p>
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.taxId')}
+                    {...registerPyme('taxId')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='XX-XXXXXXXX-X'
-                    style={{ borderColor: errors.pymeData?.taxId ? 'red' : '' }}
+                    style={{ borderColor: errors.taxId ? 'red' : '' }}
                   />
-                  {errors.pymeData?.taxId && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.taxId.message}</p>
-                  )}
+                  {errors.taxId && <p className='text-red-500 text-center'>{errors.taxId.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Correo electrónico</p>
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.email')}
+                    {...registerPyme('email')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='contacto@empresa.com'
-                    style={{ borderColor: errors.pymeData?.email ? 'red' : '' }}
+                    style={{ borderColor: errors.email ? 'red' : '' }}
                   />
-                  {errors.pymeData?.email && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.email.message}</p>
-                  )}
+                  {errors.email && <p className='text-red-500 text-center'>{errors.email.message}</p>}
                 </div>
-                <div className='flex flex-col gap-1'>
+                {/* <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Nombre dueño</p>
 
                   <input
-                    {...registerPyme('pymeData.ownerName')}
+                    {...registerPyme('ownerName')}
                     type='text'
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Nombre del titular de la empresa'
-                    style={{ borderColor: errors.pymeData?.ownerName ? 'red' : '' }}
+                    style={{ borderColor: errors.ownerName ? 'red' : '' }}
                   />
-                  {errors.pymeData?.ownerName && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.ownerName.message}</p>
-                  )}
+                  {errors.ownerName && <p className='text-red-500 text-center'>{errors.ownerName.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Apellido dueño</p>
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.ownerSurname')}
+                    {...registerPyme('ownerSurname')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Apellido del titular de la empresa'
-                    style={{ borderColor: errors.pymeData?.ownerSurname ? 'red' : '' }}
+                    style={{ borderColor: errors.ownerSurname ? 'red' : '' }}
                   />
-                  {errors.pymeData?.ownerSurname && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.ownerSurname.message}</p>
-                  )}
-                </div>
+                  {errors.ownerSurname && <p className='text-red-500 text-center'>{errors.ownerSurname.message}</p>}
+                </div> */}
               </div>
             </div>
           )}
@@ -217,9 +205,9 @@ export const RegisterPyme = () => {
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Industria</p>
                   <select
-                    style={{ borderColor: errors.pymeData?.companySector ? 'red' : '' }}
+                    style={{ borderColor: errors.industry ? 'red' : '' }}
                     className='border p-2 border-[#D1D5DB] rounded-md'
-                    {...registerPyme('pymeData.companySector')}
+                    {...registerPyme('industry')}
                   >
                     <option value='_'>Seleccionar industria</option>
                     <option value='Industria_agricola'>Agrícola</option>
@@ -228,49 +216,43 @@ export const RegisterPyme = () => {
                     <option value='Industria_ValoresArbitrarios'>etc ...</option>
                     <option value='Industria_OTRO'>Otro</option>
                   </select>
-                  {errors.pymeData?.companySector && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.companySector.message}</p>
-                  )}
+                  {errors.industry && <p className='text-red-500 text-center'>{errors.industry.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Fecha de fundación</p>
 
                   <input
                     type='date'
-                    {...registerPyme('pymeData.foundationDate', { valueAsDate: true })}
+                    {...registerPyme('foundedDate', { valueAsDate: true })}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Nombre comercial de la empresa'
-                    style={{ borderColor: errors.pymeData?.foundationDate ? 'red' : '' }}
+                    style={{ borderColor: errors.foundedDate ? 'red' : '' }}
                   />
-                  {errors.pymeData?.foundationDate && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.foundationDate.message}</p>
-                  )}
+                  {errors.foundedDate && <p className='text-red-500 text-center'>{errors.foundedDate.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Cantidad empleados</p>
 
                   <input
                     type='number'
-                    {...registerPyme('pymeData.employeesNumber', { valueAsNumber: true })}
+                    {...registerPyme('employeeCount', { valueAsNumber: true })}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='100'
-                    style={{ borderColor: errors.pymeData?.employeesNumber ? 'red' : '' }}
+                    style={{ borderColor: errors.employeeCount ? 'red' : '' }}
                   />
-                  {errors.pymeData?.employeesNumber && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.employeesNumber.message}</p>
-                  )}
+                  {errors.employeeCount && <p className='text-red-500 text-center'>{errors.employeeCount.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1 '>
                   <p className='text-sm'>Ingresos anuales</p>
 
                   <div
-                    style={{ borderColor: errors.pymeData?.annualIncome ? 'red' : '' }}
+                    style={{ borderColor: errors.annualRevenue ? 'red' : '' }}
                     className='flex items-center border gap-2 border-[#D1D5DB] overflow-hidden rounded-md focus-within:border-black '
                   >
                     <span className='text-[var(--font-title-light)] bg-[#D1D5DB] p-2'>$</span>
                     <input
                       type='number'
-                      {...registerPyme('pymeData.annualIncome', { valueAsNumber: true })}
+                      {...registerPyme('annualRevenue', { valueAsNumber: true })}
                       className='w-full outline-none py-2'
                       placeholder='1000000'
                       min={0}
@@ -278,9 +260,7 @@ export const RegisterPyme = () => {
                     <span className='text-[#414141FF] bg-[#D1D5DB] p-2'>USD</span>
                   </div>
 
-                  {errors.pymeData?.annualIncome && (
-                    <p className='text-red-500 text-center'>{errors.pymeData.annualIncome.message}</p>
-                  )}
+                  {errors.annualRevenue && <p className='text-red-500 text-center'>{errors.annualRevenue.message}</p>}
                 </div>
               </div>
             </div>
@@ -295,71 +275,61 @@ export const RegisterPyme = () => {
                   <p className='text-sm'>Dirección</p>
 
                   <input
-                    {...registerPyme('pymeData.companyAddress.address')}
+                    {...registerPyme('address')}
                     type='text'
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Av.Corrientes 1234'
-                    style={{ borderColor: errors.pymeData?.companyAddress?.address ? 'red' : '' }}
+                    style={{ borderColor: errors.address ? 'red' : '' }}
                   />
-                  {errors.pymeData?.companyAddress?.address && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.companyAddress?.address.message}</p>
-                  )}
+                  {errors.address && <p className='text-red-500 text-center'>{errors.address.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Ciudad</p>
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.companyAddress.city')}
+                    {...registerPyme('city')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Ciudad Autónoma de Buenos Aires'
-                    style={{ borderColor: errors.pymeData?.companyAddress?.city ? 'red' : '' }}
+                    style={{ borderColor: errors.city ? 'red' : '' }}
                   />
-                  {errors.pymeData?.companyAddress?.city && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.companyAddress?.city.message}</p>
-                  )}
+                  {errors.city && <p className='text-red-500 text-center'>{errors.city.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Estado/Provincia</p>
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.companyAddress.province')}
+                    {...registerPyme('state')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Caba'
-                    style={{ borderColor: errors.pymeData?.companyAddress?.province ? 'red' : '' }}
+                    style={{ borderColor: errors.state ? 'red' : '' }}
                   />
-                  {errors.pymeData?.companyAddress?.province && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.companyAddress?.province.message}</p>
-                  )}
+                  {errors.state && <p className='text-red-500 text-center'>{errors.state.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Código postal</p>
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.companyAddress.zipCode')}
+                    {...registerPyme('postalCode')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='C1043AAS'
-                    style={{ borderColor: errors.pymeData?.companyAddress?.zipCode ? 'red' : '' }}
+                    style={{ borderColor: errors.postalCode ? 'red' : '' }}
                   />
-                  {errors.pymeData?.companyAddress?.zipCode && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.companyAddress?.zipCode.message}</p>
-                  )}
+                  {errors.postalCode && <p className='text-red-500 text-center'>{errors.postalCode.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>País</p>
 
                   <input
                     type='text'
-                    {...registerPyme('pymeData.companyAddress.country')}
+                    {...registerPyme('country')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Argentina'
-                    style={{ borderColor: errors.pymeData?.companyAddress?.country ? 'red' : '' }}
+                    style={{ borderColor: errors.country ? 'red' : '' }}
                   />
-                  {errors.pymeData?.companyAddress?.country && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.companyAddress?.country.message}</p>
-                  )}
+                  {errors.country && <p className='text-red-500 text-center'>{errors.country.message}</p>}
                 </div>
               </div>
             </div>
@@ -375,20 +345,18 @@ export const RegisterPyme = () => {
                   <p className='text-sm'>Teléfono empresarial</p>
                   <input
                     type='text'
-                    {...registerPyme('pymeData.contact.phone')}
+                    {...registerPyme('phone')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='+54 11 1234-5678'
-                    style={{ borderColor: errors.pymeData?.contact?.phone ? 'red' : '' }}
+                    style={{ borderColor: errors.phone ? 'red' : '' }}
                   />
-                  {errors.pymeData?.contact?.phone && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.contact?.phone.message}</p>
-                  )}
+                  {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
                 </div>
-                <div className='flex flex-col gap-1'>
+                {/* <div className='flex flex-col gap-1'>
                   <p className='text-sm'>Teléfono de propietario</p>
                   <input
                     type='text'
-                    {...registerPyme('pymeData.contact.ownerPhone')}
+                    {...registerPyme('ownerPhone')}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='+54 11 1234-5678'
                     style={{ borderColor: errors.pymeData?.contact?.phone ? 'red' : '' }}
@@ -396,32 +364,28 @@ export const RegisterPyme = () => {
                   {errors.pymeData?.contact?.ownerPhone && (
                     <p className='text-red-500 text-center'>{errors.pymeData?.contact?.ownerPhone.message}</p>
                   )}
-                </div>
+                </div> */}
                 <div className='flex flex-col gap-1 col-span-2'>
                   <p className='text-sm'>Website (opcional)</p>
                   <input
                     type='text'
-                    {...(registerPyme('pymeData.contact.website'), { required: false })}
+                    {...(registerPyme('website'), { required: false })}
                     className='border p-2 border-[#D1D5DB] rounded-md'
                     placeholder='https://www.empresa.com'
-                    style={{ borderColor: errors.pymeData?.contact?.website ? 'red' : '' }}
+                    style={{ borderColor: errors.website ? 'red' : '' }}
                   />
-                  {errors.pymeData?.contact?.website && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.contact?.website.message}</p>
-                  )}
+                  {errors.website && <p className='text-red-500 text-center'>{errors.website.message}</p>}
                 </div>
                 <div className='flex flex-col gap-1 col-span-2'>
                   <p className='text-sm'>Descripción</p>
                   <textarea
                     rows={5}
-                    {...registerPyme('pymeData.description')}
+                    {...registerPyme('description')}
                     className='border min-h-30 max-h-60 p-2 border-[#D1D5DB] rounded-md'
                     placeholder='Describe brevemente tu empresa...'
-                    style={{ borderColor: errors.pymeData?.description ? 'red' : '' }}
+                    style={{ borderColor: errors.description ? 'red' : '' }}
                   />
-                  {errors.pymeData?.description && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.description.message}</p>
-                  )}
+                  {errors.description && <p className='text-red-500 text-center'>{errors.description.message}</p>}
                 </div>
               </div>
             </div>
