@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineClipboardList, HiOutlineLogout } from 'react-icons/hi'
+import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi'
+import { FaUser } from "react-icons/fa";
 import { useState } from 'react'
 
 export const Header = ({ avatar }: { avatar: string }) => {
@@ -7,7 +8,7 @@ export const Header = ({ avatar }: { avatar: string }) => {
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false)
 
   return (
-    <header className='flex justify-between px-3 md:px-10 h-[60px] items-center border-b-1 border-gray-400'>
+    <header className='flex justify-between px-3 md:px-10 h-[60px] items-center border-b-1 border-gray-200'>
       <Link to='/' className='flex items-center gap-6'>
         <img src='/assets/logo.png' className='h-[25px]' alt='' />
         <h1 className='font-medium text-2xl text-[var(--font-title-light)]'>Financia</h1>
@@ -34,7 +35,8 @@ export const Header = ({ avatar }: { avatar: string }) => {
               setIsAvatarMenuOpen(!isAvatarMenuOpen)
             }}
           >
-            <img src={avatar} className='h-full rounded-full '></img>
+            <FaUser />
+            {avatar}
             <HiOutlineChevronDown className='text-xl' />
           </button>
           {isAvatarMenuOpen && (
@@ -44,12 +46,6 @@ export const Header = ({ avatar }: { avatar: string }) => {
                   <HiOutlineUserCircle className='text-xl' /> Mi cuenta
                 </Link>
               </li>
-              <li className='hover:text-[var(--primary)]'>
-                <Link to='/' className='flex gap-4 items-center'>
-                  <HiOutlineClipboardList className='text-xl' /> Mis préstamos
-                </Link>
-              </li>
-
               <li className='hover:text-[var(--primary)]'>
                 <Link to='/' className='flex gap-4 items-center'>
                   <HiOutlineLogout className='text-xl' /> Cerrar sesión
@@ -69,8 +65,7 @@ export const Header = ({ avatar }: { avatar: string }) => {
           </button>
           <button
             onClick={() => navigate('/Registro')}
-            className='bg-[#0095d5] text-white outline-1 h-10 w-32 rounded-md hover:bg-[#28a9d6] transition-colors 
-            cursor-pointer'
+            className='bg-[#0095d5] text-white outline-1 h-10 w-32 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer'
           >
             Registrate
           </button>
