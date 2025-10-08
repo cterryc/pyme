@@ -8,22 +8,22 @@ export const Landing = () => {
 
   const steps = [
     {
-      title: "Registra tu Pyme",
-      text: "Completa un formulario dinámico con los datos de tu negocio y los documentos requeridos. En pocos minutos tendrás tu cuenta lista para operar.",
+      title: 'Registra tu Pyme',
+      text: 'Completa un formulario dinámico con los datos de tu negocio y los documentos requeridos. En pocos minutos tendrás tu cuenta lista para operar.'
     },
     {
-      title: "Solicita tu crédito",
-      text: "Desde tu panel Pyme, envía la solicitud indicando el monto que necesitas y el motivo del préstamo.",
+      title: 'Solicita tu crédito',
+      text: 'Desde tu panel Pyme, envía la solicitud indicando el monto que necesitas y el motivo del préstamo.'
     },
     {
-      title: "Revisa y confirma tu plan",
-      text: "Verifica el monto final, las cuotas disponibles y el cronograma de pagos antes de confirmar tu solicitud.",
+      title: 'Revisa y confirma tu plan',
+      text: 'Verifica el monto final, las cuotas disponibles y el cronograma de pagos antes de confirmar tu solicitud.'
     },
     {
-      title: "Recibe tu crédito y sigue creciendo",
-      text: "Una vez aprobado, el dinero se transfiere directamente a tu cuenta Pyme. ¡Empieza a invertir en tu crecimiento!",
-    },
-  ];
+      title: 'Recibe tu crédito y sigue creciendo',
+      text: 'Una vez aprobado, el dinero se transfiere directamente a tu cuenta Pyme. ¡Empieza a invertir en tu crecimiento!'
+    }
+  ]
 
   return (
     <>
@@ -46,16 +46,14 @@ export const Landing = () => {
         </div>
       </section>
       <section className='max-w-5xl m-auto my-16'>
-        <h2 className="text-4xl font-bold text-center mb-12">
-          Solicita tu crédito en 4 simples pasos
-        </h2>
+        <h2 className='text-4xl font-bold text-center mb-12'>Solicita tu crédito en 4 simples pasos</h2>
         <section className='flex flex-col gap-10'>
           {steps.map((step, index) => (
-            <div key={index} className="flex gap-7 items-start">
-              <p className="text-7xl font-bold text-[#0095d5]">{index + 1}</p>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-2xl font-semibold">{step.title}</h3>
-                <p className="text-gray-600">{step.text}</p>
+            <div key={index} className='flex gap-7 items-start'>
+              <p className='text-7xl font-bold text-[#0095d5]'>{index + 1}</p>
+              <div className='flex flex-col gap-2'>
+                <h3 className='text-2xl font-semibold'>{step.title}</h3>
+                <p className='text-gray-600'>{step.text}</p>
               </div>
             </div>
           ))}

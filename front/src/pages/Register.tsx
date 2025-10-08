@@ -11,7 +11,7 @@ import { registerSchema, type RegisterFormData } from '@/schemas/auth.schema'
 export const Register = () => {
   // variables
   const [hidePassword, setHidePassword] = useState<boolean>(false)
-  const [hideConfirmPassword, setHideConfirmPassword] = useState<boolean>(false)
+  // const [hideConfirmPassword, setHideConfirmPassword] = useState<boolean>(false)
 
   // hooks
   const navigate = useNavigate()
@@ -29,7 +29,7 @@ export const Register = () => {
     error
   } = useAuthRegister({
     onSuccess: (data) => {
-      localStorage.setItem("tokenPyme", data.payload.token);
+      localStorage.setItem('tokenPyme', data.payload.token)
       console.log('Register successful:', data)
       navigate('/')
     }
@@ -37,9 +37,8 @@ export const Register = () => {
 
   // methods
   const IconEye = hidePassword ? FaEye : FaEyeSlash
-  const IconEyeConfirm = hideConfirmPassword ? FaEye : FaEyeSlash
   const onSubmit = (data: RegisterFormData) => {
-    // console.log(data)
+    console.log(data)
     authRegister(data)
   }
 
@@ -59,17 +58,17 @@ export const Register = () => {
               </Link>
             </p>
           </div>
-          {isError && error?.payload && (
-            Array.isArray(error.payload) ? (
-              <ul className="text-red-500 text-xs my-2">
+          {isError &&
+            error?.payload &&
+            (Array.isArray(error.payload) ? (
+              <ul className='text-red-500 text-xs my-2'>
                 {error.payload.map((err, i) => (
                   <li key={i}>Error: {err.message}</li>
                 ))}
               </ul>
             ) : (
-              <p className="text-red-500 text-xs my-2">Error: {error.payload.message}</p>
-            )
-          )}
+              <p className='text-red-500 text-xs my-2'>Error: {error.payload.message}</p>
+            ))}
           <form className={`flex flex-col gap-0 ${!isError && 'mt-6'}`} onSubmit={handleSubmit(onSubmit)}>
             <div className='rounded-t-md border-b-0 border-2 border-gray-300'>
               <input
@@ -97,20 +96,24 @@ export const Register = () => {
             </div>
             <div className='relative rounded-b-md border-2 border-gray-300'>
               <input
-                type={hideConfirmPassword ? 'text' : 'password'}
+                type={hidePassword ? 'text' : 'password'}
                 {...register('confirmPassword')}
                 placeholder='Confirmar contraseña'
                 name='confirmPassword'
                 className='border-none p-3 w-full placeholder:text-[#7d7d7e] text-gray-600 outline-none'
               />
-              {errors.confirmPassword && <span className='text-red-500 text-xs pl-3'>{errors.confirmPassword?.message}</span>}
-              <IconEyeConfirm
-                onClick={() => setHideConfirmPassword(!hideConfirmPassword)}
+              {errors.confirmPassword && (
+                <span className='text-red-500 text-xs pl-3'>{errors.confirmPassword?.message}</span>
+              )}
+              {/* <IconEyeConfirm
+                onClick={() => setHidePassword(!hidePassword)}
                 className='absolute right-3 top-3.5 text-gray-400 cursor-pointer w-5 h-5'
-              />
+              /> */}
             </div>
-            <button className='bg-[#0095d5] text-white p-3 rounded-md mt-6 hover:bg-[#28a9d6] transition-colors 
-            cursor-pointer'>
+            <button
+              className='bg-[#0095d5] text-white p-3 rounded-md mt-6 hover:bg-[#28a9d6] transition-colors 
+            cursor-pointer'
+            >
               {isPending ? 'registrando...' : 'Registrarse'}
             </button>
           </form>
