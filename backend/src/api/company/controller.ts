@@ -56,26 +56,24 @@ export default class CompanyController {
       }
   };
 
-  // static deleteCompany = async (req: Request, res: Response, next: NextFunction) => {
-  //     try {
-  //         const companyId = parseInt(req.params.id, 10);
-  //         if (!companyId) {
-  //             return apiResponse(res, HttpStatus.BAD_REQUEST, { message: "Company ID is required" });
-  //         }
-  //         const deletedCompany = await this.companyService.deleteCompany(companyId);
-  //         if (!deletedCompany) {
-  //             return apiResponse(res, HttpStatus.NOT_FOUND, { message: "Company not found" });
-  //         }
-  //         return apiResponse(res, HttpStatus.OK, { message: "Company deleted successfully" });
-  //     } catch (error) {
-  //         return next(error);
-  //     }
-  // };
+  static deleteCompanyByUser = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const companyId = req.params.id;
+        const userId = res.locals.user?.id as string;
+        const deletedCompany = await this.companyService.deleteCompanyByUser(companyId, userId);
+        if (!deletedCompany) {
+            return res.status(HttpStatus.NOT_FOUND).json(apiResponse(false, { message: "La compañía no existe." }));
+        }
+        return res.status(HttpStatus.OK).json(apiResponse(true, { message: "Compañía eliminada con éxito." }));
+      } catch (error) {
+          return next(error);
+      }
+  };
 
-  static listCompanies = async (req: Request, res: Response, next: NextFunction) => {
+  static listCompaniesByUserId = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = res.locals.user.id;
-      const companies = await this.companyService.listCompanies(userId);
+      const companies = await this.companyService.listCompaniesByUserId(userId);
       res.status(HttpStatus.OK).json(apiResponse(true, companies));
     } catch (error) {
       return next(error);

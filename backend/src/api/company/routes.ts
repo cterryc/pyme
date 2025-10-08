@@ -18,7 +18,7 @@ companyRouter.post(
 companyRouter.get(
     "/",
     authenticate,
-    CompanyController.listCompanies
+    CompanyController.listCompaniesByUserId
 );
 
 
@@ -36,6 +36,13 @@ companyRouter.patch(
   authenticate,
   schemaValidator(updateCompanySchema, null),
   CompanyController.updateCompany
+);
+
+companyRouter.delete(
+  "/:id",
+  validateUuid,
+  authenticate,
+  CompanyController.deleteCompanyByUser
 );
 
 export default companyRouter;

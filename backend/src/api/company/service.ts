@@ -33,7 +33,7 @@ export default class CompanyService {
     return dtoCompany;
   }
 
-  async listCompanies(userId: string): Promise<responseCompanyDto[]> {
+  async listCompaniesByUserId(userId: string): Promise<responseCompanyDto[]> {
     const companies = await this.companyRepo.find({
       where: { owner: { id: userId }, deletedAt: IsNull() },
       order: { createdAt: "DESC" },
@@ -63,14 +63,14 @@ export default class CompanyService {
       return this.companyRepo.save(company);
   }
 
-  // async deleteCompany(companyId: number): Promise<Company | null> {
-  //     const company = await this.companyRepo.findOne({ where: { id: companyId } });
-  //     if (!company) {
-  //         return null;
-  //     }
-  //     await this.companyRepo.remove(company);
-  //     return company;
-  // }
+  async deleteCompanyByUser(companyId: string, userId: string): Promise<Company | null> {
+      const company = await this.companyRepo.findOne({ where: { id: companyId, owner: { id: userId } } });
+      if (!company) {
+          return null;
+      }
+      await this.companyRepo.softDelete({ id: company.id });
+      return company;
+  }
 
   // async getAllCompanies(): Promise<Company[]> {
   //     return this.companyRepo.find({ relations: ["user", "creditApplications", "documents"] });
