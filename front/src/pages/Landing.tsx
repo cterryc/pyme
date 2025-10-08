@@ -2,9 +2,19 @@ import { HiOutlineTrendingUp, HiOutlineCalendar, HiOutlineCash, HiOutlineClipboa
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { decodeToken } from '@/helpers/decodeToken'
 export const Landing = () => {
   const avatarTemp = ''
   // const avatarTemp = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
+
+  useEffect(() => {
+    console.log(localStorage.getItem("tokenPyme"))
+    const token = localStorage.getItem("tokenPyme");
+    const user = decodeToken(token || '')
+    console.log(user || 'No autenticado')
+  }, [])
+  
 
   return (
     <>
@@ -31,7 +41,7 @@ export const Landing = () => {
           Nuestros productos de crédito
         </h2>
         <div className='flex flex-col md:flex-row gap-6 justify-around items-center'>
-          <article className=' max-w-xs bg-[#F6F7F8] shadow-xl border border-[#C9C9C9] rounded-xl overflow-hidden text-sm flex flex-col '>
+          <article className=' max-w-xs bg-[#F6F7F8] shadow-xl border border-[#C9C9C9] rounded-xl overflow-hidden text-sm flex flex-col hover:scale-[1.1] duration-150 cursor-pointer'>
             <div className=' pt-3 pb-8 px-5'>
               <h3 className='text-2xl my-2 text-[var(--font-title-light)] font-medium'>Crédito Express</h3>
               <p className='text-xs'>
@@ -73,7 +83,7 @@ export const Landing = () => {
               Solicitar ahora
             </Link>
           </article>
-          <article className='relative max-w-xs bg-[#F6F7F8] shadow-xl border-2 border-[var(--primary)] rounded-xl overflow-hidden text-sm flex flex-col before:content-["Más_popular"]  before:absolute before:top-[0px] before:right-[0px] before:px-3 before:p-1 before:rounded-bl-xl before:text-xs before:bg-[var(--primary)] before:text-white'>
+          <article className='relative max-w-xs bg-[#F6F7F8] shadow-xl border-2 border-[var(--primary)] rounded-xl overflow-hidden text-sm flex flex-col before:content-["Más_popular"]  before:absolute before:top-[0px] before:right-[0px] before:px-3 before:p-1 before:rounded-bl-xl before:text-xs before:bg-[var(--primary)] before:text-white hover:scale-[1.1] duration-150 cursor-pointer'>
             <div className=' pt-3 pb-8 px-5'>
               <h3 className='text-2xl my-2 text-[var(--font-title-light)] font-medium'>Crédito para Expansión</h3>
               <p className='text-xs'>
@@ -100,7 +110,7 @@ export const Landing = () => {
                 </p>
               </li>
               <li className='flex'>
-                <HiOutlineClipboardList className='text-[var(--primary)] inline mr-3 text-2xl' />
+                <HiOutlineClipboardList className='text-[var(--primary)] inline mr-3 text-3xl' />
                 <p>
                   <strong className=''>Requisitos: </strong>
                   Ingresos anuales superiores a $250.000, plan de negocio.
@@ -115,7 +125,7 @@ export const Landing = () => {
               Solicitar ahora
             </Link>
           </article>
-          <article className='max-w-xs bg-[#F6F7F8] shadow-xl border border-[#C9C9C9] rounded-xl overflow-hidden text-sm flex flex-col'>
+          <article className='max-w-xs bg-[#F6F7F8] shadow-xl border border-[#C9C9C9] rounded-xl overflow-hidden text-sm flex flex-col hover:scale-[1.1] duration-150 cursor-pointer'>
             <div className=' pt-3 pb-8 px-5'>
               <h3 className='text-2xl my-2 text-[var(--font-title-light)] font-medium'>Capital de Trabajo</h3>
               <p className='text-xs'>
