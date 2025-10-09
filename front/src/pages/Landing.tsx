@@ -1,189 +1,65 @@
-import { HiOutlineTrendingUp, HiOutlineCalendar, HiOutlineCash, HiOutlineClipboardList } from 'react-icons/hi'
+import { Link } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { Link } from 'react-router-dom'
-import { useEffect } from 'react'
-import { decodeToken } from '@/helpers/decodeToken'
-export const Landing = () => {
-  const avatarTemp = ''
-  // const avatarTemp = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
+import { useUserAuthenticate } from '@/hooks/useUser'
 
-  useEffect(() => {
-    console.log(localStorage.getItem("tokenPyme"))
-    const token = localStorage.getItem("tokenPyme");
-    const user = decodeToken(token || '')
-    console.log(user || 'No autenticado')
-  }, [])
-  
+export const Landing = () => {
+  const { getUser } = useUserAuthenticate()
+
+  const steps = [
+    {
+      title: "Registra tu Pyme",
+      text: "Completa un formulario dinámico con los datos de tu negocio y los documentos requeridos. En pocos minutos tendrás tu cuenta lista para operar.",
+    },
+    {
+      title: "Solicita tu crédito",
+      text: "Desde tu panel Pyme, envía la solicitud indicando el monto que necesitas y el motivo del préstamo.",
+    },
+    {
+      title: "Revisa y confirma tu plan",
+      text: "Verifica el monto final, las cuotas disponibles y el cronograma de pagos antes de confirmar tu solicitud.",
+    },
+    {
+      title: "Recibe tu crédito y sigue creciendo",
+      text: "Una vez aprobado, el dinero se transfiere directamente a tu cuenta Pyme. ¡Empieza a invertir en tu crecimiento!",
+    },
+  ];
 
   return (
     <>
-      <Header avatar={avatarTemp} />
+      <Header avatar={getUser || ''} />
       <section
-        className={`min-h-[50vh] p-5 overflow-hidden bg-center bg-[url("assets/landing/portada.jpeg")] flex flex-col justify-around text-white text-center`}
+        className={`min-h-[500px] p-5 overflow-hidden bg-center bg-[url("assets/landing/portada.jpeg")] flex flex-col justify-around text-white text-center`}
       >
-        <div className='max-w-200 w-full mx-auto'>
-          <p className='text-3xl md:text-6xl font-bold mb-6'>Impulsa tu negocio con el crédito ideal</p>
-          <p className='text-xl md:text-3xl'>
+        <div className='max-w-200 w-full mx-auto flex flex-col gap-8'>
+          <p className='text-3xl md:text-6xl font-bold'>Impulsa tu negocio con el crédito ideal</p>
+          <p className='text-2xl'>
             En Financia, entendemos las necesidades de las PYMES. Ofrecemos soluciones de financiamiento flexible y
             adaptadas a tu crecimiento.
           </p>
-        </div>
-        <Link
-          to='/'
-          className='bg-[var(--primary)] mx-auto  border-1 border-[var(--primary)] px-4 py-2 rounded-md hover:bg-white hover:text-[var(--primary)] hover:font-medium cursor-pointer'
-        >
-          Descubre tu crédito
-        </Link>
-      </section>
-      <section className='max-w-7xl m-auto my-25 p-5'>
-        <h2 className='text-center font-medium text-3xl mb-20 text-[var(--font-title-light)]'>
-          Nuestros productos de crédito
-        </h2>
-        <div className='flex flex-col md:flex-row gap-6 justify-around items-center'>
-          <article className=' max-w-xs bg-[#F6F7F8] shadow-xl border border-[#C9C9C9] rounded-xl overflow-hidden text-sm flex flex-col hover:scale-[1.1] duration-150 cursor-pointer'>
-            <div className=' pt-3 pb-8 px-5'>
-              <h3 className='text-2xl my-2 text-[var(--font-title-light)] font-medium'>Crédito Express</h3>
-              <p className='text-xs'>
-                Accede rápidamente a financiamiento para cubrir necesidades inmediatas de tu negocio.
-              </p>
-            </div>
-            <ul className='p-4 text-md flex flex-col gap-5 bg-white'>
-              <li className='flex'>
-                <HiOutlineCash className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Monto:</strong> Hasta $50.000
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineCalendar className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Plazo:</strong> Hasta 2 años
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineTrendingUp className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Taza:</strong> Desde 12%
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineClipboardList className='text-[var(--primary)] inline mr-3 text-2xl' />
-                <p>
-                  <strong className=''>Requisitos: </strong>
-                  Ingresos anuales superiores a $100.000
-                </p>
-              </li>
-            </ul>
-
-            <Link
-              to='/'
-              className='bg-[var(--primary)] hover:bg-transparent hover:text-[var(--primary)] hover:border-1  border self-center p-3 text-white font-medium rounded-md w-70 text-center my-7'
-            >
-              Solicitar ahora
-            </Link>
-          </article>
-          <article className='relative max-w-xs bg-[#F6F7F8] shadow-xl border-2 border-[var(--primary)] rounded-xl overflow-hidden text-sm flex flex-col before:content-["Más_popular"]  before:absolute before:top-[0px] before:right-[0px] before:px-3 before:p-1 before:rounded-bl-xl before:text-xs before:bg-[var(--primary)] before:text-white hover:scale-[1.1] duration-150 cursor-pointer'>
-            <div className=' pt-3 pb-8 px-5'>
-              <h3 className='text-2xl my-2 text-[var(--font-title-light)] font-medium'>Crédito para Expansión</h3>
-              <p className='text-xs'>
-                Invierte en el crecimiento de tu empresa con un crédito a largo plazo y condiciones favorables.
-              </p>
-            </div>
-            <ul className='p-4 text-md flex flex-col gap-5 bg-white'>
-              <li className='flex'>
-                <HiOutlineCash className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Monto:</strong> Hasta $200.000
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineCalendar className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Plazo:</strong> Hasta 5 años
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineTrendingUp className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Taza:</strong> Desde 10%
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineClipboardList className='text-[var(--primary)] inline mr-3 text-3xl' />
-                <p>
-                  <strong className=''>Requisitos: </strong>
-                  Ingresos anuales superiores a $250.000, plan de negocio.
-                </p>
-              </li>
-            </ul>
-
-            <Link
-              to='/'
-              className='bg-[var(--primary)] hover:bg-transparent hover:text-[var(--primary)] hover:border-1  border self-center p-3 text-white font-medium rounded-md w-70 text-center my-7'
-            >
-              Solicitar ahora
-            </Link>
-          </article>
-          <article className='max-w-xs bg-[#F6F7F8] shadow-xl border border-[#C9C9C9] rounded-xl overflow-hidden text-sm flex flex-col hover:scale-[1.1] duration-150 cursor-pointer'>
-            <div className=' pt-3 pb-8 px-5'>
-              <h3 className='text-2xl my-2 text-[var(--font-title-light)] font-medium'>Capital de Trabajo</h3>
-              <p className='text-xs'>
-                Mantén la operatividad de tu negocio con un crédito flexible para cubrir gastos corrientes.
-              </p>
-            </div>
-            <ul className='p-4 text-md flex flex-col gap-5 bg-white'>
-              <li className='flex'>
-                <HiOutlineCash className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Monto:</strong> Hasta $100.000
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineCalendar className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Plazo:</strong> Hasta 3 años
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineTrendingUp className='text-[var(--primary)] inline mr-3 text-xl' />
-                <p>
-                  <strong>Taza:</strong> Desde 14%
-                </p>
-              </li>
-              <li className='flex'>
-                <HiOutlineClipboardList className='text-[var(--primary)] inline mr-3 text-2xl' />
-                <p>
-                  <strong className=''>Requisitos: </strong>
-                  Ingresos anuales superiores a $150.000
-                </p>
-              </li>
-            </ul>
-
-            <Link
-              to='/'
-              className='bg-[var(--primary)] hover:bg-transparent hover:text-[var(--primary)] hover:border-1  border self-center p-3 text-white font-medium rounded-md w-70 text-center my-7'
-            >
-              Solicitar ahora
-            </Link>
-          </article>
+          <Link
+            to={getUser ? '/Dashboard' : '/Login'}
+            className='bg-[#0095d5] text-white flex items-center w-fit mx-auto px-6 py-3 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer'
+          >
+            Solicita tu crédito
+          </Link>
         </div>
       </section>
-
-      <section className='max-w-7xl p-5 m-auto my-25 flex flex-col gap-15 text-center items-center'>
-        <h2 className='text-center font-medium text-3xl text-[var(--font-title-light)]'>
-          ¿No estás seguro de cuál elegir?
+      <section className='max-w-5xl m-auto my-16'>
+        <h2 className="text-4xl font-bold text-center mb-12">
+          Solicita tu crédito en 4 simples pasos
         </h2>
-        <p className='text-xl max-w-250'>
-          Utiliza nuestra herramienta de comparación para encontrar el crédito que mejor se adapte a las necesidades
-          específicas de tu empresa.
-        </p>
-        <Link
-          to='/'
-          className='bg-[var(--primary)] border border-[var(--primary)] mx-auto text-white px-4 py-2 rounded-md hover:bg-white hover:text-[var(--primary)] hover:font-medium cursor-pointer'
-        >
-          Comparar créditos
-        </Link>
+        <section className='flex flex-col gap-10'>
+          {steps.map((step, index) => (
+            <div key={index} className="flex gap-7 items-start">
+              <p className="text-7xl font-bold text-[#0095d5]">{index + 1}</p>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-2xl font-semibold">{step.title}</h3>
+                <p className="text-gray-600">{step.text}</p>
+              </div>
+            </div>
+          ))}
+        </section>
       </section>
       <Footer />
     </>
