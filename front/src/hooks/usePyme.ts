@@ -1,11 +1,20 @@
 import { useMutation } from '@tanstack/react-query'
-import { type RegisterPymeErrorResponse, type RegisterPymeSucessResponse } from '@/interfaces/pyme.interface'
-import { type RegisterPymeFormData, type RegisterPymeDocumentsFormData } from '@/schemas/pyme.schema'
+import {
+  type RegisterPymeErrorResponse,
+  type RegisterPymeSucessResponse,
+  type RegisterPymeDocumentsSuccessResponse
+} from '@/interfaces/pyme.interface'
+import { type RegisterPymeFormData } from '@/schemas/pyme.schema'
 import { pymeRegister, pymeRegisterDocuments } from '@/services/pyme.service'
 
 interface UsePymeRegisterProps {
   onSuccess?: (data: RegisterPymeSucessResponse) => void
-  onError?: (error: unknown) => void
+  onError?: (error: RegisterPymeErrorResponse) => void
+}
+
+interface UsePymeRegisterDocumentsProps {
+  onSuccess?: (data: RegisterPymeDocumentsSuccessResponse) => void
+  onError?: (error: RegisterPymeErrorResponse) => void
 }
 
 export const usePymeRegister = ({ onSuccess, onError }: UsePymeRegisterProps) => {
@@ -20,9 +29,9 @@ export const usePymeRegister = ({ onSuccess, onError }: UsePymeRegisterProps) =>
   })
 }
 
-export const usePymeRegisterDocuments = ({ onSuccess, onError }: UsePymeRegisterProps) => {
+export const usePymeRegisterDocuments = ({ onSuccess, onError }: UsePymeRegisterDocumentsProps) => {
   // return useMutation<RegisterPymeSucessResponse, RegisterPymeErrorResponse, RegisterPymeDocumentsFormData>({
-  return useMutation<RegisterPymeSucessResponse, RegisterPymeErrorResponse, FormData>({
+  return useMutation<RegisterPymeDocumentsSuccessResponse, RegisterPymeErrorResponse, FormData>({
     mutationFn: async (data) => pymeRegisterDocuments(data),
     onSuccess: (data) => {
       if (onSuccess) onSuccess(data)

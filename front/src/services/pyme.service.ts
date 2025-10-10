@@ -1,4 +1,4 @@
-import { type RegisterPymeSucessResponse } from '@/interfaces/pyme.interface'
+import { type RegisterPymeSucessResponse, type RegisterPymeDocumentsSuccessResponse } from '@/interfaces/pyme.interface'
 import { type RegisterPymeFormData } from '@/schemas/pyme.schema'
 
 export const pymeRegister = async (data: RegisterPymeFormData): Promise<RegisterPymeSucessResponse> => {
@@ -21,7 +21,7 @@ export const pymeRegister = async (data: RegisterPymeFormData): Promise<Register
   }
 }
 
-export const pymeRegisterDocuments = async (data: FormData): Promise<RegisterPymeSucessResponse> => {
+export const pymeRegisterDocuments = async (data: FormData): Promise<RegisterPymeDocumentsSuccessResponse> => {
   try {
     const token = localStorage.tokenPyme
 

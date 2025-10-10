@@ -73,7 +73,7 @@ export const SignDocuments = ({ onSignDocument }: { onSignDocument: (signedPDFs:
         )}
       </div>
       <div className='flex flex-col gap-3  items-center'>
-        <h2 className='text-xl mb-8'>Documentos agregados :</h2>
+        <h2 className='text-xl mb-8 font-medium'>Documentos agregados :</h2>
         {PDFFiles.map((pdfFile, index) => {
           const signedPDFData = SignedPDFFiles.find((pdfSigned) => pdfSigned.docName == pdfFile.name)
           return !signedPDFData ? (

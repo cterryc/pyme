@@ -21,4 +21,24 @@ export type RegisterPymeSucessResponse = {
     description: string
   }
 }
-export type RegisterPymeErrorResponse = { success: boolean; payload: { error: string; message: string } }
+export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
+
+export type RegisterPymeDocumentsSuccessResponse = {
+  success: boolean
+  payload: { documents: Array<DocumentResponse> }
+}
+
+export type DocumentResponse = {
+  id: string
+  type: string
+  fileName: string
+  fileUrl: string
+  mimeType: string
+  fileSize: number
+  status: string
+  companyId: string
+  creditApplicationId?: string
+  uploadedById: string
+  createdAt: string
+  updatedAt: string
+}

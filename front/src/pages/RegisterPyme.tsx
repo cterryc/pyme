@@ -9,24 +9,33 @@ import { usePymeRegister } from '@/hooks/usePyme'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useUserAuthenticate } from '@/hooks/useUser'
+
 export const RegisterPyme = () => {
   const navigate = useNavigate()
-  const maxStep = 3
-  const [step, setStep] = useState(0) //useState(4)
+  const maxStep = 4
+  const [step, setStep] = useState(4) //useState(0)
+  const [pymeId, setPymeId] = useState('')
   const { getUser, isLoading } = useUserAuthenticate()
 
   const {
     mutate: pymeRegister,
     isPending,
-    isError
-    // error
+    isError,
+    error
   } = usePymeRegister({
     onSuccess: (data) => {
-      console.log(data)
-      navigate(`/Dashboard/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
+      // console.log(data)
+      toast.success('La pyme fue registrada correctamente', {
+        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
+        description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la pyme.',
+        duration: 4000
+      })
+      //navigate(`/Dashboard/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
+      setPymeId(data.payload.id)
     }
   })
 
+  //checkear sesion
   useEffect(() => {
     if (!isLoading && getUser == '') {
       navigate('/Login')
@@ -35,20 +44,37 @@ export const RegisterPyme = () => {
 
   useEffect(() => {
     if (isPending) {
-      toast('Guardando los cambios ...')
+      toast('Guardando los cambios ...', { duration: 1000 })
     }
     if (isError) {
-      toast('No se pudo guardar sus cambios')
+      error.payload.forEach((err) => {
+        toast.error('', {
+          style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+          description: err.message,
+          duration: 4000
+        })
+      })
     }
-  }, [isPending, isError])
+  }, [isPending, isError, error])
+
+  const getStoredData = () => {
+    const storedForm = localStorage.getItem('registerPymeBackup')
+    if (storedForm) {
+      const storedDataForm = JSON.parse(storedForm)
+      return storedDataForm
+    }
+    return {}
+  }
 
   const {
     register: registerPyme,
     // setValue,
+    watch,
     handleSubmit,
     formState: { errors }
   } = useForm<RegisterPymeFormData>({
-    resolver: zodResolver(registerPymeSchema)
+    resolver: zodResolver(registerPymeSchema),
+    defaultValues: getStoredData()
   })
 
   useEffect(() => {
@@ -58,7 +84,7 @@ export const RegisterPyme = () => {
   }, [errors, setStep])
 
   const onSubmit = (data: RegisterPymeFormData) => {
-    console.log(data)
+    // localStorage.removeItem('registerPymeBackup')
     pymeRegister(data)
   }
 
@@ -75,36 +101,18 @@ export const RegisterPyme = () => {
     }
   }
 
-  // const handleNotarialPDFSign = () => {
-  //   console.log('FIRMAR PDF NOTARIAL')
-  // }
-
-  // const handleSignedDocuments = (newSignedPDFs: Array<SignedPDF>) => {
-  //   const currentSignedPDFs = [...signedPDFs]
-  //   newSignedPDFs.forEach((newPDF) => {
-  //     if (!currentSignedPDFs.find((pdf) => pdf.name == newPDF.name)) {
-  //       currentSignedPDFs.push(newPDF)
-  //     }
-  //   })
-  //   setSignedPDFs(currentSignedPDFs)
-  //   // console.log('LOS PDFS FIRMADOS ACTUALMENTE SON : ', currentSignedPDFs)
-  // }
+  useEffect(() => {
+    const subscription = watch((value) => {
+      localStorage.setItem('registerPymeBackup', JSON.stringify(value))
+    })
+    return () => subscription.unsubscribe()
+  }, [watch])
 
   return (
     <>
-      {/* <Header avatar={''} /> */}
       <Header />
 
-      {/* TEMPORAL */}
-      {/* {isError && (
-        <div className='text-5xl text-red-500'>
-          <p>{error.error}</p>
-          <p>{error.message}</p>
-        </div>
-      )} */}
-      {/* TEMPORAL */}
-
-      <section className='w-full max-w-7xl py-5 my-10 m-auto text-center'>
+      <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1 min-h-screen'>
         <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Registra de PYME</h2>
         <p>Completa la información para crear el perfil de tu empresa.</p>
 
@@ -352,6 +360,76 @@ export const RegisterPyme = () => {
               </div>
             </div>
           )}
+          {step == 4 && (
+            <div className='flex flex-col gap-5'>
+              <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
+                Confirma tus datos
+              </h3>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Nombre legal :</span> {getStoredData().legalName}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Nombre comercial : </span>
+                {getStoredData().tradeName}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>CUIT : </span>
+                {getStoredData().taxId}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Correo electrónico : </span>
+                {getStoredData().email}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Industria : </span>
+                {getStoredData().industry}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Fecha fundacion : </span>
+                {new Date(getStoredData().foundedDate).toLocaleDateString('es-ES')}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Cantidad de empleados : </span>
+                {getStoredData().employeeCount}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Ingresos anuales : </span>
+                {getStoredData().annualRevenue}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Dirección : </span>
+                {getStoredData().address}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Ciudad : </span>
+                {getStoredData().city}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Estado/Provincia : </span>
+                {getStoredData().state}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Código postal : </span>
+                {getStoredData().postalCode}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>País : </span>
+                {getStoredData().country}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Telefono empresarial : </span>
+                {getStoredData().phone}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Website : </span>
+                {getStoredData().website}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Descripción : </span>
+                {getStoredData().description}
+              </p>
+            </div>
+          )}
 
           <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
             <button
@@ -372,22 +450,41 @@ export const RegisterPyme = () => {
               <input
                 type='submit'
                 className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                value='Guardar Prefil'
+                value='Confirmar'
               />
             )}
           </div>
         </form>
-
-        {/* {isPending && (
-          <div className='fixed w-[100vw] top-[0] left-[0] h-[100vh] bg-[rgba(0,0,0,.9)]'>
-            <div className='flex flex-col gap-15 items-center text-5xl mt-30 text-white'>
-              <span>Cargando ...</span>
-              <ImSpinner9 className='w-[200px] h-[200px] animate-spin' />
-            </div>
-          </div>
-        )}*/}
       </section>
 
+      {pymeId != '' && (
+        <div className='fixed w-screen h-screen bg-[rgba(0,0,0,.4)] top-[0] left-[0] flex items-center '>
+          <dialog open className='bg-[var(--bg-light)] p-7 m-auto text-black rounded-md'>
+            <h3 className='text-xl mb-5'>Tu pyme se ha registrado correctamente</h3>
+            <p className='px-5 mb-10 '>Es obligatorio adjuntar documentos para solicitar un crédito</p>
+            <p className='px-5 mb-10 '>¿Quieres continuar ahora?</p>
+            <div className='flex justify-around'>
+              <button
+                className='bg-gray-500 p-2 rounded-md cursor-pointer text-white'
+                onClick={() => {
+                  navigate('/Dashboard')
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  // navigate(`/Dashboard/RegistroDocumentosPyme/${pymeId}`, { replace: true })
+                  navigate(`/Dashboard/RegistroDocumentosPyme/${pymeId}`)
+                }}
+                className='bg-green-500 p-2 rounded-md cursor-pointer text-white hover:bg-green-700 duration-150'
+              >
+                Continuar
+              </button>
+            </div>
+          </dialog>
+        </div>
+      )}
       <Footer />
     </>
   )
