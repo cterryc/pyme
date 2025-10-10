@@ -5,6 +5,7 @@ import { NotFound } from '../pages/NotFound'
 import { Login } from '@/pages/Login'
 import { UserDashboard } from '@/pages/UserDashboard'
 import { RegisterPyme } from '@/pages/RegisterPyme'
+import { RegisterPymeDocuments } from '@/pages/RegisterPymeDocuments'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ export const mainRouter = createBrowserRouter([
   {
     path: '/Dashboard/RegistroPyme',
     element: <RegisterPyme />
+  },
+  {
+    path: '/Dashboard/RegistroDocumentosPyme/:id',
+    element: <RegisterPymeDocuments />
   }
 
   // add pages
