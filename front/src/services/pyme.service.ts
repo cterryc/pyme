@@ -1,5 +1,5 @@
 import { type RegisterPymeSucessResponse } from '@/interfaces/pyme.interface'
-import { type RegisterPymeFormData, type RegisterPymeDocumentsFormData } from '@/schemas/pyme.schema'
+import { type RegisterPymeFormData } from '@/schemas/pyme.schema'
 
 export const pymeRegister = async (data: RegisterPymeFormData): Promise<RegisterPymeSucessResponse> => {
   try {
@@ -22,15 +22,16 @@ export const pymeRegister = async (data: RegisterPymeFormData): Promise<Register
 }
 
 export const pymeRegisterDocuments = async (
-  data: RegisterPymeDocumentsFormData
+  // data: RegisterPymeDocumentsFormData
+  data: FormData
 ): Promise<RegisterPymeSucessResponse> => {
   try {
     const token = localStorage.tokenPyme
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/companies/ID_PYME_CHECKTHIS`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/documents/upload`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify(data)
+      headers: { Authorization: `Bearer ${token}` },
+      body: data
     })
 
     const result = await response.json()

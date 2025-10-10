@@ -29,17 +29,14 @@ export const SignSingleDocument = ({
       const pdfImagesProcessed = await convertirPDFaImagenes(pdfFile)
       setPDFImages(pdfImagesProcessed)
       setIsLoading(false)
-      // console.log(pdfImagesProcessed)
     }
-    // console.log(pdfFile)
     if (pdfFile) {
       processPDF()
     }
   }, [pdfFile])
 
   const handleSigned = (pdfSigned: SignedPDF) => {
-    // console.log({ ...pdfSigned, name: pdfName })
-    onSuccess({ ...pdfSigned, name: pdfName })
+    onSuccess({ ...pdfSigned, docName: pdfName })
   }
 
   const convertirPDFaImagenes = async (file: File | null): Promise<Array<PDFImagesProcessed>> => {
@@ -122,7 +119,6 @@ const SignFrame = ({
   const initialHeight = 161
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
-  // const [signPDF, setSignPDF] = useState<File | null>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [signDraw, setSignDraw] = useState('')
 
@@ -138,9 +134,8 @@ const SignFrame = ({
     const rect = canvas.getBoundingClientRect()
     ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top)
     ctx.beginPath()
-    // console.log(canvas.width)
 
-    ctx.lineWidth = 2
+    ctx.lineWidth = 1
     ctx.lineCap = 'round'
     ctx.strokeStyle = '#000'
     setIsDrawing(true)

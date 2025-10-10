@@ -1,1 +1,1 @@
-export type SignedPDF = { imageBytes: ArrayBuffer; pdfBytes: ArrayBuffer; urlPreview: string; name?: string }
+export type SignedPDF = { imageBytes: ArrayBuffer; pdfBytes: ArrayBuffer; urlPreview: string; docName?: string }

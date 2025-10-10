@@ -1,12 +1,10 @@
 import { useState } from 'react'
-// import { SignSingleDocument } from './components/SignSingleDocument'
 import { SignSingleDocument } from './SignSingleDocument'
 import { useDropzone } from 'react-dropzone'
 import { useCallback } from 'react'
 import { IoIosAddCircleOutline, IoIosAddCircle } from 'react-icons/io'
 import type { SignedPDF } from '@/interfaces/sign.interface'
-
-// type SignedPDF = { imageBytes: ArrayBuffer; pdfBytes: ArrayBuffer; urlPreview: string; name: string }
+import { TbTrashX } from 'react-icons/tb'
 
 export const SignDocuments = ({ onSignDocument }: { onSignDocument: (signedPDFs: Array<SignedPDF>) => void }) => {
   const [PDFFiles, setPDFFiles] = useState<Array<File>>([])
@@ -15,7 +13,7 @@ export const SignDocuments = ({ onSignDocument }: { onSignDocument: (signedPDFs:
   const [currentPDF, setCurrentPDF] = useState('')
 
   const removePDF = (name: string) => {
-    setSignedPDFFiles((prev) => prev.filter((signedPDF) => signedPDF.name !== name))
+    setSignedPDFFiles((prev) => prev.filter((signedPDF) => signedPDF.docName !== name))
     setPDFFiles((prev) => prev.filter((pdf) => pdf.name !== name))
   }
 
@@ -74,28 +72,31 @@ export const SignDocuments = ({ onSignDocument }: { onSignDocument: (signedPDFs:
           </div>
         )}
       </div>
-      <div className='flex flex-col my-3 gap-3  items-center'>
-        <h2 className='text-xl'>Documentos agregados :</h2>
+      <div className='flex flex-col gap-3  items-center'>
+        <h2 className='text-xl mb-8'>Documentos agregados :</h2>
         {PDFFiles.map((pdfFile, index) => {
-          const signedPDFData = SignedPDFFiles.find((pdfSigned) => pdfSigned.name == pdfFile.name)
+          const signedPDFData = SignedPDFFiles.find((pdfSigned) => pdfSigned.docName == pdfFile.name)
           return !signedPDFData ? (
             <div
               key={index}
-              className='flex gap-5 border-2 border-[var(--primary)] items-center justify-around border-dashed rounded-md p-2 w-sm max-w-full'
+              className='flex gap-5 border-b-1 border-[#ccc]  justify-around items-center py-2  w-sm max-w-full'
             >
-              <p className='flex-1 overflow-hidden text-ellipsis'>{pdfFile.name}</p>
+              <p className='overflow-hidden text-center text-ellipsis text-[var(--font-title-light)] font-medium'>
+                {pdfFile.name.split('.pdf')[0]}
+              </p>
+
               <button
-                className='bg-red-400 p-1 px-2 flex-1 text-white borderborder-red-400 rounded-md hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
+                className='text-red-500 text-3xl cursor-pointer hover:text-[#8c060c]'
                 onClick={(e) => {
                   e.preventDefault()
                   removePDF(pdfFile.name)
                 }}
               >
-                Quitar
+                <TbTrashX />
               </button>
 
               <button
-                className='bg-[var(--primary)] flex-1 p-1 px-2 text-white border border-[var(--primary)] rounded-md hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
+                className='bg-[var(--primary)] p-1 px-2 text-white text-center border border-[var(--primary)] rounded-md hover:bg-[#0972a6] duration-150 cursor-pointer'
                 onClick={(e) => {
                   e.preventDefault()
                   signPDF(pdfFile.name)
@@ -107,21 +108,24 @@ export const SignDocuments = ({ onSignDocument }: { onSignDocument: (signedPDFs:
           ) : (
             <div
               key={index}
-              className='flex gap-5 border-2 border-[var(--primary)] items-center justify-around border-dashed rounded-md p-2 w-sm max-w-full'
+              className='flex gap-5 border-b-1 border-[#ccc]  justify-around items-center py-2  w-sm max-w-full'
             >
-              <p className='flex-1 overflow-hidden text-ellipsis'>{pdfFile.name}</p>
+              <p className='overflow-hidden text-center text-ellipsis text-[var(--font-title-light)] font-medium'>
+                {pdfFile.name.split('.pdf')[0]}
+              </p>
               <button
-                className='bg-red-400 flex-1 p-1 px-2 text-white border border-red-400 rounded-md hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                onClick={() => {
+                className='text-red-500 text-3xl cursor-pointer hover:text-[#8c060c]'
+                onClick={(e) => {
+                  e.preventDefault()
                   removePDF(pdfFile.name)
                 }}
               >
-                Quitar
+                <TbTrashX />
               </button>
               <a
                 href={signedPDFData.urlPreview}
                 target='blank_'
-                className='bg-green-400 flex-1 p-1 px-2 text-white text-center border border-red-400 rounded-md hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
+                className='bg-[#12b92f] p-1 px-2 text-white text-center rounded-md hover:bg-[#18912d] duration-150 cursor-pointer'
               >
                 Revisar
               </a>

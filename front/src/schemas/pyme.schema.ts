@@ -39,6 +39,7 @@ export const registerPymeDocumentsSchema = z.object({
   isOwner: z.boolean(),
   documents: z.array(
     z.object({
+      docName: z.string(),
       data: z.instanceof(ArrayBuffer),
       sign: z.instanceof(ArrayBuffer)
     })

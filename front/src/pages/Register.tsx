@@ -45,7 +45,7 @@ export const Register = () => {
   return (
     <div className='min-h-screen flex flex-col'>
       <div className='sticky top-0 z-50'>
-        <Header avatar='' />
+        <Header />
       </div>
       <section className='flex-grow flex items-center justify-center'>
         <section className='w-full max-w-md px-4'>

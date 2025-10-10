@@ -5,35 +5,42 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { registerPymeSchema, type RegisterPymeFormData } from '@/schemas/pyme.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-// import { TbTrashX } from 'react-icons/tb'
-// import { SignDocuments } from '@/components/SignDocuments'
-// import { SignSingleDocument } from '@/components/SignSingleDocument'
-// import type { SignedPDF } from '@/interfaces/sign.interface'
 import { usePymeRegister } from '@/hooks/usePyme'
-import { ImSpinner9 } from 'react-icons/im'
 import { useNavigate } from 'react-router-dom'
-
+import { toast } from 'sonner'
+import { useUserAuthenticate } from '@/hooks/useUser'
 export const RegisterPyme = () => {
   const navigate = useNavigate()
-
   const maxStep = 3
   const [step, setStep] = useState(0) //useState(4)
-  // const [isOwner, setIsOwner] = useState(false)
-  // const [notarialPDF, setNotarialPDF] = useState<File | null>(null)
-  // const [signedPDFs, setSignedPDFs] = useState<Array<SignedPDF>>([])
-  // const [notarialSignedPDF, setNotarialSignedPDF] = useState<SignedPDF | null>(null)
+  const { getUser, isLoading } = useUserAuthenticate()
 
   const {
     mutate: pymeRegister,
     isPending,
-    isError,
-    error
+    isError
+    // error
   } = usePymeRegister({
     onSuccess: (data) => {
       console.log(data)
       navigate(`/Dashboard/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
     }
   })
+
+  useEffect(() => {
+    if (!isLoading && getUser == '') {
+      navigate('/Login')
+    }
+  }, [getUser, isLoading, navigate])
+
+  useEffect(() => {
+    if (isPending) {
+      toast('Guardando los cambios ...')
+    }
+    if (isError) {
+      toast('No se pudo guardar sus cambios')
+    }
+  }, [isPending, isError])
 
   const {
     register: registerPyme,
@@ -50,22 +57,7 @@ export const RegisterPyme = () => {
     }
   }, [errors, setStep])
 
-  // useEffect(() => {
-  //   const signedPDFToSend: Array<{ data: ArrayBuffer; sign: ArrayBuffer }> = []
-  //   signedPDFs.forEach((signedPDF) => {
-  //     // const data:{ data: ArrayBuffer; sign: ArrayBuffer } = {}
-  //     const value = { data: signedPDF.pdfBytes, sign: signedPDF.imageBytes }
-  //     signedPDFToSend.push(value)
-  //   })
-  //   setValue('pymeData.documents', signedPDFToSend)
-  // }, [notarialSignedPDF, signedPDFs, setValue])
-
   const onSubmit = (data: RegisterPymeFormData) => {
-    // if (!data.isOwner && notarialSignedPDF == null) {
-    //   alert('Debes adjuntar y firmar el poder notarial')
-    //   return
-    // }
-    // console.log(data.pymeData.documents)
     console.log(data)
     pymeRegister(data)
   }
@@ -100,7 +92,9 @@ export const RegisterPyme = () => {
 
   return (
     <>
-      <Header avatar={''} />
+      {/* <Header avatar={''} /> */}
+      <Header />
+
       {/* TEMPORAL */}
       {/* {isError && (
         <div className='text-5xl text-red-500'>
@@ -173,30 +167,6 @@ export const RegisterPyme = () => {
                   />
                   {errors.email && <p className='text-red-500 text-center'>{errors.email.message}</p>}
                 </div>
-                {/* <div className='flex flex-col gap-1'>
-                  <p className='text-sm'>Nombre dueño</p>
-
-                  <input
-                    {...registerPyme('ownerName')}
-                    type='text'
-                    className='border p-2 border-[#D1D5DB] rounded-md'
-                    placeholder='Nombre del titular de la empresa'
-                    style={{ borderColor: errors.ownerName ? 'red' : '' }}
-                  />
-                  {errors.ownerName && <p className='text-red-500 text-center'>{errors.ownerName.message}</p>}
-                </div>
-                <div className='flex flex-col gap-1'>
-                  <p className='text-sm'>Apellido dueño</p>
-
-                  <input
-                    type='text'
-                    {...registerPyme('ownerSurname')}
-                    className='border p-2 border-[#D1D5DB] rounded-md'
-                    placeholder='Apellido del titular de la empresa'
-                    style={{ borderColor: errors.ownerSurname ? 'red' : '' }}
-                  />
-                  {errors.ownerSurname && <p className='text-red-500 text-center'>{errors.ownerSurname.message}</p>}
-                </div> */}
               </div>
             </div>
           )}
@@ -356,19 +326,7 @@ export const RegisterPyme = () => {
                   />
                   {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
                 </div>
-                {/* <div className='flex flex-col gap-1'>
-                  <p className='text-sm'>Teléfono de propietario</p>
-                  <input
-                    type='text'
-                    {...registerPyme('ownerPhone')}
-                    className='border p-2 border-[#D1D5DB] rounded-md'
-                    placeholder='+54 11 1234-5678'
-                    style={{ borderColor: errors.pymeData?.contact?.phone ? 'red' : '' }}
-                  />
-                  {errors.pymeData?.contact?.ownerPhone && (
-                    <p className='text-red-500 text-center'>{errors.pymeData?.contact?.ownerPhone.message}</p>
-                  )}
-                </div> */}
+
                 <div className='flex flex-col gap-1 col-span-2'>
                   <p className='text-sm'>Website (opcional)</p>
                   <input
@@ -394,89 +352,6 @@ export const RegisterPyme = () => {
               </div>
             </div>
           )}
-          {/* {step == 4 && (
-            <div>
-              <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
-                Documentación
-              </h3>
-
-              <div className='flex flex-col  xl:flex-row gap-2 justify-around items-center border-2 border-[var(--primary)] border-dashed rounded-md py-3'>
-                <div className='flex flex-col sm:flex-row items-center gap-3'>
-                  <p className='text-lg'>Es el dueño de la pyme?</p>
-                  <input
-                    type='checkbox'
-                    className='cursor-pointer w-5'
-                    {...registerPyme('isOwner')}
-                    onChange={(e) => {
-                      setIsOwner(e.target.checked)
-                    }}
-                  />
-                </div>
-
-                {!isOwner && (
-                  <div className='flex flex-col gap-2 p-5'>
-                    <p className='text-sm'>Poder Notarial con Facultades para Endeudamiento:</p>
-                    {
-                      notarialPDF == null ? (
-                        <input
-                          accept='.pdf'
-                          disabled={notarialPDF != null}
-                          type='file'
-                          className='border p-2 border-[#D1D5DB] rounded-md w-full'
-                          onChange={(e) => {
-                            const pdfFile = e.target.files?.[0]
-                            if (pdfFile && pdfFile.type == 'application/pdf') {
-                              setNotarialPDF(pdfFile)
-                            } else {
-                              setNotarialPDF(null)
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className='flex items-center gap-1 justify-around'>
-                          <p className='text-[var(--font-title-light)] font-medium'>{notarialPDF.name}</p>
-                          {notarialSignedPDF != null ? (
-                            <a
-                              target='blank_'
-                              href={notarialSignedPDF.urlPreview}
-                              className='px-3 border border-[var(--primary)] rounded-md text-white bg-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                            >
-                              Revisar
-                            </a>
-                          ) : (
-                            <button
-                              className='px-3 border border-[var(--primary)] rounded-md text-white bg-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                              // onClick={(e) => {
-                              //   e.preventDefault()
-                              //   handleNotarialPDFSign()
-                              // }}
-                            >
-                              Firmar
-                            </button>
-                          )}
-                          <button
-                            className='text-red-500 text-3xl cursor-pointer hover:text-[#8c060c]'
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setNotarialPDF(null)
-                              setNotarialSignedPDF(null)
-                            }}
-                          >
-                            <TbTrashX />
-                          </button>
-                        </div>
-                        // {!errors.website && <p className='text-red-500 text-center'>{'errors.website.message'}</p>}
-                      )
-                      // </div>
-                    }
-                  </div>
-                )}
-              </div>
-              <div className='border-2 border-[var(--primary)] border-dashed my-3 sm:p-5 rounded-md'>
-                <SignDocuments onSignDocument={handleSignedDocuments} />
-              </div>
-            </div>
-          )} */}
 
           <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
             <button
@@ -502,26 +377,15 @@ export const RegisterPyme = () => {
             )}
           </div>
         </form>
-        {/* {notarialPDF != null && notarialSignedPDF == null && (
-          <SignSingleDocument
-            pdfFile={notarialPDF}
-            onSuccess={(signedPDF) => {
-              const newSignedPDFFiles = [...signedPDFs]
-              newSignedPDFFiles.push(signedPDF)
-              setNotarialSignedPDF(signedPDF)
-              setSignedPDFs(newSignedPDFFiles)
-              console.log(newSignedPDFFiles)
-            }}
-          />
-        )} */}
-        {isPending && (
+
+        {/* {isPending && (
           <div className='fixed w-[100vw] top-[0] left-[0] h-[100vh] bg-[rgba(0,0,0,.9)]'>
             <div className='flex flex-col gap-15 items-center text-5xl mt-30 text-white'>
               <span>Cargando ...</span>
               <ImSpinner9 className='w-[200px] h-[200px] animate-spin' />
             </div>
           </div>
-        )}
+        )}*/}
       </section>
 
       <Footer />

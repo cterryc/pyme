@@ -27,7 +27,7 @@ export const Landing = () => {
 
   return (
     <>
-      <Header avatar={getUser || ''} />
+      <Header />
       <section
         className={`min-h-[500px] p-5 overflow-hidden bg-center bg-[url("assets/landing/portada.jpeg")] flex flex-col justify-around text-white text-center`}
       >

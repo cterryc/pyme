@@ -21,7 +21,8 @@ export const usePymeRegister = ({ onSuccess, onError }: UsePymeRegisterProps) =>
 }
 
 export const usePymeRegisterDocuments = ({ onSuccess, onError }: UsePymeRegisterProps) => {
-  return useMutation<RegisterPymeSucessResponse, RegisterPymeErrorResponse, RegisterPymeDocumentsFormData>({
+  // return useMutation<RegisterPymeSucessResponse, RegisterPymeErrorResponse, RegisterPymeDocumentsFormData>({
+  return useMutation<RegisterPymeSucessResponse, RegisterPymeErrorResponse, FormData>({
     mutationFn: async (data) => pymeRegisterDocuments(data),
     onSuccess: (data) => {
       if (onSuccess) onSuccess(data)
