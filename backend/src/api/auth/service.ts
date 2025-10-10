@@ -11,8 +11,8 @@ import {
   IUpdateUserPayload,
   UserDTO,
 } from "./interfaces";
-import { generateToken } from "../../utils/jwt.utils";
-import { htmlWelcomeContent } from "./helpers";
+import { generateToken, generateResetPasswordToken, verifyResetPasswordToken } from "../../utils/jwt.utils";
+import { htmlWelcomeContent, htmlResetPasswordContent } from "./helpers";
 import config from "../../config/enviroment.config";
 
 export default class AuthService {
@@ -211,5 +211,83 @@ export default class AuthService {
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
     };
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const user = await this.userRepo.findOne({
+      where: { email: normalizedEmail },
+      select: ["id", "email", "firstName"],
+    });
+
+    if (!user) {
+      // Nota: Por seguridad, no se revela si el email existe o no
+      return;
+    }
+
+    const resetToken = generateResetPasswordToken({
+      userId: user.id,
+      email: user.email,
+    });
+
+    const resetUrl = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    const userName = user.firstName || "Usuario";
+
+    // Enviar email con Brevo
+    const url = "https://api.brevo.com/v3/smtp/email";
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "api-key": config.BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: "Pyme", email: "nc.equipo21@gmail.com" },
+        replyTo: { email: "nc.equipo21@gmail.com", name: "Equipo de Soporte" },
+        to: [{ email: user.email, name: userName }],
+        subject: "Restablece tu contraseña - Pyme",
+        htmlContent: htmlResetPasswordContent(resetUrl, userName),
+      }),
+    };
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        console.error("Error al enviar email de restablecimiento:", await response.text());
+        // Opcional: lanzar error si es crítico, pero comúnmente se loguea y se responde OK por seguridad
+      }
+    } catch (err) {
+      console.error("Excepción al enviar email de restablecimiento:", err);
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    let payload: { userId: string; email: string };
+    try {
+      payload = verifyResetPasswordToken(token);
+    } catch (error) {
+      throw new HttpError(HttpStatus.UNAUTHORIZED, "Token inválido o expirado");
+    }
+
+    const user = await this.userRepo.findOne({
+      where: { id: payload.userId, email: payload.email },
+      select: ["id", "password"],
+    });
+
+    if (!user) {
+      throw new HttpError(HttpStatus.UNAUTHORIZED, "Token inválido");
+    }
+
+    // Evitar reutilizar la misma contraseña (opcional, pero recomendado)
+    const isSamePassword = await BcryptUtils.isValidPassword(user, newPassword);
+    if (isSamePassword) {
+      throw new HttpError(HttpStatus.BAD_REQUEST, "La nueva contraseña debe ser diferente a la actual");
+    }
+
+    const hashedPassword = await BcryptUtils.createHash(newPassword);
+    await this.userRepo.update(user.id, { password: hashedPassword });
   }
 }
