@@ -28,7 +28,7 @@ export const Login = () => {
     error
   } = useAuthLogin({
     onSuccess: (data) => {
-      localStorage.setItem("tokenPyme", data.payload.token);
+      localStorage.setItem('tokenPyme', data.payload.token)
       console.log('Login successful:', data)
       navigate('/')
     }
@@ -44,7 +44,7 @@ export const Login = () => {
   return (
     <div className='min-h-screen flex flex-col'>
       <div className='sticky top-0 z-50'>
-        <Header avatar='' />
+        <Header />
       </div>
       <section className='flex-grow flex items-center justify-center'>
         <section className='w-full max-w-md px-4'>
@@ -57,17 +57,17 @@ export const Login = () => {
               </Link>
             </p>
           </div>
-          {isError && error?.payload && (
-            Array.isArray(error.payload) ? (
-              <ul className="text-red-500 text-xs my-2">
+          {isError &&
+            error?.payload &&
+            (Array.isArray(error.payload) ? (
+              <ul className='text-red-500 text-xs my-2'>
                 {error.payload.map((err, i) => (
                   <li key={i}>Error: {err.message}</li>
                 ))}
               </ul>
             ) : (
-              <p className="text-red-500 text-xs my-2">Error: {error.payload.message}</p>
-            )
-          )}
+              <p className='text-red-500 text-xs my-2'>Error: {error.payload.message}</p>
+            ))}
           <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-0 ${!isError && 'mt-6'}`}>
             <div className='rounded-t-md border-b-0 border-2 border-gray-300'>
               <input
@@ -92,8 +92,10 @@ export const Login = () => {
               />
             </div>
             <p className='text-[#0095d5] text-right mt-4 cursor-pointer'>Olvidaste tu contraseña?</p>
-            <button className='bg-[#0095d5] text-white p-3 rounded-md mt-6 hover:bg-[#28a9d6] transition-colors 
-            cursor-pointer'>
+            <button
+              className='bg-[#0095d5] text-white p-3 rounded-md mt-6 hover:bg-[#28a9d6] transition-colors 
+            cursor-pointer'
+            >
               {isPending ? 'logueando...' : 'Iniciar Sesión'}
             </button>
           </form>
