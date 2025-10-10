@@ -21,10 +21,7 @@ export const pymeRegister = async (data: RegisterPymeFormData): Promise<Register
   }
 }
 
-export const pymeRegisterDocuments = async (
-  // data: RegisterPymeDocumentsFormData
-  data: FormData
-): Promise<RegisterPymeSucessResponse> => {
+export const pymeRegisterDocuments = async (data: FormData): Promise<RegisterPymeSucessResponse> => {
   try {
     const token = localStorage.tokenPyme
 
