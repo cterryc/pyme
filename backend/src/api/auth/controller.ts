@@ -6,6 +6,8 @@ import {
   IRegisterPayload,
   ILoginPayload,
   IUpdateUserPayload,
+  IForgotPasswordPayload,
+  IResetPasswordPayload,
 } from "./interfaces";
 
 export default class AuthController {
@@ -62,6 +64,31 @@ export default class AuthController {
       );
 
       res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (err: any) {
+      next(err);
+    }
+  };
+
+  static forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body;
+      const payload: IForgotPasswordPayload = { email };
+
+      await AuthController.authService.forgotPassword(payload.email);
+      // Siempre responde OK por seguridad, incluso si el email no existe
+      res.status(HttpStatus.OK).json(apiResponse(true, null));
+    } catch (err: any) {
+      next(err);
+    }
+  };
+
+  static resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { token, newPassword } = req.body;
+      const payload: IResetPasswordPayload = { token, newPassword };
+
+      await AuthController.authService.resetPassword(payload.token, payload.newPassword);
+      res.status(HttpStatus.OK).json(apiResponse(true, null));
     } catch (err: any) {
       next(err);
     }

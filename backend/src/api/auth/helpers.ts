@@ -171,3 +171,87 @@ export const htmlWelcomeContent = (usuario = "Usuario") => {
 </html>
     `;
 };
+
+export const htmlResetPasswordContent = (resetUrl: string, userName = "Usuario") => {
+  return `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - Pyme</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f7fa; font-family: Arial, sans-serif;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f5f7fa;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #4a6fff 0%, #2a56d6 100%); padding: 30px 40px; text-align: center; color: white;">
+                            <div style="font-size: 28px; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px;">PYME</div>
+                            <div style="font-size: 16px; font-weight: 300; opacity: 0.9;">Recuperación de Contraseña</div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Contenido -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <h1 style="font-size: 24px; color: #2d3748; margin-bottom: 20px; text-align: center; font-weight: 600;">
+                                Hola, ${userName}
+                            </h1>
+                            
+                            <p style="color: #4a5568; line-height: 1.6; margin-bottom: 20px; font-size: 16px;">
+                                Recibimos una solicitud para restablecer la contraseña de tu cuenta. Si no realizaste esta solicitud, puedes ignorar este correo de forma segura.
+                            </p>
+
+                            <p style="color: #4a5568; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+                                Para restablecer tu contraseña, haz clic en el siguiente botón:
+                            </p>
+                            
+                            <!-- Botón CTA -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #4a6fff 0%, #2a56d6 100%); color: white; padding: 16px 30px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 18px; box-shadow: 0 4px 15px rgba(74, 111, 255, 0.3);">
+                                            Restablecer Contraseña
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Alerta de seguridad -->
+                            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                                <p style="margin: 0; color: #856404; font-size: 14px;">
+                                    <strong>⚠️ Importante:</strong> Este enlace expirará en <strong>1 hora</strong> por seguridad. Si el enlace expira, deberás solicitar uno nuevo.
+                                </p>
+                            </div>
+
+                            <p style="color: #718096; font-size: 14px; line-height: 1.5; margin-top: 30px;">
+                                Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+                            </p>
+                            <p style="word-break: break-all; color: #4a6fff; font-size: 14px; background: #f7f9fc; padding: 10px; border-radius: 4px;">
+                                ${resetUrl}
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background: #f7f9fc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+                            <p style="color: #718096; font-size: 14px; margin: 0 0 10px 0;">
+                                Si no solicitaste restablecer tu contraseña, contacta a nuestro equipo de soporte de inmediato.
+                            </p>
+                            <div style="color: #a0aec0; font-size: 14px; margin-top: 20px;">
+                                © 2025 Pyme. Todos los derechos reservados.
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+  `;
+};

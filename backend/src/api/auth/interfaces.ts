@@ -54,3 +54,18 @@ export interface UserDTO {
 //   createdAt: Date;
 //   updatedAt: Date;
 // }
+
+export interface IForgotPasswordPayload {
+  email: string;
+}
+
+export interface IResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+export interface IResetPasswordTokenPayload {
+  userId: string;
+  email: string;
+  exp?: number;
+}
