@@ -32,3 +32,19 @@ export const decodeToken = (token: string): ITokenPayload | null => {
         return null;
     }
 };
+
+// utils/jwt.utils.ts (agrega al final del archivo)
+
+export const generateResetPasswordToken = (payload: { userId: string; email: string }): string => {
+  return jwt.sign(payload, config.JWT_SECRET, {
+    expiresIn: '1h',
+  });
+};
+
+export const verifyResetPasswordToken = (token: string): { userId: string; email: string } => {
+  try {
+    return jwt.verify(token, config.JWT_SECRET) as { userId: string; email: string };
+  } catch (error) {
+    throw new Error("Invalid or expired reset password token");
+  }
+};
