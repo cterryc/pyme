@@ -2,8 +2,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi'
 import { useState } from 'react'
 import { useUserAuthenticate } from '@/hooks/useUser'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const Header = (/*{ avatar }: { avatar?: string }*/) => {
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false)
   const [avatar] = useState('')
@@ -14,6 +16,7 @@ export const Header = (/*{ avatar }: { avatar?: string }*/) => {
 
   const deleteToken = () => {
     localStorage.removeItem('tokenPyme')
+    queryClient.clear()
     navigate('/Login')
   }
 
