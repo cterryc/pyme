@@ -29,7 +29,8 @@ export const Landing = () => {
     <>
       <Header />
       <section
-        className={`min-h-[500px] p-5 overflow-hidden bg-center bg-[url("assets/landing/portada.jpeg")] flex flex-col justify-around text-white text-center`}
+        className={`min-h-[500px] p-5 overflow-hidden bg-center flex flex-col justify-around text-white text-center`}
+        style={{ backgroundImage: `url("assets/landing/portada.jpeg")` }}
       >
         <div className='max-w-200 w-full mx-auto flex flex-col gap-8'>
           <p className='text-3xl md:text-6xl font-bold'>Impulsa tu negocio con el crédito ideal</p>
