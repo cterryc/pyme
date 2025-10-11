@@ -1,11 +1,12 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   type RegisterPymeErrorResponse,
   type RegisterPymeSucessResponse,
-  type RegisterPymeDocumentsSuccessResponse
+  type RegisterPymeDocumentsSuccessResponse,
+  type GetPymesByUserResponse
 } from '@/interfaces/pyme.interface'
 import { type RegisterPymeFormData } from '@/schemas/pyme.schema'
-import { pymeRegister, pymeRegisterDocuments } from '@/services/pyme.service'
+import { getPymesByUser, pymeRegister, pymeRegisterDocuments } from '@/services/pyme.service'
 
 interface UsePymeRegisterProps {
   onSuccess?: (data: RegisterPymeSucessResponse) => void
@@ -39,5 +40,15 @@ export const usePymeRegisterDocuments = ({ onSuccess, onError }: UsePymeRegister
     onError: (error) => {
       if (onError) onError(error)
     }
+  })
+}
+
+export const useGetPymesByUser = () => {
+  return useQuery<GetPymesByUserResponse>({
+    queryKey: ['pymesByUser'],        // clave única para cache
+    queryFn: () => getPymesByUser(),  // función que trae los datos
+    staleTime: 1000 * 60 * 5,           // 5 min antes de recargar
+    retry: 1,                           // reintenta 1 vez si falla
+    refetchOnWindowFocus: false,        // no recarga al volver a la pestaña
   })
 }

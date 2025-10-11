@@ -80,26 +80,6 @@ export default class CompanyController {
     }
   };
 
-  // static uploadCompanyDocument = async (req: Request, res: Response, next: NextFunction) => {
-  //     try {
-  //         const companyId = parseInt(req.params.id, 10);
-  //         if (!companyId) {
-  //             return apiResponse(res, HttpStatus.BAD_REQUEST, { message: "Company ID is required" });
-  //         }
-  //         const document = req.file;
-  //         if (!document) {
-  //             return apiResponse(res, HttpStatus.BAD_REQUEST, { message: "Document is required" });
-  //         }
-  //         const uploadedDocument = await this.companyService.uploadCompanyDocument(companyId, document);
-  //         if (!uploadedDocument) {
-  //             return apiResponse(res, HttpStatus.NOT_FOUND, { message: "Company not found" });
-  //         }
-  //         return apiResponse(res, HttpStatus.OK, uploadedDocument);
-  //     } catch (error) {
-  //         return next(error);
-  //     }
-  // };
-
   // static getCompanyDocuments = async (req: Request, res: Response, next: NextFunction) => {
   //     try {
   //         const companyId = parseInt(req.params.id, 10);
