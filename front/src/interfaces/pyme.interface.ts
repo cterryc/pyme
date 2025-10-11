@@ -42,3 +42,18 @@ export type DocumentResponse = {
   createdAt: string
   updatedAt: string
 }
+
+export type GetPymeResponse = {
+  id: string
+  legalName: string
+  industry: string
+  ownerName: string
+  ownerSurname: string
+  statusCredit: string
+  hasDocuments: boolean
+}
+
+export type GetPymesByUserResponse = {
+  success: boolean;
+  payload: GetPymeResponse[];
+};
