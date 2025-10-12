@@ -50,10 +50,10 @@ export class Document extends BaseEntity {
     signedAt?: Date;
 
     @Index()
-    @Column({ type: "varchar", length: 64, nullable: true })
+    @Column({ type: "varchar", length: 255, nullable: true })
     contentHash!: string;
 
-    @Column({ type: "varchar", length: 64, nullable: true })
+    @Column({ type: "varchar", length: 255, nullable: true })
     signatureHash?: string;
 
     @Column({ type: "varchar", length: 50, nullable: true })

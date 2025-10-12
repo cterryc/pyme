@@ -67,3 +67,23 @@ export const userUpdatePayloadValidator = z.object({
     .optional(),
   currentPassword: z.string().optional(),
 });
+
+export const forgotPasswordValidator = z.object({
+  email: z.string().email({ message: "Dirección de email inválida" }),
+});
+
+export const resetPasswordValidator = z.object({
+  token: z.string().min(1, { message: "El token es requerido" }),
+  newPassword: z
+    .string()
+    .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
+    .regex(/[A-Z]/, {
+      message: "La contraseña debe contener al menos una letra mayúscula",
+    })
+    .regex(/[a-z]/, {
+      message: "La contraseña debe contener al menos una letra minúscula",
+    })
+    .regex(/[0-9]/, {
+      message: "La contraseña debe contener al menos un número",
+    }),
+});

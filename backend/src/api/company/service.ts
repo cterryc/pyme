@@ -61,6 +61,7 @@ export default class CompanyService {
     const companies = await this.companyRepo.find({
       where: { owner: { id: userId }, deletedAt: IsNull() },
       order: { createdAt: "DESC" },
+      relations: ["documents", "creditApplications", "owner"],
     });
 
     return toCompanyListDto(companies);
@@ -85,7 +86,7 @@ export default class CompanyService {
     companyId: string,
     companyData: Partial<Company>,
     userId: string
-  ): Promise<responseCompanyDto | null> {
+  ): Promise<Object | null> {
     const company = await this.companyRepo.findOne({
       where: { id: companyId, owner: { id: userId } },
     });
@@ -155,22 +156,6 @@ export default class CompanyService {
   //     });
   // }
 
-  // async addDocumentToCompany(companyId: number, documentId: number): Promise<Company | null> {
-  //     const company = await this.companyRepo.findOne({
-  //         where: { id: companyId },
-  //         relations: ["documents"],
-  //     });
-  //     if (!company) {
-  //         return null;
-  //     }
-  //     const document = await this.documentRepo.findOne({ where: { id: documentId } });
-  //     if (!document) {
-  //         return null;
-  //     }
-  //     company.documents.push(document);
-  //     await this.companyRepo.save(company);
-  //     return company;
-  // }
   // async removeDocumentFromCompany(companyId: number, documentId: number): Promise<Company | null> {
   //     const company = await this.companyRepo.findOne({
   //         where: { id: companyId },
