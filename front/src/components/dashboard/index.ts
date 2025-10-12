@@ -1,0 +1,5 @@
+export { DashboardOverview } from './DashboardOverview'
+export { SolicitudesContent } from './SolicitudesContent'
+export { MypesContent } from './MypesContent'
+export { ProductosContent } from './ProductosContent'
+export { ConfiguracionContent } from './ConfiguracionContent'

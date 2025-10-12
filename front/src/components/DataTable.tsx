@@ -1,0 +1,100 @@
+import { StatusBadge } from './StatusBadge'
+
+interface Column {
+  key: string
+  label: string
+  width?: string
+  align?: 'left' | 'center' | 'right'
+  render?: (value: any, row: any) => React.ReactNode
+}
+
+interface DataTableProps {
+  columns: Column[]
+  data: any[]
+  onRowClick?: (row: any) => void
+}
+
+export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(amount)
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-AR')
+  }
+
+  const renderCellValue = (column: Column, value: any, row: any) => {
+    if (column.render) {
+      return column.render(value, row)
+    }
+
+    // Auto-format based on column key
+    if (column.key.toLowerCase().includes('fecha') && value) {
+      return formatDate(value)
+    }
+    
+    if (column.key.toLowerCase().includes('monto') || column.key.toLowerCase().includes('amount')) {
+      return formatCurrency(value)
+    }
+
+    if (column.key.toLowerCase().includes('estado') || column.key.toLowerCase().includes('status')) {
+      return <StatusBadge status={value} />
+    }
+
+    return value
+  }
+
+  const getAlignmentClass = (align?: string) => {
+    switch (align) {
+      case 'center':
+        return 'text-center'
+      case 'right':
+        return 'text-right'
+      default:
+        return 'text-left'
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map((column) => (
+                <th
+                  key={column.key}
+                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignmentClass(column.align)}`}
+                  style={{ width: column.width }}
+                >
+                  {column.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {data.map((row, index) => (
+              <tr
+                key={index}
+                className={`${onRowClick ? 'hover:bg-gray-50 cursor-pointer' : ''}`}
+                onClick={() => onRowClick?.(row)}
+              >
+                {columns.map((column) => (
+                  <td
+                    key={column.key}
+                    className={`px-6 py-4 whitespace-nowrap text-sm ${getAlignmentClass(column.align)}`}
+                  >
+                    {renderCellValue(column, row[column.key], row)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
