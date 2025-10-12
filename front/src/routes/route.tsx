@@ -21,13 +21,13 @@ export const mainRouter = createBrowserRouter([
     element: <Login />
   },
   {
-    path: '/Dashboard',
-    element: <AdminDashboard />
-  },
-  {
     path: '/Dashboard/RegistroPyme',
     element: <RegisterPyme />
-  }
+  },
+  {
+    path: '/AdminDashboard',
+    element: <AdminDashboard />
+  },
 
   // add pages
 ])
