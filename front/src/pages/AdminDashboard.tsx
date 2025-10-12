@@ -42,7 +42,7 @@ const DashboardContent = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <Header avatar='/assets/defaultAvatar.jpg' />
+      {/* <Header avatar='/assets/defaultAvatar.jpg' /> */}
       
       {/* Layout principal */}
       <div className="flex">
