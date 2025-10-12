@@ -65,7 +65,7 @@ const DashboardContent = () => {
   )
 }
 
-export const UserDashboard = () => {
+export const AdminDashboard = () => {
   return (
     <DashboardProvider>
       <DashboardContent />

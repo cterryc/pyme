@@ -3,7 +3,7 @@ import { Landing } from '../pages/Landing'
 import { Register } from '../pages/Register'
 import { NotFound } from '../pages/NotFound'
 import { Login } from '@/pages/Login'
-import { UserDashboard } from '@/pages/UserDashboard'
+import { AdminDashboard } from '@/pages/AdminDashboard'
 import { RegisterPyme } from '@/pages/RegisterPyme'
 
 export const mainRouter = createBrowserRouter([
@@ -22,7 +22,7 @@ export const mainRouter = createBrowserRouter([
   },
   {
     path: '/Dashboard',
-    element: <UserDashboard />
+    element: <AdminDashboard />
   },
   {
     path: '/Dashboard/RegistroPyme',
