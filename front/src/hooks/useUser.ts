@@ -1,26 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
-import { getUser } from "@/services/user.service";
-import { useEffect, useState } from "react";
-import { decodeToken } from "@/helpers/decodeToken";
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getUser } from '@/services/user.service'
+import { useEffect, useState } from 'react'
+import { decodeToken } from '@/helpers/decodeToken'
 
 export const useUser = () => {
   return useQuery({
-    queryKey: ["user"],
+    queryKey: ['user'],
     queryFn: getUser,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
-    refetchOnWindowFocus: false,
-  });
-};
+    refetchOnWindowFocus: false
+  })
+}
 
 export const useUserAuthenticate = () => {
-  const [getUser, setGetUser] = useState<string>("");
+  const queryClient = useQueryClient()
+  const [getUser, setGetUser] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem("tokenPyme");
-    const user = decodeToken(token || "");
-    setGetUser(user?.email.split("@")[0] || "");
-  }, []);
+    const token = localStorage.getItem('tokenPyme')
+    const user = decodeToken(token || '')
 
-  return { getUser };
-};
+    if (!user) queryClient.clear()
+
+    setGetUser(user?.email.split('@')[0] || '')
+    setIsLoading(false)
+  }, [queryClient])
+
+  return { getUser, isLoading }
+}

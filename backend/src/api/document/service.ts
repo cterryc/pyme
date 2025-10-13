@@ -39,7 +39,10 @@ export default class DocumentService {
   ): Promise<IDocumentResponse[]> {
     // Validar que existan archivos
     if (!files || files.length === 0) {
-      throw new HttpError(HttpStatus.BAD_REQUEST, "No se proporcionaron archivos");
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "No se proporcionaron archivos"
+      );
     }
 
     // Validar que la empresa exista
@@ -68,17 +71,16 @@ export default class DocumentService {
     // Validar tipos de archivo permitidos
     const allowedMimeTypes = [
       "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
     ];
 
     for (const file of files) {
       if (!allowedMimeTypes.includes(file.mimetype)) {
         throw new HttpError(
           HttpStatus.BAD_REQUEST,
-          `El archivo "${file.originalname}" no es válido. Solo se permiten PDF, Word y Excel.`
+          `El archivo "${file.originalname}" no es válido. Solo se permiten PDF e imágenes (JPG, PNG).`
         );
       }
 
