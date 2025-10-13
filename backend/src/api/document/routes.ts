@@ -11,7 +11,6 @@ import {
 
 const documentRouter = Router();
 
-// Configurar multer para almacenamiento en memoria
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -19,14 +18,8 @@ const upload = multer({
   },
 });
 
-// Todas las rutas requieren autenticación
 documentRouter.use(authenticate);
 
-/**
- * @route   POST /api/documents/upload
- * @desc    Subir uno o múltiples documentos
- * @access  Private
- */
 documentRouter.post(
   "/upload",
   upload.array("files", 10),
@@ -34,44 +27,24 @@ documentRouter.post(
   DocumentController.uploadDocuments
 );
 
-/**
- * @route   GET /api/documents/company/:companyId
- * @desc    Obtener todos los documentos de una empresa
- * @access  Private
- */
 documentRouter.get(
   "/company/:companyId",
   validateUuid,
   DocumentController.getDocumentsByCompany
 );
 
-/**
- * @route   DELETE /api/documents/:id
- * @desc    Eliminar un documento (soft delete)
- * @access  Private
- */
 documentRouter.delete(
   "/:id",
   validateUuid,
   DocumentController.deleteDocument
 );
 
-/**
- * @route   GET /api/documents/:id/download
- * @desc    Obtener URL de descarga de un documento
- * @access  Private
- */
 documentRouter.get(
   "/:id/download",
   validateUuid,
   DocumentController.getDocumentDownloadUrl
 );
 
-/**
- * @route   PATCH /api/documents/:id/status
- * @desc    Actualizar el estado de un documento
- * @access  Private
- */
 documentRouter.patch(
   "/:id/status",
   validateUuid,
