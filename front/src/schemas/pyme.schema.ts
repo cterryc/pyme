@@ -48,3 +48,15 @@ export const registerPymeDocumentsSchema = z.object({
 
 export type RegisterPymeFormData = z.infer<typeof registerPymeSchema>
 export type RegisterPymeDocumentsFormData = z.infer<typeof registerPymeDocumentsSchema>
+
+export const loanRequestSchema = z.object({
+  pymeId: z.uuid()
+})
+export const loanRequestConfirmSchema = z.object({
+  pymeId: z.uuid(),
+  amount: z.number().min(0),
+  paymentNumber: z.int().min(0)
+})
+
+export type LoanRequestConfirmFormData = z.infer<typeof loanRequestConfirmSchema>
+export type LoanRequestFormData = z.infer<typeof loanRequestSchema>

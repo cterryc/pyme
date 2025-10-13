@@ -6,6 +6,7 @@ import { Login } from '@/pages/Login'
 import { UserDashboard } from '@/pages/UserDashboard'
 import { RegisterPyme } from '@/pages/RegisterPyme'
 import { RegisterPymeDocuments } from '@/pages/RegisterPymeDocuments'
+import { LoanRequest } from '@/pages/LoanRequest'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export const mainRouter = createBrowserRouter([
   {
     path: '/Dashboard/RegistroDocumentosPyme/:id',
     element: <RegisterPymeDocuments />
+  },
+  {
+    path: '/Dashboard/SolicitudCredito/:id',
+    element: <LoanRequest />
   }
 
   // add pages
