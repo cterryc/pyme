@@ -51,7 +51,6 @@ export const usePymeRegisterDocuments = ({ onSuccess, onError }: UsePymeRegister
 }
 
 export const usePymeLoanRequest = ({ onSuccess, onError }: UsePymeLoanRequestProps) => {
-  // return useMutation<RegisterPymeSucessResponse, RegisterPymeErrorResponse, RegisterPymeDocumentsFormData>({
   return useMutation<LoanRequestResponse, LoanRequestErrorResponse, LoanRequestFormData>({
     mutationFn: async (data) => pymeLoanRequestOptions(data),
     onSuccess: (data) => {
