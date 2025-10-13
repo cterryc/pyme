@@ -89,15 +89,9 @@ export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
     const result = await response.json()
     if (!response.ok) throw result
 
-    return result
+    return result;
   } catch (error) {
-    console.error('[getPymesByUser]: Error fetching data:', error)
-=======
-    if (!response.ok) throw new Error(result.message || 'Error registering user')
-    return result
-  } catch (error) {
-    console.error('[authRegister]: Error fetching data:', error)
->>>>>>> Stashed changes
-    throw error
+    console.error("[getPymesByUser]: Error fetching data:", error);
+    throw error;
   }
 }
