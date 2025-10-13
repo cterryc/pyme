@@ -158,6 +158,32 @@ export const RegisterPyme = () => {
                   />
                   {errors.tradeName && <p className='text-red-500 text-center'>{errors.tradeName.message}</p>}
                 </div>
+
+                {/* <div className='flex flex-col gap-1'>
+                  <p className='text-sm'>Nombre del propietario</p>
+
+                  <input
+                    type='text'
+                    {...registerPyme('ownerName')}
+                    className='border p-2 border-[#D1D5DB] rounded-md'
+                    placeholder='Nombre del propietario de la empresa'
+                    style={{ borderColor: errors.ownerName ? 'red' : '' }}
+                  />
+                  {errors.ownerName && <p className='text-red-500 text-center'>{errors.ownerName.message}</p>}
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <p className='text-sm'>Apellido del propietario</p>
+
+                  <input
+                    {...registerPyme('ownerSurname')}
+                    type='text'
+                    className='border p-2 border-[#D1D5DB] rounded-md'
+                    placeholder='Apellido del propietario de la empresa'
+                    style={{ borderColor: errors.ownerSurname ? 'red' : '' }}
+                  />
+                  {errors.ownerSurname && <p className='text-red-500 text-center'>{errors.ownerSurname.message}</p>}
+                </div> */}
+
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>CUIT</p>
 
@@ -379,6 +405,14 @@ export const RegisterPyme = () => {
                 <span className='font-bold'>Nombre comercial : </span>
                 {getStoredData().tradeName}
               </p>
+              {/* <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Nombre del propietario :</span>
+                {getStoredData().ownerName}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Apellido del propietario : </span>
+                {getStoredData().ownerSurname}
+              </p> */}
               <p className='border-b-1 border-[#ddd]'>
                 <span className='font-bold'>CUIT : </span>
                 {getStoredData().taxId}

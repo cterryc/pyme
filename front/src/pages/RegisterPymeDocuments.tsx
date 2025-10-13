@@ -46,7 +46,8 @@ export const RegisterPymeDocuments = () => {
     onError: (data) => {
       toast.error('Error al subir los documentos', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: `${data.payload[0].message}`,
+        // description: `${data.payload[0].message}`,
+        description: `${data.payload.message}`,
         duration: 4000
       })
     }
@@ -114,10 +115,10 @@ export const RegisterPymeDocuments = () => {
 
     data.documents.forEach((doc) => {
       const pdfBlob = new Blob([doc.data], { type: 'application/pdf' })
-      // const signBlob = new Blob([doc.sign], { type: 'image/png' })
+      const signBlob = new Blob([doc.sign], { type: 'image/png' })
 
       formData.append('files', pdfBlob, doc.docName.split('.')[0])
-      // formData.append('files', signBlob, doc.docName.split('.')[0])
+      formData.append('files', signBlob, doc.docName.split('.')[0])
     })
     formData.set('companyId', pymeID)
     formData.set('type', 'Tax Return')
