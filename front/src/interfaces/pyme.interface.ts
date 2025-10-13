@@ -21,7 +21,8 @@ export type RegisterPymeSucessResponse = {
     description: string
   }
 }
-export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
+// export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
+export type RegisterPymeErrorResponse = { success: boolean; payload: { message: string } }
 
 export type RegisterPymeDocumentsSuccessResponse = {
   success: boolean
@@ -54,6 +55,18 @@ export type GetPymeResponse = {
 }
 
 export type GetPymesByUserResponse = {
-  success: boolean;
-  payload: GetPymeResponse[];
-};
+  success: boolean
+  payload: GetPymeResponse[]
+}
+
+export type LoanRequestResponse = {
+  tradeName: string
+  minAmount: string
+  maxAmount: string
+  paymentOptions: Array<PaymentOption>
+}
+type PaymentOption = {
+  paymentsNumber: string
+  interestRate: string
+}
+export type LoanRequestErrorResponse = { success: boolean; payload: { message: string } }

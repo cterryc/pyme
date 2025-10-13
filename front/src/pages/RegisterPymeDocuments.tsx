@@ -129,7 +129,7 @@ export const RegisterPymeDocuments = () => {
     <div className='flex flex-col min-h-screen'>
       <Header />
       {response.length == 0 ? (
-        <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1'>
+        <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1 p-2'>
           <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Adjunta documentos de la PYME</h2>
           <p>Completa con la documentación necesaria para poder solicitar un crédito</p>
           <form className='flex flex-col text-left px-10 md:px-20 mt-5' onSubmit={handleSubmit(onSubmit)}>

@@ -31,15 +31,15 @@ export const mainRouter = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <UserProfile />,
+        element: <UserProfile />
       },
       {
         path: 'Pymes',
-        element: <UserPymesList />,
+        element: <UserPymesList />
       },
       {
         path: 'Solicitudes',
-        element: <UserCreditRequests />,
+        element: <UserCreditRequests />
       }
     ]
   },
@@ -56,6 +56,6 @@ export const mainRouter = createBrowserRouter([
     element: <RegisterPyme />
   },
   {
-
     // add pages
-  }])
+  }
+])
