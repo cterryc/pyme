@@ -13,7 +13,7 @@ import { useUserAuthenticate } from '@/hooks/useUser'
 export const RegisterPyme = () => {
   const navigate = useNavigate()
   const maxStep = 4
-  const [step, setStep] = useState(4) //useState(0)
+  const [step, setStep] = useState(0)
   const [pymeId, setPymeId] = useState('')
   const { getUser, isLoading } = useUserAuthenticate()
 
@@ -30,6 +30,7 @@ export const RegisterPyme = () => {
         description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la pyme.',
         duration: 4000
       })
+      localStorage.removeItem('registerPymeBackup')
       //navigate(`/Dashboard/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
       setPymeId(data.payload.id)
     }
@@ -47,13 +48,19 @@ export const RegisterPyme = () => {
       toast('Guardando los cambios ...', { duration: 1000 })
     }
     if (isError) {
+      toast.error('', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: error.payload.message,
+        duration: 4000
+      })
+      /*
       error.payload.forEach((err) => {
         toast.error('', {
           style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
           description: err.message,
           duration: 4000
         })
-      })
+      })*/
     }
   }, [isPending, isError, error])
 
@@ -460,9 +467,9 @@ export const RegisterPyme = () => {
       {pymeId != '' && (
         <div className='fixed w-screen h-screen bg-[rgba(0,0,0,.4)] top-[0] left-[0] flex items-center '>
           <dialog open className='bg-[var(--bg-light)] p-7 m-auto text-black rounded-md'>
-            <h3 className='text-xl mb-5'>Tu pyme se ha registrado correctamente</h3>
-            <p className='px-5 mb-10 '>Es obligatorio adjuntar documentos para solicitar un crédito</p>
-            <p className='px-5 mb-10 '>¿Quieres continuar ahora?</p>
+            <h3 className='text-xl text-center mb-5'>Tu pyme se ha registrado correctamente</h3>
+            <p className='px-5 mb-2'>Es obligatorio adjuntar documentos para solicitar un crédito</p>
+            <p className='px-5 mb-7 text-center '>¿Quieres continuar ahora?</p>
             <div className='flex justify-around'>
               <button
                 className='bg-gray-500 p-2 rounded-md cursor-pointer text-white'
