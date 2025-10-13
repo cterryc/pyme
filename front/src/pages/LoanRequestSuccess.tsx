@@ -1,7 +1,10 @@
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { MdOutlineCheck } from 'react-icons/md'
+import { useNavigate } from 'react-router-dom'
+
 export const LoanRequestSuccess = () => {
+  const navigate = useNavigate()
   return (
     <div className='min-h-screen flex flex-col'>
       <Header />
@@ -26,7 +29,12 @@ export const LoanRequestSuccess = () => {
               <p className='font-medium text-[var(--font-title-light)]'>3-5 días hábiles</p>
             </div>
           </div>
-          <button className='bg-[var(--primary)] text-white px-5 py-3 rounded-md cursor-pointer hover:bg-[#10638d] duration-150 '>
+          <button
+            onClick={() => {
+              navigate('/Dashboard')
+            }}
+            className='bg-[var(--primary)] text-white px-5 py-3 rounded-md cursor-pointer hover:bg-[#10638d] duration-150 '
+          >
             Volvr al inicio
           </button>
         </div>
