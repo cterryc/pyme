@@ -6,6 +6,9 @@ import {
   type LoanRequestResponse
 } from '@/interfaces/pyme.interface'
 import { type LoanRequestFormData, type RegisterPymeFormData } from '@/schemas/pyme.schema'
+  type LoanRequestResponse
+} from '@/interfaces/pyme.interface'
+import { type LoanRequestFormData, type RegisterPymeFormData } from '@/schemas/pyme.schema'
 
 export const pymeRegister = async (data: RegisterPymeFormData): Promise<RegisterPymeSucessResponse> => {
   try {
@@ -76,6 +79,27 @@ export const pymeLoanRequestOptions = async (data: LoanRequestFormData): Promise
     throw error
   }
 }
+}
+
+export const pymeLoanRequestOptions = async (data: LoanRequestFormData): Promise<LoanRequestResponse> => {
+  try {
+    const token = localStorage.tokenPyme
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/credit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data)
+    })
+
+    const result = await response.json()
+    if (!response.ok) throw result
+
+    return result
+  } catch (error) {
+    console.error('[pymeRegister]: Error fetching data:', error)
+    throw error
+  }
+}
 
 export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
   try {
@@ -85,7 +109,12 @@ export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     })
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    })
 
+    const result = await response.json()
+    if (!response.ok) throw result
     const result = await response.json()
     if (!response.ok) throw result
 
@@ -100,4 +129,5 @@ export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
 >>>>>>> Stashed changes
     throw error
   }
+}
 }
