@@ -46,7 +46,8 @@ export const RegisterPymeDocuments = () => {
     onError: (data) => {
       toast.error('Error al subir los documentos', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: `${data.payload[0].message}`,
+        // description: `${data.payload[0].message}`,
+        description: `${data.payload.message}`,
         duration: 4000
       })
     }
@@ -114,10 +115,10 @@ export const RegisterPymeDocuments = () => {
 
     data.documents.forEach((doc) => {
       const pdfBlob = new Blob([doc.data], { type: 'application/pdf' })
-      // const signBlob = new Blob([doc.sign], { type: 'image/png' })
+      const signBlob = new Blob([doc.sign], { type: 'image/png' })
 
       formData.append('files', pdfBlob, doc.docName.split('.')[0])
-      // formData.append('files', signBlob, doc.docName.split('.')[0])
+      formData.append('files', signBlob, doc.docName.split('.')[0])
     })
     formData.set('companyId', pymeID)
     formData.set('type', 'Tax Return')
@@ -129,7 +130,7 @@ export const RegisterPymeDocuments = () => {
     <div className='flex flex-col min-h-screen'>
       <Header />
       {response.length == 0 ? (
-        <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1'>
+        <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1 p-2'>
           <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Adjunta documentos de la PYME</h2>
           <p>Completa con la documentación necesaria para poder solicitar un crédito</p>
           <form className='flex flex-col text-left px-10 md:px-20 mt-5' onSubmit={handleSubmit(onSubmit)}>
