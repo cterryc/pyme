@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { HttpStatus } from "../../constants/HttpStatus";
 import apiResponse from "../../utils/apiResponse.utils";
 import LoanService from "./service";
-import { loanRequestSchema } from "./validator";
+import { createCreditApplicationSchema, loanRequestSchema } from "./validator";
+import { create } from "domain";
+import { responseLoanRequest } from "./interface";
 
 export default class LoanController {
   private static loanService = new LoanService();
@@ -24,8 +26,12 @@ export default class LoanController {
 
     static createCreditApplication = async (req: Request, res: Response, next: NextFunction) => {
       try {
-        // Lógica para crear la solicitud de crédito
-        res.status(HttpStatus.CREATED).json(apiResponse(true, { message: "Solicitud de crédito creada" }));
+        const userId = res.locals.user?.id as string;
+        const loanData = createCreditApplicationSchema.parse(req.body);
+
+        const loanRequest : responseLoanRequest | null = await this.loanService.createCreditApplication(loanData, userId);
+
+        res.status(HttpStatus.CREATED).json(apiResponse(true, loanRequest));
       } catch (error) {
         return next(error);
       }     

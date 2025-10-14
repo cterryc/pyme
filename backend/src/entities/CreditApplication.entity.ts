@@ -10,10 +10,10 @@ export class CreditApplication extends BaseEntity {
     @Column({ type: "varchar", length: 50, unique: true })
     applicationNumber!: string;
 
-    @Column({ type: "decimal", precision: 15, scale: 2 })
+    @Column({ type: "decimal", precision: 15, scale: 2, nullable: true })
     requestedAmount!: number;
 
-    @Column({ type: "varchar", length: 100 })
+    @Column({ type: "varchar", length: 100, nullable: true })
     purpose!: string;
 
     @Column({ type: "text", nullable: true })
@@ -37,14 +37,29 @@ export class CreditApplication extends BaseEntity {
     })
     kycStatus!: KYCStatus;
 
+    @Column({ type: "boolean", default: false })
+    confirmed!: boolean;
+
     @Column({ type: "int", default: 0, comment: "0-100" })
     completionPercentage!: number;
 
     @Column({ type: "decimal", precision: 5, scale: 2, nullable: true })
     approvedAmount?: number;
 
-    @Column({ type: "decimal", precision: 5, scale: 2, nullable: true })
+    @Column({ type: "decimal", precision: 15, scale: 2, nullable: true })
     interestRate?: number;
+
+    @Column({ type: "decimal", precision: 15, scale: 2, nullable: true })
+    minAmount?: number;
+
+    @Column({ type: "decimal", precision: 15, scale: 2, nullable: true })
+    maxAmount?: number;
+
+    @Column({ type: "decimal", precision: 15, scale: 2, nullable: true })
+    amount?: number;
+
+    @Column({ type: "decimal", precision: 15, scale: 2, nullable: true })
+    paymentNumber?: number;
 
     @Column({ type: "text", nullable: true })
     rejectionReason?: string;

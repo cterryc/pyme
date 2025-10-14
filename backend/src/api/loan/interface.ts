@@ -1,4 +1,5 @@
 export interface responseLoanRequest {
+    aplicationNumber?: string;
     minAmount: number;
     maxAmount: number;
     paymentOptions: {
@@ -22,7 +23,7 @@ const ABSOLUTE_MIN_LOAN = 1_000;
 const ABSOLUTE_MAX_LOAN = 5_000_000;
 const ROUND_TO = 1_000;
 
-// Industria → tier base (completa según tu catálogo)
+// Industria → tier base
 const INDUSTRY_BASE: Record<string, RiskTier> = {
   software: "A",
   services: "B",
@@ -45,7 +46,6 @@ export function toDate(val: unknown): Date | null {
   }
   if (typeof val === "string") {
     const s = val.trim();
-    // YYYY-MM-DD (muy común en columnas type: 'date' de Postgres/TypeORM)
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
     if (m) {
       const [, y, mo, day] = m;

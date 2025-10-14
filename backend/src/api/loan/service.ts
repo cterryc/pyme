@@ -1,23 +1,24 @@
-import { IsNull, Not, Repository } from "typeorm";
+import { In, Not, Or, Repository } from "typeorm";
 import { AppDataSource } from "../../config/data-source";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
 import { CreditApplication } from "../../entities/CreditApplication.entity";
 import { Company } from "../../entities/Company.entity";
-import { User } from "../../entities/User.entity";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
 import { adjustTier, allowedTermsFor, baseTierByIndustry, capsFor, computeAgeYears, interestRateFor,  } from "./interface";
 import { responseLoanRequest } from "./interface";
+import { generateUniqueCode } from "../../utils/generateCode.utils";
+
+
+const excludedStatuses = [CreditApplicationStatus.SUBMITTED, CreditApplicationStatus.UNDER_REVIEW ];
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
   private readonly companyRepo: Repository<Company>;
-  private readonly userRepo: Repository<User>;
 
   constructor() {
       this.loanRepo = AppDataSource.getRepository(CreditApplication);
       this.companyRepo = AppDataSource.getRepository(Company);
-      this.userRepo = AppDataSource.getRepository(User);
     }
 
   async loanRequest(
@@ -36,8 +37,10 @@ export default class LoanService {
     }
 
     const loanRequest = await this.loanRepo.findOne({
-        where: { company: { id: company.id }, status: Not(CreditApplicationStatus.DRAFT) },
+        where: { company: { id: company.id }, status: In(excludedStatuses) },
     });
+
+    console.log(loanRequest);
 
     if (loanRequest) {
       throw new HttpError(
@@ -48,7 +51,29 @@ export default class LoanService {
 
     const loanOptions = await this.getLoanOptions(company);
 
-    return loanOptions;
+    const { minAmount, maxAmount, paymentOptions } = loanOptions;
+
+    const code = await generateUniqueCode('CRD');
+
+    const newLoanRequest = this.loanRepo.create({
+        applicationNumber: code,
+        company,
+        minAmount,
+        maxAmount,
+        ...paymentOptions,
+        status: CreditApplicationStatus.SUBMITTED,
+    });
+
+    await this.loanRepo.save(newLoanRequest);
+
+    const response: responseLoanRequest = {
+        aplicationNumber: newLoanRequest.applicationNumber,
+        minAmount,
+        maxAmount,
+        paymentOptions
+    };
+
+    return response;
   }
 
 
@@ -93,12 +118,61 @@ export default class LoanService {
 
   async createCreditApplication(
     loanData: Partial<CreditApplication>,
-    pymeId: string
-  ): Promise<void> {
-    // Lógica para crear la solicitud de crédito
+    userId: string
+  ): Promise<responseLoanRequest | null> {
+    const company = await this.companyRepo.findOne({
+      where: { id: loanData.companyId, owner: { id: userId } },
+    });
+
+    if (!company) {
+      throw new HttpError(
+                HttpStatus.NOT_FOUND,
+                "La compañía no existe."
+              );
+    }
+
+    const loanRequest = await this.loanRepo.findOne({
+        where: { id: loanData.id, company: { id: company.id } },
+    });
+
+    if (!loanRequest) {
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La solicitud de crédito no existe."
+      );
+    }
+
+    if(loanData.amount! < loanRequest.minAmount! ) {
+        throw new HttpError(
+            HttpStatus.BAD_REQUEST,
+            `El monto mínimo para la solicitud de crédito es ${loanRequest.minAmount}.`
+          );
+    }
+
+    if(loanData.amount! > loanRequest.maxAmount! ) {
+        throw new HttpError(
+            HttpStatus.BAD_REQUEST,
+            `El monto máximo para la solicitud de crédito es ${loanRequest.maxAmount}.`
+          );
+    }
+
+    const updatedLoanRequest = this.loanRepo.update(loanRequest.id, {
+        amount: loanData.amount!,
+        confirmed: true,
+    });
+
+    return {
+        aplicationNumber: loanRequest.applicationNumber,
+        minAmount: loanRequest.minAmount!,
+        maxAmount: loanRequest.maxAmount!,
+        paymentOptions: {
+            paymentNumber: loanRequest.paymentNumber!,
+            interestRate: loanRequest.interestRate!,
+        }
+    };
   }
 
-    async getCreditApplicationStatus(
+  async getCreditApplicationStatus(
     applicationId: string
   ): Promise<string> {
     // Lógica para obtener el estado de la solicitud de crédito

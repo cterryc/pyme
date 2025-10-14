@@ -4,7 +4,7 @@ import schemaValidator from "../../middlewares/schemaValidators.middlewares";
 import authenticate from "../../middlewares/authenticate.middleware";
 import { validateUuid } from "../../middlewares/validateParamId.middleware";
 import LoanController from "./controller";
-import { loanRequestSchema } from "./validator";
+import { createCreditApplicationSchema, loanRequestSchema } from "./validator";
 
 const loanRouter = Router();
 
@@ -21,6 +21,7 @@ loanRouter.post(
 loanRouter.post(
     "/confirm",
     authenticate,
+    schemaValidator(createCreditApplicationSchema, null),
     LoanController.createCreditApplication
 );
 
