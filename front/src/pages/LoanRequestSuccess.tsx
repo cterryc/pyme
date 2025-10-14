@@ -22,11 +22,15 @@ export const LoanRequestSuccess = () => {
             <h3 className='text-xl font-medium text-[var(--font-title-light)]'>Detalles de la solicitud</h3>
             <div className='flex justify-between items-center border-b-1 border-[#ccc] pb-5'>
               <p>Numero de referencia</p>
-              <p className='font-medium text-[var(--font-title-light)]'>#CRD-2023-123456</p>
+              <p className='font-medium text-[var(--font-title-light)]'>63df8260-3860-429a-b286-b104ca25452f</p>
             </div>
             <div className='flex justify-between items-center'>
-              <p>Tiempo estimado de respuesta</p>
-              <p className='font-medium text-[var(--font-title-light)]'>3-5 días hábiles</p>
+              <p>Monto solicitado</p>
+              <p className='font-medium text-[var(--font-title-light)]'>$5000</p>
+            </div>
+            <div className='flex justify-between items-center'>
+              <p>Pago en</p>
+              <p className='font-medium text-[var(--font-title-light)]'>12 cuotas</p>
             </div>
           </div>
           <button
