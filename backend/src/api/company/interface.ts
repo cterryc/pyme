@@ -7,3 +7,6 @@ export interface responseCompanyDto {
     statusCredit: string;
     hasDocuments: boolean;
 }
+
+
+

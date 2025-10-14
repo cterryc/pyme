@@ -26,7 +26,7 @@ export class CreditApplication extends BaseEntity {
     @Column({
         type: "enum",
         enum: CreditApplicationStatus,
-        default: CreditApplicationStatus.DRAFT,
+        default: null,
     })
     status!: CreditApplicationStatus;
 
