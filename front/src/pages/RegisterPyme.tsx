@@ -15,7 +15,6 @@ export const RegisterPyme = () => {
   const navigate = useNavigate()
   const maxStep = 4
   const [step, setStep] = useState(0)
-  const [step, setStep] = useState(0)
   const [pymeId, setPymeId] = useState('')
   const [confettiSize, setConfettiSize] = useState({ width: 0, height: 0 })
   const { getUser, isLoading } = useUserAuthenticate()
