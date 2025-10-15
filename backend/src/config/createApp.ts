@@ -36,6 +36,9 @@ export default class ExpressAppCreator {
         // Initialize database connection
         TypeORMManager.connect();
 
+         const status = TypeORMManager.getDatabaseStatus();
+        console.log("🎯 Estado final de la base de datos:", status);
+
         if (this.modeCluster && cluster.isPrimary) {
             this.setupCluster();
         } else {
