@@ -7,15 +7,20 @@ import { LeftAdminDashboard } from './LeftAdminDashboard'
 const AdminDashboardRoutes = () => {
   return (
     <Routes>
+      {/* Main module selection page */}
       <Route path="/" element={<ModuleSelectionPage />} />
 
+      {/* Submodule selection for a specific module (optional, can be removed if not needed) */}
       <Route path="/modules/:moduleId" element={<SubmoduleSelectionPage />} />
-      <Route path="/operations/dashboard" element={<LeftAdminDashboard moduleId="operations" />} />
-      <Route path="/operations/solicitudes" element={<LeftAdminDashboard moduleId="operations" />} />
-      <Route path="/clients/mypes" element={<LeftAdminDashboard moduleId="clients" />} />
-      <Route path="/products/productos" element={<LeftAdminDashboard moduleId="products" />} />
-      <Route path="/settings/configuracion" element={<LeftAdminDashboard moduleId="settings" />} />
+      
+      {/* All submodule routes now use the same LeftAdminDashboard with collapsible sidebar */}
+      <Route path="/operations/dashboard" element={<LeftAdminDashboard />} />
+      <Route path="/operations/solicitudes" element={<LeftAdminDashboard />} />
+      <Route path="/clients/mypes" element={<LeftAdminDashboard />} />
+      <Route path="/products/productos" element={<LeftAdminDashboard />} />
+      <Route path="/settings/configuracion" element={<LeftAdminDashboard />} />
 
+      {/* Redirect unknown routes to main page */}
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   )
