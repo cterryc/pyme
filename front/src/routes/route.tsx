@@ -46,7 +46,7 @@ export const mainRouter = createBrowserRouter([
     ]
   },
   {
-    path: '/AdminDashboard',
+    path: '/admin/*',
     element: <AdminDashboard />
   },
   {

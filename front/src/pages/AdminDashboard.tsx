@@ -1,74 +1,34 @@
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
-import { Sidebar } from '@/components/Sidebar'
-import { DashboardProvider, useDashboard } from '@/context/DashboardContext'
-import {
-  DashboardOverview,
-  SolicitudesContent,
-  MypesContent,
-  ProductosContent,
-  ConfiguracionContent
-} from '@/components/dashboard'
+import { DashboardProvider } from '@/context/DashboardContext'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { ModuleSelectionPage } from './ModuleSelectionPage'
+import { SubmoduleSelectionPage } from './SubmoduleSelectionPage'
+import { LeftAdminDashboard } from './LeftAdminDashboard'
 
-const DashboardContent = () => {
-  const { activeSection, setActiveSection } = useDashboard()
-
-  // Configuración del sidebar
-  const sidebarItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'solicitudes', label: 'Solicitudes', icon: '📋' },
-    { id: 'clientes', label: 'Pymes', icon: '👥' },
-    { id: 'productos', label: 'Productos', icon: '📦' },
-    { id: 'configuracion', label: 'Configuración', icon: '⚙️' }
-  ]
-
-  const renderContent = () => {
-    switch (activeSection) {
-      case 'solicitudes':
-        return <SolicitudesContent />
-      case 'dashboard':
-        return <DashboardOverview />
-      case 'clientes':
-        return <MypesContent />
-      case 'productos':
-        return <ProductosContent />
-      case 'configuracion':
-        return <ConfiguracionContent />
-      default:
-        return <DashboardOverview />
-    }
-  }
-
+const AdminDashboardRoutes = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      {/* <Header avatar='/assets/defaultAvatar.jpg' /> */}
-      
-      {/* Layout principal */}
-      <div className="flex">
-        {/* Sidebar */}
-        <Sidebar
-          title="Financiera Innova"
-          subtitle=""
-          items={sidebarItems}
-          onItemClick={setActiveSection}
-          activeItem={activeSection}
-        />
+    <Routes>
+      {/* Main module selection page */}
+      <Route path="/" element={<ModuleSelectionPage />} />
 
-        {/* Contenido principal */}
-        {renderContent()}
-      </div>
+      {/* Submodule selection for a specific module (optional, can be removed if not needed) */}
+      <Route path="/modules/:moduleId" element={<SubmoduleSelectionPage />} />
+      {/* All submodule routes now use the same LeftAdminDashboard with collapsible sidebar */}
+      <Route path="/operations/dashboard" element={<LeftAdminDashboard />} />
+      <Route path="/operations/solicitudes" element={<LeftAdminDashboard />} />
+      <Route path="/clients/mypes" element={<LeftAdminDashboard />} />
+      <Route path="/products/productos" element={<LeftAdminDashboard />} />
+      <Route path="/settings/configuracion" element={<LeftAdminDashboard />} />
 
-      {/* Footer */}
-      <Footer />
-    </div>
+      {/* Redirect unknown routes to main page */}
+      <Route path="*" element={<Navigate to="/admin" replace />} />
+    </Routes>
   )
 }
 
 export const AdminDashboard = () => {
   return (
     <DashboardProvider>
-      <DashboardContent />
+      <AdminDashboardRoutes />
     </DashboardProvider>
   )
 }
