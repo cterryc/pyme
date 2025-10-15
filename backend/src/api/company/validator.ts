@@ -3,9 +3,9 @@ import { z } from "zod";
 export const createCompanySchema = z.object({
   legalName: z.string().min(1, { message: 'Nombre legal requerido' }).max(255),
   tradeName: z.string().optional(),
+  industryId: z.string().uuid({ message: 'ID de industria inválido' }),
   taxId: z.string().min(1, { message: 'Tax ID requerido' }).max(50), 
   email: z.string().email({ message: 'Email inválido' }).optional(),
-  industry: z.string().optional(),
   foundedDate: z.coerce.date().optional(),  
   employeeCount: z.number().int().min(0).optional(),
   annualRevenue: z.number().min(0).optional(),  

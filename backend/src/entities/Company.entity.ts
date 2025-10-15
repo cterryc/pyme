@@ -11,6 +11,8 @@ import { BaseEntity } from "./BaseEntity";
 import { User } from "./User.entity";
 import { CreditApplication } from "./CreditApplication.entity";
 import { Document } from "./Document.entity";
+import { RiskTier } from "../constants/RiskTier";
+import { Industry } from "./Industry.entity";
 
 @Entity("companies")
 export class Company extends BaseEntity {
@@ -25,9 +27,6 @@ export class Company extends BaseEntity {
 
   @Column({ type: "varchar", length: 255, nullable: true, unique: true })
   email?: string;
-
-  @Column({ type: "varchar", length: 100, nullable: true })
-  industry?: string;
 
   @Column({ type: "date", nullable: true })
   foundedDate?: Date;
@@ -62,16 +61,38 @@ export class Company extends BaseEntity {
   @Column({ type: "text", nullable: true })
   description?: string;
 
+  @Column({
+    type: "enum",
+    enum: RiskTier,
+    nullable: true,
+  })
+  baseRiskTier?: RiskTier;
+
+  @Column({
+    type: "enum",
+    enum: RiskTier,
+    nullable: true,
+  })
+  adjustedRiskTier?: RiskTier;
+
   // Relations
-  @Index("ix_companies_owner_id") 
+  @Index("ix_companies_owner_id")
   @ManyToOne(() => User, (u) => u.companies, {
     onDelete: "CASCADE",
     nullable: false,
   })
+
   @JoinColumn({ name: "owner_id" })
   owner!: User;
 
- 
+
+  @Index("ix_companies_industry_id")
+  @ManyToOne(() => Industry, (industry) => industry!.companies, {
+    nullable: true,
+  })
+  @JoinColumn({ name: "industry_id" }) 
+  industry?: Industry;
+
   @RelationId((c: Company) => c.owner)
   ownerId!: string;
 

@@ -5,16 +5,20 @@ import { HttpStatus } from "../../constants/HttpStatus";
 import { Company } from "../../entities/Company.entity";
 import { toCompanyDto, toCompanyListDto } from "./dto";
 import { responseCompanyDto } from "./interface";
+import { Industry } from "../../entities/Industry.entity";
+import { CreateCompanyInput } from "./validator";
 
 export default class CompanyService {
   private readonly companyRepo: Repository<Company>;
+  private readonly industryRepo: Repository<Industry> = AppDataSource.getRepository(Industry);
 
   constructor() {
     this.companyRepo = AppDataSource.getRepository(Company);
+    this.industryRepo = AppDataSource.getRepository(Industry);
   }
 
   async createCompany(
-    companyData: Partial<Company>,
+    companyData: CreateCompanyInput, 
     ownerUserId: string
   ): Promise<responseCompanyDto> {
     const whereConditions: Array<{ taxId?: string; email?: string }> = [
@@ -45,16 +49,29 @@ export default class CompanyService {
       throw new HttpError(HttpStatus.BAD_REQUEST, "La compañía ya existe.");
     }
 
-    const entity = this.companyRepo.create({
-      ...companyData,
-      owner: { id: ownerUserId },
-    });
+   
+        const industry = await this.industryRepo.findOne({
+            where: { id: companyData.industryId },
+        });
 
-    const saved = await this.companyRepo.save(entity);
+       
+        if (!industry) {
+            throw new HttpError(
+                HttpStatus.BAD_REQUEST,
+                "La industria especificada con ese ID no existe."
+            );
+        }
 
-    const dtoCompany = toCompanyDto(saved);
+       
+        const newCompany = this.companyRepo.create({
+            ...companyData,
+            owner: { id: ownerUserId },
+            industry: industry,
+        });
 
-    return dtoCompany;
+        const savedCompany = await this.companyRepo.save(newCompany);
+
+        return toCompanyDto(savedCompany); 
   }
 
   async listCompaniesByUserId(userId: string): Promise<responseCompanyDto[]> {
@@ -73,6 +90,7 @@ export default class CompanyService {
   ): Promise<responseCompanyDto | null> {
     const company = await this.companyRepo.findOne({
       where: { id: companyId, owner: { id: userId } },
+      relations: ["industry"]
     });
 
     if (!company) {

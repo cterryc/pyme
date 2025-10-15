@@ -10,14 +10,13 @@ export const createCreditApplicationSchema = z
   .object({
     id: z.string().uuid({ message: "ID de solicitud inválido" }),
     companyId: z.string().uuid({ message: "ID de compañía inválido" }),
-    amount: z
+    selectedAmount: z
       .number()
-      .positive({ message: "Monto solicitado debe ser mayor a 0" }),
-    paymentNumber: z
+      .positive({ message: "Monto seleccionado debe ser mayor a 0" }),
+    selectedTermMonths: z
       .number()
       .int()
-      .positive({ message: "Cuotas deben ser un número positivo" })
-      .default(12),
+      .min(1, { message: "El plazo seleccionado debe ser al menos 1 mes" }),
   })
   .strict({message: "Faltan campos requeridos o hay campos extra"});
 

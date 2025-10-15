@@ -8,8 +8,8 @@ export function toCompanyDto(company: Company): responseCompanyDto {
     return {
         id: company.id,
         legalName: company.legalName,
-        industry: company.industry,
         ownerName: company.owner?.firstName,
+        industryName: company.industry?.name,
         ownerSurname: company.owner?.lastName,
         statusCredit: company.creditApplications && company.creditApplications.length > 0
             ? company.creditApplications[0].status
