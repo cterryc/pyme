@@ -1,5 +1,13 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
+import type { Module } from '@/interfaces/module.interface'
+import { 
+  FiHome, 
+  FiFileText, 
+  FiUsers, 
+  FiPackage, 
+  FiSettings 
+} from 'react-icons/fi'
 
 // Interfaces para los datos
 export interface CreditApplication {
@@ -35,6 +43,12 @@ export interface Product {
 
 // Estado del contexto
 interface DashboardContextType {
+  // Module management
+  modules: Module[]
+  getActiveModules: () => Module[]
+  getModuleById: (moduleId: string) => Module | undefined
+  getSubmoduleByRoute: (route: string) => { module: Module; submodule: any } | undefined
+  
   // Sección activa
   activeSection: string
   setActiveSection: (section: string) => void
@@ -53,6 +67,7 @@ interface DashboardContextType {
   creditApplications: CreditApplication[]
   clients: Client[]
   products: Product[]
+  allSubmodules: any[]
   
   // Funciones utilitarias
   formatCurrency: (amount: number) => string
@@ -204,7 +219,112 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   const [fechaFilter, setFechaFilter] = useState('Reciente')
   const [montoFilter, setMontoFilter] = useState('Todos')
 
-  // Funciones utilitarias
+  const modules: Module[] = [
+    {
+      id: 'operations',
+      name: 'Gestión',
+      description: 'Gestión general de operaciones y solicitudes de crédito',
+      logo: FiHome,
+      active: true,
+      permissionId: 'perm_operations_' + Math.random().toString(36).substr(2, 9),
+      submodules: [
+        {
+          id: 'dashboard',
+          name: 'Dashboard',
+          description: 'Vista general del sistema',
+          logo: FiHome,
+          active: true,
+          permissionId: 'perm_dashboard_' + Math.random().toString(36).substr(2, 9),
+          route: '/admin/operations/dashboard'
+        },
+        {
+          id: 'solicitudes',
+          name: 'Solicitudes',
+          description: 'Gestión de solicitudes de crédito',
+          logo: FiFileText,
+          active: true,
+          permissionId: 'perm_solicitudes_' + Math.random().toString(36).substr(2, 9),
+          route: '/admin/operations/solicitudes'
+        }
+      ]
+    },
+    {
+      id: 'clients',
+      name: 'Clientes',
+      description: 'Gestión de clientes y PyMEs',
+      logo: FiUsers,
+      active: true,
+      permissionId: 'perm_clients_' + Math.random().toString(36).substr(2, 9),
+      submodules: [
+        {
+          id: 'mypes',
+          name: 'PyMEs',
+          description: 'Listado y gestión de PyMEs',
+          logo: FiUsers,
+          active: true,
+          permissionId: 'perm_mypes_' + Math.random().toString(36).substr(2, 9),
+          route: '/admin/clients/mypes'
+        }
+      ]
+    },
+    {
+      id: 'products',
+      name: 'Planes',
+      description: 'Catálogo de productos financieros',
+      logo: FiPackage,
+      active: true,
+      permissionId: 'perm_products_' + Math.random().toString(36).substr(2, 9),
+      submodules: [
+        {
+          id: 'productos',
+          name: 'Lista de planes',
+          description: 'Lista de planes financieros disponibles',
+          logo: FiPackage,
+          active: true,
+          permissionId: 'perm_productos_' + Math.random().toString(36).substr(2, 9),
+          route: '/admin/products/productos'
+        }
+      ]
+    },
+    {
+      id: 'settings',
+      name: 'Configuración',
+      description: 'Configuración del sistema',
+      logo: FiSettings,
+      active: true,
+      permissionId: 'perm_settings_' + Math.random().toString(36).substr(2, 9),
+      submodules: [
+        {
+          id: 'configuracion',
+          name: 'Configuración',
+          description: 'Configuración general del sistema',
+          logo: FiSettings,
+          active: true,
+          permissionId: 'perm_configuracion_' + Math.random().toString(36).substr(2, 9),
+          route: '/admin/settings/configuracion'
+        }
+      ]
+    }
+  ]
+
+  const getActiveModules = () => {
+    return modules.filter(module => module.active)
+  }
+
+  const getModuleById = (moduleId: string) => {
+    return modules.find(module => module.id === moduleId)
+  }
+
+  const getSubmoduleByRoute = (route: string) => {
+    for (const module of modules) {
+      const submodule = module.submodules.find(sub => sub.route === route)
+      if (submodule) {
+        return { module, submodule }
+      }
+    }
+    return undefined
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -216,7 +336,6 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     return new Date(dateString).toLocaleDateString('es-AR')
   }
 
-  // Filtros para solicitudes
   const getFilteredApplications = () => {
     return mockCreditApplications.filter(app => {
       const matchesSearch = app.empresa.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -226,7 +345,6 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     })
   }
 
-  // Filtros para clientes
   const getFilteredClients = () => {
     return mockClients.filter(client => {
       const matchesSearch = client.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -237,7 +355,6 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     })
   }
 
-  // Filtros para productos
   const getFilteredProducts = () => {
     return mockProducts.filter(product => {
       const matchesSearch = product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -247,8 +364,20 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     })
   }
 
+  const allSubmodules = modules.flatMap(module => {
+    return module.submodules.map(sub => ({
+      ...sub,
+      moduleId: module.id,
+      moduleName: module.name
+    }))
+  })
+
   const value: DashboardContextType = {
-    // Estado
+    modules,
+    getActiveModules,
+    getModuleById,
+    getSubmoduleByRoute,
+    
     activeSection,
     setActiveSection,
     searchTerm,
@@ -260,12 +389,11 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     montoFilter,
     setMontoFilter,
     
-    // Datos
     creditApplications: mockCreditApplications,
     clients: mockClients,
     products: mockProducts,
+    allSubmodules,
     
-    // Funciones
     formatCurrency,
     formatDate,
     getFilteredApplications,
