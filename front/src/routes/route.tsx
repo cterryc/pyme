@@ -25,7 +25,7 @@ export const mainRouter = createBrowserRouter([
     element: <RegisterPyme />
   },
   {
-    path: '/AdminDashboard',
+    path: '/admin/*',
     element: <AdminDashboard />
   },
 
