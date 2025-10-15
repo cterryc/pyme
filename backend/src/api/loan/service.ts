@@ -138,6 +138,7 @@ export default class LoanService {
       throw new HttpError(HttpStatus.NOT_FOUND, "La compañía no existe.");
     }
 
+
     const loanRequest = await this.loanRepo.findOne({
       where: { id: loanData.id, company: { id: company.id } },
     });
@@ -146,6 +147,13 @@ export default class LoanService {
       throw new HttpError(
         HttpStatus.NOT_FOUND,
         "La solicitud de crédito no existe."
+      );
+    }
+
+    if( loanRequest.confirmed ) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "La solicitud de crédito ya ha sido confirmada."
       );
     }
 
@@ -166,7 +174,7 @@ export default class LoanService {
     loanRequest.confirmed = true;
     loanRequest.amount = loanData.amount;
 
-    await this.loanRepo.save({ ...loanRequest });
+    await this.loanRepo.save(loanRequest);
 
     return {
       aplicationNumber: loanRequest.applicationNumber,
