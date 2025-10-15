@@ -53,7 +53,7 @@ export const LoanRequest = () => {
     id: '',
     companyId: pymeID || '',
     amount: 0,
-    paymentNumber: 6
+    paymentNumber: 0
   })
 
   const {
@@ -67,7 +67,8 @@ export const LoanRequest = () => {
       console.log(data.payload)
       setSuccessResponse(data.payload)
       const newLoanRequest = {
-        id: data.payload.aplicationNumber,
+        // id: data.payload.aplicationNumber,
+        id: '',
         companyId: pymeID || '',
         amount: 0,
         paymentNumber: 0
