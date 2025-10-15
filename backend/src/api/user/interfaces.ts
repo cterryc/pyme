@@ -44,3 +44,19 @@ export interface IUpdateUserPayload {
   newPassword?: string;
   currentPassword?: string;
 }
+
+export interface IGetUsersQuery {
+  page?: number;
+  limit?: number;
+  role?: UserRole;
+  search?: string;
+  isActive?: boolean;
+}
+
+export interface IGetUsersResponse {
+  users: UserDTO[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

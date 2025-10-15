@@ -3,8 +3,10 @@ import { HttpStatus } from "../../constants/HttpStatus";
 import apiResponse from "../../utils/apiResponse.utils";
 import AuthService from "./service";
 import {
+  IGetUsersQuery,
   IUpdateUserPayload,
 } from "./interfaces";
+import { UserRole } from "../../constants/Roles";
 
 export default class AuthController {
   private static authService = new AuthService();
@@ -74,6 +76,27 @@ export default class AuthController {
         requestingUserId,
         requestingUserRole
       );
+
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (err: any) {
+      next(err);
+    }
+  };
+  static getAllUsers = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const query: IGetUsersQuery = {
+        page: req.query.page ? parseInt(req.query.page as string) : undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+        role: req.query.role as UserRole | undefined,
+        search: req.query.search as string | undefined,
+        isActive: req.query.isActive === "true" ? true : req.query.isActive === "false" ? false : undefined,
+      };
+
+      const result = await AuthController.authService.getAllUsers(query);
 
       res.status(HttpStatus.OK).json(apiResponse(true, result));
     } catch (err: any) {
