@@ -3,7 +3,7 @@ import { AppDataSource } from "../../config/data-source";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
 import { Company } from "../../entities/Company.entity";
-import { toCompanyDto, toCompanyListDto } from "./dto";
+import { toCompanyDto, toCompanyListDto, toIndustryListDto } from "./dto";
 import { responseCompanyDto } from "./interface";
 import { Industry } from "../../entities/Industry.entity";
 import { CreateCompanyInput } from "./validator";
@@ -161,6 +161,14 @@ export default class CompanyService {
     }
     await this.companyRepo.softDelete({ id: company.id });
     return company;
+  }
+
+  async getIndustries(): Promise<Industry[]> {
+    const industries = await this.industryRepo.find({
+      order: { name: "ASC" },
+    });
+
+    return toIndustryListDto(industries);
   }
 
   // async getAllCompanies(): Promise<Company[]> {

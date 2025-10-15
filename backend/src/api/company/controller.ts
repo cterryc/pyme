@@ -80,6 +80,14 @@ export default class CompanyController {
     }
   };
 
+  static getIndustries = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const industries = await this.companyService.getIndustries();
+      res.status(HttpStatus.OK).json(apiResponse(true, industries));
+    } catch (error) {
+      return next(error);
+    }
+
   // static getCompanyDocuments = async (req: Request, res: Response, next: NextFunction) => {
   //     try {
   //         const companyId = parseInt(req.params.id, 10);
@@ -112,4 +120,5 @@ export default class CompanyController {
   //         return next(error);
   //     }
   // };
+  }
 }

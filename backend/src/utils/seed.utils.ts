@@ -49,20 +49,20 @@ export class SeedService {
   private async seedIndustries(): Promise<void> {
     const industriesData = [
       { name: "software", baseRiskTier: RiskTier.A, description: "Desarrollo de software y tecnología" },
-      { name: "services", baseRiskTier: RiskTier.B, description: "Servicios profesionales y consultoría" },
-      { name: "retail", baseRiskTier: RiskTier.C, description: "Comercio minorista" },
-      { name: "hospitality", baseRiskTier: RiskTier.C, description: "Hotelería y turismo" },
-      { name: "construction", baseRiskTier: RiskTier.C, description: "Construcción e ingeniería civil" },
-      { name: "agriculture", baseRiskTier: RiskTier.B, description: "Agricultura y ganadería" },
-      { name: "manufacturing", baseRiskTier: RiskTier.B, description: "Manufactura y producción industrial" },
-      { name: "healthcare", baseRiskTier: RiskTier.A, description: "Salud y servicios médicos" },
-      { name: "education", baseRiskTier: RiskTier.A, description: "Educación y formación" },
-      { name: "finance", baseRiskTier: RiskTier.A, description: "Servicios financieros y bancarios" },
-      { name: "real_estate", baseRiskTier: RiskTier.B, description: "Bienes raíces y propiedades" },
-      { name: "transportation", baseRiskTier: RiskTier.C, description: "Transporte y logística" },
-      { name: "energy", baseRiskTier: RiskTier.B, description: "Energía y utilities" },
-      { name: "entertainment", baseRiskTier: RiskTier.B, description: "Entretenimiento y medios" },
-      { name: "food_beverage", baseRiskTier: RiskTier.C, description: "Alimentos y bebidas" }
+      { name: "servicios", baseRiskTier: RiskTier.B, description: "Servicios profesionales y consultoría" },
+      { name: "comercio", baseRiskTier: RiskTier.C, description: "Comercio minorista" },
+      { name: "hoteleria", baseRiskTier: RiskTier.C, description: "Hotelería y turismo" },
+      { name: "construccion", baseRiskTier: RiskTier.C, description: "Construcción e ingeniería civil" },
+      { name: "agricultura", baseRiskTier: RiskTier.B, description: "Agricultura y ganadería" },
+      { name: "manufactura", baseRiskTier: RiskTier.B, description: "Manufactura y producción industrial" },
+      { name: "salud", baseRiskTier: RiskTier.A, description: "Salud y servicios médicos" },
+      { name: "educacion", baseRiskTier: RiskTier.A, description: "Educación y formación" },
+      { name: "finanzas", baseRiskTier: RiskTier.A, description: "Servicios financieros y bancarios" },
+      { name: "bienes_raices", baseRiskTier: RiskTier.B, description: "Bienes raíces y propiedades" },
+      { name: "transporte", baseRiskTier: RiskTier.C, description: "Transporte y logística" },
+      { name: "energia", baseRiskTier: RiskTier.B, description: "Energía y utilities" },
+      { name: "entretenimiento", baseRiskTier: RiskTier.B, description: "Entretenimiento y medios" },
+      { name: "alimentos y bebidas", baseRiskTier: RiskTier.C, description: "Alimentos y bebidas" }
     ];
 
     for (const industryData of industriesData) {

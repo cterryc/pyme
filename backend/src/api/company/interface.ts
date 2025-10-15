@@ -10,3 +10,9 @@ export interface responseCompanyDto {
 
 
 
+export interface responseIndustryDto {
+    id: string;
+    name: string;
+    description?: string;
+}
+
