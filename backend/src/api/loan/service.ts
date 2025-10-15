@@ -50,7 +50,10 @@ export default class LoanService {
 
     if (loanRequest) {
       return {
+        id: loanRequest.id,
         aplicationNumber: loanRequest.applicationNumber,
+        legalName: company.legalName,
+        annualRevenue: company.annualRevenue,
         minAmount: loanRequest.minAmount!,
         maxAmount: loanRequest.maxAmount!,
         paymentOptions: {
@@ -78,6 +81,9 @@ export default class LoanService {
     await this.loanRepo.save(newLoanRequest);
 
     const response: responseLoanRequest = {
+      id: newLoanRequest.id,
+      legalName: company.legalName,
+      annualRevenue: company.annualRevenue,
       aplicationNumber: newLoanRequest.applicationNumber,
       minAmount,
       maxAmount,
@@ -177,6 +183,9 @@ export default class LoanService {
     await this.loanRepo.save(loanRequest);
 
     return {
+      id: loanRequest.id,
+      legalName: company.legalName,
+      annualRevenue: company.annualRevenue,
       aplicationNumber: loanRequest.applicationNumber,
       minAmount: loanRequest.minAmount!,
       maxAmount: loanRequest.maxAmount!,

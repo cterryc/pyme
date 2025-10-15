@@ -1,5 +1,8 @@
 export interface responseLoanRequest {
+    id?: string;
     aplicationNumber?: string;
+    legalName?: string;
+    annualRevenue?: number;
     minAmount: number;
     maxAmount: number;
     paymentOptions: {
