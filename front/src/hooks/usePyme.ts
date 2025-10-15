@@ -4,6 +4,7 @@ import {
   type RegisterPymeSucessResponse,
   type RegisterPymeDocumentsSuccessResponse,
   type GetPymesByUserResponse,
+  type GetIndustriesResponse,
   type LoanRequestResponse,
   type LoanRequestErrorResponse
 } from '@/interfaces/pyme.interface'
@@ -17,7 +18,8 @@ import {
   pymeLoanRequestOptions,
   pymeRegister,
   pymeRegisterDocuments,
-  pymeLoanRequestConfirm
+  pymeLoanRequestConfirm,
+  getIndustries
 } from '@/services/pyme.service'
 
 interface UsePymeRegisterProps {
@@ -37,6 +39,16 @@ interface UsePymeLoanRequestProps {
 interface UsePymeLoanRequestConfirmProps {
   onSuccess?: (data: LoanRequestResponse) => void
   onError?: (error: LoanRequestErrorResponse) => void
+}
+
+export const useGetIndustries = () => {
+  return useQuery<GetIndustriesResponse>({
+    queryKey: ['pymeIndustries'],
+    queryFn: () => getIndustries(),
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+    refetchOnWindowFocus: false
+  })
 }
 
 export const usePymeRegister = ({ onSuccess, onError }: UsePymeRegisterProps) => {

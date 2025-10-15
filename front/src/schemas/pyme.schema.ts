@@ -9,7 +9,7 @@ export const registerPymeSchema = z.object({
   email: z.email('Debes ingresar un email válido'),
   // ownerName: z.string().min(3, 'El nombre del dueño debe tener al menos tres caracteres'), //Van?
   // ownerSurname: z.string().min(3, 'El apllido del dueño debe tener al menos tres caracteres'), //Van?
-  industry: z.string().min(3, 'Debes ingresar una industria'), // eventualmente un enum?
+  industryId: z.string().min(3, 'Debes ingresar una industria'), // eventualmente un enum?
   foundedDate: z.date('Fecha incompleta'),
   employeeCount: z.number().min(0, 'Debes ingresar la cantidad de empleados'),
   annualRevenue: z.number().min(0, 'Debes ingresar los ingresos anuales'),

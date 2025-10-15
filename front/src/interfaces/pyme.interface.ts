@@ -1,3 +1,8 @@
+export type GetIndustriesResponse = {
+  success: boolean
+  payload: Array<{ id: string; name: string }>
+}
+
 export type RegisterPymeSucessResponse = {
   success: boolean
   payload: {

@@ -41,7 +41,7 @@ export const RegisterPymeDocuments = () => {
       })
 
       setResponse(data.payload.documents)
-      console.log(data.payload.documents)
+      // console.log(data.payload.documents)
     },
     onError: (data) => {
       toast.error('Error al subir los documentos', {

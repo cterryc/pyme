@@ -2,13 +2,35 @@ import {
   type RegisterPymeSucessResponse,
   type RegisterPymeDocumentsSuccessResponse,
   type GetPymesByUserResponse,
-  type LoanRequestResponse
+  type LoanRequestResponse,
+  type GetIndustriesResponse
 } from '@/interfaces/pyme.interface'
 import {
   type LoanRequestFormData,
   type RegisterPymeFormData,
   type LoanRequestConfirmFormData
 } from '@/schemas/pyme.schema'
+
+export const getIndustries = async (): Promise<GetIndustriesResponse> => {
+  try {
+    const token = localStorage.tokenPyme
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/companies/industries`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const result = await response.json()
+    if (!response.ok) throw new Error(result.message || 'Error fetching industries data')
+    return result
+  } catch (error) {
+    console.error('[getIndustries]: Error fetching data:', error)
+    throw error
+  }
+}
 
 export const pymeRegister = async (data: RegisterPymeFormData): Promise<RegisterPymeSucessResponse> => {
   try {
