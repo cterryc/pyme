@@ -5,8 +5,7 @@ import {
   type RegisterPymeDocumentsSuccessResponse,
   type GetPymesByUserResponse,
   type LoanRequestResponse,
-  type LoanRequestErrorResponse,
-  type LoanRequestConfirmResponse
+  type LoanRequestErrorResponse
 } from '@/interfaces/pyme.interface'
 import {
   type RegisterPymeFormData,
@@ -36,7 +35,7 @@ interface UsePymeLoanRequestProps {
   onError?: (error: LoanRequestErrorResponse) => void
 }
 interface UsePymeLoanRequestConfirmProps {
-  onSuccess?: (data: LoanRequestConfirmResponse) => void
+  onSuccess?: (data: LoanRequestResponse) => void
   onError?: (error: LoanRequestErrorResponse) => void
 }
 
@@ -78,7 +77,7 @@ export const usePymeLoanRequest = ({ onSuccess, onError }: UsePymeLoanRequestPro
 }
 
 export const usePymeLoanRequestConfirm = ({ onSuccess, onError }: UsePymeLoanRequestConfirmProps) => {
-  return useMutation<LoanRequestConfirmResponse, LoanRequestErrorResponse, LoanRequestConfirmFormData>({
+  return useMutation<LoanRequestResponse, LoanRequestErrorResponse, LoanRequestConfirmFormData>({
     mutationFn: async (data) => pymeLoanRequestConfirm(data),
     onSuccess: (data) => {
       if (onSuccess) onSuccess(data)

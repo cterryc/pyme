@@ -53,10 +53,10 @@ export const loanRequestSchema = z.object({
   companyId: z.uuid()
 })
 export const loanRequestConfirmSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   companyId: z.uuid(),
-  amount: z.number().min(0),
-  paymentNumber: z.int().min(0)
+  selectedAmount: z.number().min(0),
+  selectedTermMonths: z.int().min(0)
 })
 
 export type LoanRequestConfirmFormData = z.infer<typeof loanRequestConfirmSchema>

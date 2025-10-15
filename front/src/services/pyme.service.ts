@@ -2,8 +2,7 @@ import {
   type RegisterPymeSucessResponse,
   type RegisterPymeDocumentsSuccessResponse,
   type GetPymesByUserResponse,
-  type LoanRequestResponse,
-  type LoanRequestConfirmResponse
+  type LoanRequestResponse
 } from '@/interfaces/pyme.interface'
 import {
   type LoanRequestFormData,
@@ -71,7 +70,7 @@ export const pymeLoanRequestOptions = async (data: LoanRequestFormData): Promise
   }
 }
 
-export const pymeLoanRequestConfirm = async (data: LoanRequestConfirmFormData): Promise<LoanRequestConfirmResponse> => {
+export const pymeLoanRequestConfirm = async (data: LoanRequestConfirmFormData): Promise<LoanRequestResponse> => {
   try {
     const token = localStorage.tokenPyme
 
