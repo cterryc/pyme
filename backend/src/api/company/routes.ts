@@ -7,6 +7,13 @@ import { validateUuid } from "../../middlewares/validateParamId.middleware";
 
 const companyRouter = Router();
 
+
+companyRouter.get(
+  "/industries",
+  authenticate,
+  CompanyController.getIndustries
+);
+
 // Protected routes
 companyRouter.post(
   "/",
@@ -28,6 +35,8 @@ companyRouter.get(
   authenticate,
   CompanyController.getCompanyById
 );
+
+
 
 
 companyRouter.patch(

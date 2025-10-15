@@ -26,3 +26,16 @@ export function toCompanyDto(company: Company): responseCompanyDto {
 export function toCompanyListDto(companies: Company[]): responseCompanyDto[] {
     return companies.map(toCompanyDto);
 }
+
+
+export function toIndustryDto(industry: any): any {
+    return {
+        id: industry.id,
+        name: industry.name,
+    };
+}
+
+
+export function toIndustryListDto(industries: any[]): any[] {
+    return industries.map(toIndustryDto);
+}
