@@ -99,13 +99,22 @@ export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     })
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    })
 
+    const result = await response.json()
+    if (!response.ok) throw result
     const result = await response.json()
     if (!response.ok) throw result
 
     return result
+    return result
   } catch (error) {
     console.error('[getPymesByUser]: Error fetching data:', error)
     throw error
+    console.error('[getPymesByUser]: Error fetching data:', error)
+    throw error
   }
+}
 }

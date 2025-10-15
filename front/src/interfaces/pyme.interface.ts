@@ -23,6 +23,8 @@ export type RegisterPymeSucessResponse = {
 }
 // export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
 export type RegisterPymeErrorResponse = { success: boolean; payload: { message: string } }
+// export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
+export type RegisterPymeErrorResponse = { success: boolean; payload: { message: string } }
 
 export type RegisterPymeDocumentsSuccessResponse = {
   success: boolean
