@@ -122,6 +122,10 @@ const SignFrame = ({
   const [isDrawing, setIsDrawing] = useState(false)
   const [signDraw, setSignDraw] = useState('')
 
+  useEffect(() => {
+    handleResizeStop()
+  }, [])
+
   if (pdfFile == null) {
     const res: SignedPDF = { imageBytes: new ArrayBuffer(), pdfBytes: new ArrayBuffer(), urlPreview: '' }
     alert('Error al intentar firmar')
@@ -155,8 +159,8 @@ const SignFrame = ({
     setSignDraw(canvas.toDataURL('image/png'))
     setIsDrawing(false)
   }
-  const clearSign = () => {
-    // e.preventDefault()
+  const clearSign = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
     const canvas = canvasRef.current as unknown as HTMLCanvasElement
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -259,7 +263,7 @@ const SignFrame = ({
         onResizeStop={handleResizeStop}
         minWidth={260}
         maxWidth={500}
-        lockAspectRatio={1.6180339887}
+        lockAspectRatio={2}
         bounds='parent'
         dragHandleClassName='drag-handle'
         enableResizing={{

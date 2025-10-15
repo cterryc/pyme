@@ -10,6 +10,8 @@ import { UserPymesList } from '@/components/UserPymesList'
 import { UserProfile } from '@/components/UserProfile'
 import { UserCreditRequests } from '@/components/UserCreditRequests'
 import { UserDashboard } from '@/pages/UserDashboard'
+import { LoanRequest } from '@/pages/LoanRequest'
+import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -31,15 +33,15 @@ export const mainRouter = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <UserProfile />,
+        element: <UserProfile />
       },
       {
         path: 'Pymes',
-        element: <UserPymesList />,
+        element: <UserPymesList />
       },
       {
         path: 'Solicitudes',
-        element: <UserCreditRequests />,
+        element: <UserCreditRequests />
       }
     ]
   },
@@ -56,6 +58,14 @@ export const mainRouter = createBrowserRouter([
     element: <RegisterPyme />
   },
   {
-
+    path: '/Dashboard/SolicitarCredito/:id',
+    element: <LoanRequest />
+  },
+  {
+    path: '/Dashboard/SolicitarCredito/Success',
+    element: <LoanRequestSuccess />
+  },
+  {
     // add pages
-  }])
+  }
+])
