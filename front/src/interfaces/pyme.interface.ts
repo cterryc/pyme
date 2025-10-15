@@ -60,13 +60,25 @@ export type GetPymesByUserResponse = {
 }
 
 export type LoanRequestResponse = {
-  tradeName: string
+  success: boolean
+  payload: LoanRequestOptions
+}
+export type LoanRequestOptions = {
+  aplicationNumber: string
+  tradeName?: string
   minAmount: string
   maxAmount: string
-  paymentOptions: Array<PaymentOption>
+  // paymentOptions: Array<PaymentOption>
+  paymentOptions: { paymentNumber: number; interestRate: number } //temp
 }
-type PaymentOption = {
-  paymentsNumber: string
-  interestRate: string
+// type PaymentOption = {
+//   paymentsNumber: string
+//   interestRate: string
+// }
+
+export type LoanRequestConfirmResponse = {
+  message: string
+  //Mas cosas
 }
+
 export type LoanRequestErrorResponse = { success: boolean; payload: { message: string } }

@@ -5,10 +5,21 @@ import {
   type RegisterPymeDocumentsSuccessResponse,
   type GetPymesByUserResponse,
   type LoanRequestResponse,
-  type LoanRequestErrorResponse
+  type LoanRequestErrorResponse,
+  type LoanRequestConfirmResponse
 } from '@/interfaces/pyme.interface'
-import { type RegisterPymeFormData, type LoanRequestFormData } from '@/schemas/pyme.schema'
-import { getPymesByUser, pymeLoanRequestOptions, pymeRegister, pymeRegisterDocuments } from '@/services/pyme.service'
+import {
+  type RegisterPymeFormData,
+  type LoanRequestFormData,
+  type LoanRequestConfirmFormData
+} from '@/schemas/pyme.schema'
+import {
+  getPymesByUser,
+  pymeLoanRequestOptions,
+  pymeRegister,
+  pymeRegisterDocuments,
+  pymeLoanRequestConfirm
+} from '@/services/pyme.service'
 
 interface UsePymeRegisterProps {
   onSuccess?: (data: RegisterPymeSucessResponse) => void
@@ -22,6 +33,10 @@ interface UsePymeRegisterDocumentsProps {
 
 interface UsePymeLoanRequestProps {
   onSuccess?: (data: LoanRequestResponse) => void
+  onError?: (error: LoanRequestErrorResponse) => void
+}
+interface UsePymeLoanRequestConfirmProps {
+  onSuccess?: (data: LoanRequestConfirmResponse) => void
   onError?: (error: LoanRequestErrorResponse) => void
 }
 
@@ -53,6 +68,18 @@ export const usePymeRegisterDocuments = ({ onSuccess, onError }: UsePymeRegister
 export const usePymeLoanRequest = ({ onSuccess, onError }: UsePymeLoanRequestProps) => {
   return useMutation<LoanRequestResponse, LoanRequestErrorResponse, LoanRequestFormData>({
     mutationFn: async (data) => pymeLoanRequestOptions(data),
+    onSuccess: (data) => {
+      if (onSuccess) onSuccess(data)
+    },
+    onError: (error) => {
+      if (onError) onError(error)
+    }
+  })
+}
+
+export const usePymeLoanRequestConfirm = ({ onSuccess, onError }: UsePymeLoanRequestConfirmProps) => {
+  return useMutation<LoanRequestConfirmResponse, LoanRequestErrorResponse, LoanRequestConfirmFormData>({
+    mutationFn: async (data) => pymeLoanRequestConfirm(data),
     onSuccess: (data) => {
       if (onSuccess) onSuccess(data)
     },
