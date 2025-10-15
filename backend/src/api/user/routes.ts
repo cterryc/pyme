@@ -46,6 +46,11 @@ userRouter.delete(
   AuthController.deleteUser
 );
 
-
+userRouter.get(
+  "/users",
+  authenticate,
+  authorizeRoles([UserRole.ADMIN]),
+  AuthController.getAllUsers
+);
 
 export default userRouter;

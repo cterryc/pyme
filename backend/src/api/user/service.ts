@@ -5,6 +5,8 @@ import { User } from "../../entities/User.entity";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
 import {
+  IGetUsersQuery,
+  IGetUsersResponse,
   IUpdateUserPayload,
   UserDTO,
 } from "./interfaces";
@@ -185,6 +187,79 @@ export default class AuthService {
 
     return {
       message: "Usuario eliminado exitosamente",
+    };
+  }
+
+  async getAllUsers(query: IGetUsersQuery): Promise<IGetUsersResponse> {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Construir query con filtros
+    const queryBuilder = this.userRepo
+      .createQueryBuilder("user")
+      .select([
+        "user.id",
+        "user.email",
+        "user.firstName",
+        "user.lastName",
+        "user.phone",
+        "user.role",
+        "user.isEmailVerified",
+        "user.isActive",
+        "user.profileImage",
+        "user.createdAt",
+        "user.updatedAt",
+      ])
+      .where("user.deletedAt IS NULL");
+
+    // Filtro por role
+    if (query.role) {
+      queryBuilder.andWhere("user.role = :role", { role: query.role });
+    }
+
+    // Filtro por isActive
+    if (query.isActive !== undefined) {
+      queryBuilder.andWhere("user.isActive = :isActive", { isActive: query.isActive });
+    }
+
+    // Búsqueda por email o nombre
+    if (query.search) {
+      queryBuilder.andWhere(
+        "(user.email ILIKE :search OR user.firstName ILIKE :search OR user.lastName ILIKE :search)",
+        { search: `%${query.search}%` }
+      );
+    }
+
+    // Ordenar por fecha de creación (más recientes primero)
+    queryBuilder.orderBy("user.createdAt", "DESC");
+
+    // Contar total
+    const total = await queryBuilder.getCount();
+
+    // Aplicar paginación
+    const users = await queryBuilder.skip(skip).take(limit).getMany();
+
+    // Mapear a DTO
+    const usersDTO: UserDTO[] = users.map((user) => ({
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName || null,
+      lastName: user.lastName || null,
+      phone: user.phone || null,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified,
+      profileImage: user.profileImage || null,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    }));
+
+    return {
+      users: usersDTO,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }
