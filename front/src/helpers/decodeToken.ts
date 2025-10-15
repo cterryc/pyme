@@ -1,27 +1,27 @@
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode'
 
 export type TokenPayload = {
-  id: string;
-  email: string;
-  role: string;
-  iat?: number;
-  exp?: number;
-};
+  id: string
+  email: string
+  role: string
+  iat?: number
+  exp?: number
+}
 
 export function decodeToken(getToken: string): TokenPayload | null {
-  if (!getToken) return null;
+  if (!getToken) return null
 
   try {
-    const decoded = jwtDecode<TokenPayload>(getToken);
-    const now = Math.floor(Date.now() / 1000);
+    const decoded = jwtDecode<TokenPayload>(getToken)
+    const now = Math.floor(Date.now() / 1000)
 
     if (decoded.exp && decoded.exp < now) {
-      localStorage.removeItem("tokenPyme");
-      return null;
+      localStorage.removeItem('tokenPyme')
+      return null
     }
 
-    return decoded;
+    return decoded
   } catch {
-    return null;
+    return null
   }
 }

@@ -1,3 +1,8 @@
+export type GetIndustriesResponse = {
+  success: boolean
+  payload: Array<{ id: string; name: string }>
+}
+
 export type RegisterPymeSucessResponse = {
   success: boolean
   payload: {
@@ -21,8 +26,6 @@ export type RegisterPymeSucessResponse = {
     description: string
   }
 }
-// export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
-export type RegisterPymeErrorResponse = { success: boolean; payload: { message: string } }
 // export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
 export type RegisterPymeErrorResponse = { success: boolean; payload: { message: string } }
 
@@ -61,26 +64,29 @@ export type GetPymesByUserResponse = {
   payload: GetPymeResponse[]
 }
 
+//LoanRequestOptionsConfirmResponse es lo mismo que este
 export type LoanRequestResponse = {
   success: boolean
   payload: LoanRequestOptions
 }
 export type LoanRequestOptions = {
-  aplicationNumber: string
-  tradeName?: string
-  minAmount: string
-  maxAmount: string
-  // paymentOptions: Array<PaymentOption>
-  paymentOptions: { paymentNumber: number; interestRate: number } //temp
+  id: string
+  applicationNumber: string
+  legalName: string
+  annualRevenue: number
+  offerDetails: OfferDetails
+  selectedDetalis?: SelectedDetails
 }
-// type PaymentOption = {
-//   paymentsNumber: string
-//   interestRate: string
-// }
 
-export type LoanRequestConfirmResponse = {
-  message: string
-  //Mas cosas
+export type OfferDetails = {
+  minAmount: number
+  maxAmount: number
+  interestRate: number
+  allowedTerms: Array<number>
+}
+export type SelectedDetails = {
+  amount: number
+  termMonths: number
 }
 
 export type LoanRequestErrorResponse = { success: boolean; payload: { message: string } }

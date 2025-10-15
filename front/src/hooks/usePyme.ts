@@ -4,9 +4,9 @@ import {
   type RegisterPymeSucessResponse,
   type RegisterPymeDocumentsSuccessResponse,
   type GetPymesByUserResponse,
+  type GetIndustriesResponse,
   type LoanRequestResponse,
-  type LoanRequestErrorResponse,
-  type LoanRequestConfirmResponse
+  type LoanRequestErrorResponse
 } from '@/interfaces/pyme.interface'
 import {
   type RegisterPymeFormData,
@@ -18,7 +18,8 @@ import {
   pymeLoanRequestOptions,
   pymeRegister,
   pymeRegisterDocuments,
-  pymeLoanRequestConfirm
+  pymeLoanRequestConfirm,
+  getIndustries
 } from '@/services/pyme.service'
 
 interface UsePymeRegisterProps {
@@ -36,8 +37,18 @@ interface UsePymeLoanRequestProps {
   onError?: (error: LoanRequestErrorResponse) => void
 }
 interface UsePymeLoanRequestConfirmProps {
-  onSuccess?: (data: LoanRequestConfirmResponse) => void
+  onSuccess?: (data: LoanRequestResponse) => void
   onError?: (error: LoanRequestErrorResponse) => void
+}
+
+export const useGetIndustries = () => {
+  return useQuery<GetIndustriesResponse>({
+    queryKey: ['pymeIndustries'],
+    queryFn: () => getIndustries(),
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+    refetchOnWindowFocus: false
+  })
 }
 
 export const usePymeRegister = ({ onSuccess, onError }: UsePymeRegisterProps) => {
@@ -78,7 +89,7 @@ export const usePymeLoanRequest = ({ onSuccess, onError }: UsePymeLoanRequestPro
 }
 
 export const usePymeLoanRequestConfirm = ({ onSuccess, onError }: UsePymeLoanRequestConfirmProps) => {
-  return useMutation<LoanRequestConfirmResponse, LoanRequestErrorResponse, LoanRequestConfirmFormData>({
+  return useMutation<LoanRequestResponse, LoanRequestErrorResponse, LoanRequestConfirmFormData>({
     mutationFn: async (data) => pymeLoanRequestConfirm(data),
     onSuccess: (data) => {
       if (onSuccess) onSuccess(data)
