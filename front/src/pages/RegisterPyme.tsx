@@ -9,12 +9,14 @@ import { usePymeRegister } from '@/hooks/usePyme'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useUserAuthenticate } from '@/hooks/useUser'
+import Confetti from 'react-confetti'
 
 export const RegisterPyme = () => {
   const navigate = useNavigate()
   const maxStep = 4
-  const [step, setStep] = useState(4) //useState(0)
+  const [step, setStep] = useState(0)
   const [pymeId, setPymeId] = useState('')
+  const [confettiSize, setConfettiSize] = useState({ width: 0, height: 0 })
   const { getUser, isLoading } = useUserAuthenticate()
 
   const {
@@ -30,13 +32,23 @@ export const RegisterPyme = () => {
         description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la pyme.',
         duration: 4000
       })
+      localStorage.removeItem('registerPymeBackup')
+      localStorage.removeItem('registerPymeBackup')
       //navigate(`/Dashboard/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
       setPymeId(data.payload.id)
+    },
+    onError: (dataError) => {
+      toast.error('', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: dataError.payload.message,
+        duration: 4000
+      })
     }
   })
 
   //checkear sesion
   useEffect(() => {
+    setConfettiSize({ width: window.innerWidth, height: window.innerHeight })
     if (!isLoading && getUser == '') {
       navigate('/Login')
     }
@@ -45,15 +57,6 @@ export const RegisterPyme = () => {
   useEffect(() => {
     if (isPending) {
       toast('Guardando los cambios ...', { duration: 1000 })
-    }
-    if (isError) {
-      error.payload.forEach((err) => {
-        toast.error('', {
-          style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-          description: err.message,
-          duration: 4000
-        })
-      })
     }
   }, [isPending, isError, error])
 
@@ -151,6 +154,57 @@ export const RegisterPyme = () => {
                   />
                   {errors.tradeName && <p className='text-red-500 text-center'>{errors.tradeName.message}</p>}
                 </div>
+
+                {/* <div className='flex flex-col gap-1'>
+                  <p className='text-sm'>Nombre del propietario</p>
+
+                  <input
+                    type='text'
+                    {...registerPyme('ownerName')}
+                    className='border p-2 border-[#D1D5DB] rounded-md'
+                    placeholder='Nombre del propietario de la empresa'
+                    style={{ borderColor: errors.ownerName ? 'red' : '' }}
+                  />
+                  {errors.ownerName && <p className='text-red-500 text-center'>{errors.ownerName.message}</p>}
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <p className='text-sm'>Apellido del propietario</p>
+
+                  <input
+                    {...registerPyme('ownerSurname')}
+                    type='text'
+                    className='border p-2 border-[#D1D5DB] rounded-md'
+                    placeholder='Apellido del propietario de la empresa'
+                    style={{ borderColor: errors.ownerSurname ? 'red' : '' }}
+                  />
+                  {errors.ownerSurname && <p className='text-red-500 text-center'>{errors.ownerSurname.message}</p>}
+                </div> */}
+
+                {/* <div className='flex flex-col gap-1'>
+                  <p className='text-sm'>Nombre del propietario</p>
+
+                  <input
+                    type='text'
+                    {...registerPyme('ownerName')}
+                    className='border p-2 border-[#D1D5DB] rounded-md'
+                    placeholder='Nombre del propietario de la empresa'
+                    style={{ borderColor: errors.ownerName ? 'red' : '' }}
+                  />
+                  {errors.ownerName && <p className='text-red-500 text-center'>{errors.ownerName.message}</p>}
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <p className='text-sm'>Apellido del propietario</p>
+
+                  <input
+                    {...registerPyme('ownerSurname')}
+                    type='text'
+                    className='border p-2 border-[#D1D5DB] rounded-md'
+                    placeholder='Apellido del propietario de la empresa'
+                    style={{ borderColor: errors.ownerSurname ? 'red' : '' }}
+                  />
+                  {errors.ownerSurname && <p className='text-red-500 text-center'>{errors.ownerSurname.message}</p>}
+                </div> */}
+
                 <div className='flex flex-col gap-1'>
                   <p className='text-sm'>CUIT</p>
 
@@ -372,6 +426,22 @@ export const RegisterPyme = () => {
                 <span className='font-bold'>Nombre comercial : </span>
                 {getStoredData().tradeName}
               </p>
+              {/* <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Nombre del propietario :</span>
+                {getStoredData().ownerName}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Apellido del propietario : </span>
+                {getStoredData().ownerSurname}
+              </p> */}
+              {/* <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Nombre del propietario :</span>
+                {getStoredData().ownerName}
+              </p>
+              <p className='border-b-1 border-[#ddd]'>
+                <span className='font-bold'>Apellido del propietario : </span>
+                {getStoredData().ownerSurname}
+              </p> */}
               <p className='border-b-1 border-[#ddd]'>
                 <span className='font-bold'>CUIT : </span>
                 {getStoredData().taxId}
@@ -459,10 +529,15 @@ export const RegisterPyme = () => {
 
       {pymeId != '' && (
         <div className='fixed w-screen h-screen bg-[rgba(0,0,0,.4)] top-[0] left-[0] flex items-center '>
+          <Confetti width={confettiSize.width} height={confettiSize.height} initialVelocityY={10} />
+
           <dialog open className='bg-[var(--bg-light)] p-7 m-auto text-black rounded-md'>
-            <h3 className='text-xl mb-5'>Tu pyme se ha registrado correctamente</h3>
-            <p className='px-5 mb-10 '>Es obligatorio adjuntar documentos para solicitar un crédito</p>
-            <p className='px-5 mb-10 '>¿Quieres continuar ahora?</p>
+            <h3 className='text-xl text-center mb-5'>Tu pyme se ha registrado correctamente</h3>
+            <p className='px-5 mb-2'>Es obligatorio adjuntar documentos para solicitar un crédito</p>
+            <p className='px-5 mb-7 text-center '>¿Quieres continuar ahora?</p>
+            <h3 className='text-xl text-center mb-5'>Tu pyme se ha registrado correctamente</h3>
+            <p className='px-5 mb-2'>Es obligatorio adjuntar documentos para solicitar un crédito</p>
+            <p className='px-5 mb-7 text-center '>¿Quieres continuar ahora?</p>
             <div className='flex justify-around'>
               <button
                 className='bg-gray-500 p-2 rounded-md cursor-pointer text-white'

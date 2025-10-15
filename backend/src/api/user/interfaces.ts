@@ -21,3 +21,26 @@ export interface IUser {
   updatedAt: Date | null;
   updatedBy: string | null;
 }
+
+export interface UserDTO {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  role: UserRole;
+  isEmailVerified: boolean;
+  profileImage: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IUpdateUserPayload {
+  firstName?: string;
+  lastName?: string;
+  phone?: string | null;
+  profileImage?: string | null;
+  email?: string;
+  newPassword?: string;
+  currentPassword?: string;
+}

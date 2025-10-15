@@ -75,7 +75,6 @@ export default class AuthService {
   }
 
   async sendWelcomeEmail(email: string) {
-    console.log(email);
     const url = "https://api.brevo.com/v3/smtp/email";
     const options = {
       method: "POST",
