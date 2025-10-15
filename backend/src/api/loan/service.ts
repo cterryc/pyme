@@ -1,33 +1,30 @@
-import { In, Not, Or, Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { AppDataSource } from "../../config/data-source";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
 import { CreditApplication } from "../../entities/CreditApplication.entity";
 import { Company } from "../../entities/Company.entity";
+import { RiskTierConfig } from "../../entities/Risk_tier_config.entity";
+import { SystemConfig } from "../../entities/System_config.entity";
+import { Industry } from "../../entities/Industry.entity";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
-import {
-  adjustTier,
-  allowedTermsFor,
-  baseTierByIndustry,
-  capsFor,
-  computeAgeYears,
-  interestRateFor,
-} from "./interface";
-import { responseLoanRequest } from "./interface";
+import { RiskTier } from "../../constants/RiskTier";
+import { responseLoanRequest, LoanCalculationResult } from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
-
-const excludedStatuses = [
-  CreditApplicationStatus.SUBMITTED,
-  CreditApplicationStatus.UNDER_REVIEW,
-];
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
   private readonly companyRepo: Repository<Company>;
+  private readonly riskTierConfigRepo: Repository<RiskTierConfig>;
+  private readonly systemConfigRepo: Repository<SystemConfig>;
+  private readonly industryRepo: Repository<Industry>;
 
   constructor() {
     this.loanRepo = AppDataSource.getRepository(CreditApplication);
     this.companyRepo = AppDataSource.getRepository(Company);
+    this.riskTierConfigRepo = AppDataSource.getRepository(RiskTierConfig);
+    this.systemConfigRepo = AppDataSource.getRepository(SystemConfig);
+    this.industryRepo = AppDataSource.getRepository(Industry);
   }
 
   async loanRequest(
@@ -42,158 +39,380 @@ export default class LoanService {
       throw new HttpError(HttpStatus.NOT_FOUND, "La compañía no existe.");
     }
 
-    const loanRequest = await this.loanRepo.findOne({
-      where: { company: { id: company.id }, status: In(excludedStatuses) },
+    const activeStatuses = [
+      CreditApplicationStatus.DRAFT,
+      CreditApplicationStatus.SUBMITTED,
+      CreditApplicationStatus.UNDER_REVIEW,
+    ];
+
+    const existingApplication = await this.loanRepo.findOne({
+      where: {
+        company: { id: company.id },
+        status: In(activeStatuses),
+      },
     });
 
-    console.log(loanRequest);
+    if (existingApplication) {
+      if (!existingApplication.offerDetails) {
+        throw new HttpError(
+          HttpStatus.BAD_REQUEST,
+          "La solicitud existe pero no tiene oferta calculada."
+        );
+      }
 
-    if (loanRequest) {
       return {
-        id: loanRequest.id,
-        aplicationNumber: loanRequest.applicationNumber,
+        id: existingApplication.id,
+        applicationNumber: existingApplication.applicationNumber,
         legalName: company.legalName,
         annualRevenue: company.annualRevenue,
-        minAmount: loanRequest.minAmount!,
-        maxAmount: loanRequest.maxAmount!,
-        paymentOptions: {
-          paymentNumber: loanRequest.paymentNumber!,
-          interestRate: loanRequest.interestRate!,
+        offerDetails: {
+          minAmount: existingApplication.offerDetails.minAmount,
+          maxAmount: existingApplication.offerDetails.maxAmount,
+          interestRate: existingApplication.offerDetails.interestRate,
+          allowedTerms: existingApplication.offerDetails.allowedTerms,
+        },
+        selectedDetails: {
+          amount: existingApplication.selectedAmount,
+          termMonths: existingApplication.selectedTermMonths,
         },
       };
     }
 
-    const loanOptions = await this.getLoanOptions(company);
-
-    const { minAmount, maxAmount, paymentOptions } = loanOptions;
+    const loanOptions = await this.calculateLoanOptions(company);
 
     const code = await generateUniqueCode("CRD");
 
     const newLoanRequest = this.loanRepo.create({
       applicationNumber: code,
       company,
-      minAmount,
-      maxAmount,
-      ...paymentOptions,
+      offerDetails: loanOptions,
       status: CreditApplicationStatus.SUBMITTED,
+      statusHistory: [
+        {
+          status: CreditApplicationStatus.SUBMITTED,
+          timestamp: new Date(),
+          changedBy: "system",
+          reason: "Oferta calculada automáticamente",
+        },
+      ],
     });
 
     await this.loanRepo.save(newLoanRequest);
 
-    const response: responseLoanRequest = {
+    return {
       id: newLoanRequest.id,
+      applicationNumber: newLoanRequest.applicationNumber,
       legalName: company.legalName,
       annualRevenue: company.annualRevenue,
-      aplicationNumber: newLoanRequest.applicationNumber,
-      minAmount,
-      maxAmount,
-      paymentOptions,
+      offerDetails: loanOptions,
     };
-
-    return response;
   }
 
-  async getLoanOptions(company: Company): Promise<responseLoanRequest> {
+  async calculateLoanOptions(company: Company): Promise<LoanCalculationResult> {
+    const [baseRateConfig, riskTierConfigs] = await Promise.all([
+      this.systemConfigRepo.findOne({ where: { key: "BASE_RATE" } }),
+      this.riskTierConfigRepo.find(),
+    ]);
+
+    if (!baseRateConfig) {
+      throw new HttpError(
+        HttpStatus.SERVER_ERROR,
+        "Configuración BASE_RATE no encontrada."
+      );
+    }
+
+    const riskTierConfigMap = new Map<RiskTier, RiskTierConfig>();
+    riskTierConfigs.forEach((config) => {
+      riskTierConfigMap.set(config.tier, config);
+    });
+
+    const BASE_RATE = Number(baseRateConfig.value);
     const revenue = Math.max(0, Number(company.annualRevenue ?? 0));
-    const emp = company.employeeCount ?? null;
-    const ageYears = computeAgeYears(company.foundedDate ?? null);
-    const revPerEmp = emp && emp > 0 ? revenue / emp : null;
+    const employeeCount = company.employeeCount ?? null;
+    const ageYears = this.computeAgeYears(company.foundedDate);
+    const revPerEmp =
+      employeeCount && employeeCount > 0 ? revenue / employeeCount : null;
 
     if (!revenue) {
       return {
         minAmount: 1000,
         maxAmount: 5000,
-        paymentOptions: {
-          paymentNumber: 12,
-          interestRate: 10,
+        interestRate: 10,
+        allowedTerms: [12],
+        calculationSnapshot: {
+          baseRate: BASE_RATE,
+          companyRiskTier: RiskTier.D,
+          industryRiskTier: RiskTier.D,
+          riskTierConfig: null,
+          systemConfigs: { BASE_RATE },
+          calculatedAt: new Date(),
+          note: "Sin revenue - valores por defecto",
         },
       };
     }
+    // 2. Determinar risk tier
+    const industryTier = company.industry?.baseRiskTier ?? RiskTier.B;
+    const companyTier = this.adjustTier(industryTier, ageYears, revPerEmp);
 
-    const baseTier = baseTierByIndustry(company.industry ?? null);
-    const tier = adjustTier(baseTier, ageYears, revPerEmp);
+    const tierConfig = riskTierConfigMap.get(companyTier);
+    if (!tierConfig) {
+      throw new HttpError(
+        HttpStatus.SERVER_ERROR,
+        `Configuración para risk tier ${companyTier} no encontrada.`
+      );
+    }
 
-    const { min, max } = capsFor(tier, revenue);
+    // 3. Calcular montos y términos
+    const { min, max } = this.capsFor(tierConfig, revenue);
+    const allowedTerms = this.allowedTermsFor(
+      tierConfig,
+      ageYears,
+      revenue > 0
+    );
+    const interestRate = this.interestRateFor(
+      BASE_RATE,
+      tierConfig,
+      ageYears,
+      revPerEmp
+    );
 
-    const terms = allowedTermsFor(tier, ageYears, revenue > 0);
-    const recommended = terms[Math.floor(terms.length / 2)];
-
-    const rate = interestRateFor(tier, ageYears, revPerEmp);
-
-    const loanOptions: responseLoanRequest = {
+    return {
       minAmount: min,
       maxAmount: max,
-      paymentOptions: {
-        paymentNumber: recommended,
-        interestRate: rate,
-      },
+      interestRate,
+      allowedTerms,
+      // calculationSnapshot: {
+      //   baseRate: BASE_RATE,
+      //   companyRiskTier: companyTier,
+      //   industryRiskTier: industryTier,
+      //   riskTierConfig: {
+      //     tier: tierConfig.tier,
+      //     spread: Number(tierConfig.spread),
+      //     factor: Number(tierConfig.factor),
+      //   },
+      //   systemConfigs: { BASE_RATE },
+      //   companyData: {
+      //     revenue,
+      //     employeeCount,
+      //     ageYears,
+      //     revPerEmp,
+      //   },
+      //   calculatedAt: new Date(),
     };
-
-    return loanOptions;
   }
 
   async createCreditApplication(
-    loanData: Partial<CreditApplication>,
+    applicationId: string,
+    selectedAmount: number,
+    selectedTermMonths: number,
     userId: string
-  ): Promise<responseLoanRequest | null> {
-    const company = await this.companyRepo.findOne({
-      where: { id: loanData.companyId, owner: { id: userId } },
+  ): Promise<responseLoanRequest> {
+    const application = await this.loanRepo.findOne({
+      where: { id: applicationId },
+      relations: ["company"],
     });
 
-    if (!company) {
-      throw new HttpError(HttpStatus.NOT_FOUND, "La compañía no existe.");
-    }
-
-
-    const loanRequest = await this.loanRepo.findOne({
-      where: { id: loanData.id, company: { id: company.id } },
-    });
-
-    if (!loanRequest) {
+    if (!application) {
       throw new HttpError(
         HttpStatus.NOT_FOUND,
         "La solicitud de crédito no existe."
       );
     }
 
-    if( loanRequest.confirmed ) {
+    // Verificar que la compañía pertenece al usuario
+    const company = await this.companyRepo.findOne({
+      where: { id: application.companyId, owner: { id: userId } },
+    });
+
+    if (!company) {
       throw new HttpError(
-        HttpStatus.BAD_REQUEST,
-        "La solicitud de crédito ya ha sido confirmada."
+        HttpStatus.FORBIDDEN,
+        "No tienes permisos para esta solicitud."
       );
     }
 
-    if (loanData.amount! < loanRequest.minAmount!) {
+    if (application.status !== CreditApplicationStatus.SUBMITTED) {
       throw new HttpError(
         HttpStatus.BAD_REQUEST,
-        `El monto mínimo para la solicitud de crédito es ${loanRequest.minAmount}.`
+        "Solo se pueden confirmar solicitudes en estado SUBMITTED."
       );
     }
 
-    if (loanData.amount! > loanRequest.maxAmount!) {
+    if (!application.offerDetails) {
       throw new HttpError(
         HttpStatus.BAD_REQUEST,
-        `El monto máximo para la solicitud de crédito es ${loanRequest.maxAmount}.`
+        "La solicitud no tiene una oferta calculada."
       );
     }
 
-    loanRequest.confirmed = true;
-    loanRequest.amount = loanData.amount;
+    // Validar montos y términos contra la oferta
+    const { minAmount, maxAmount, allowedTerms } = application.offerDetails;
 
-    await this.loanRepo.save(loanRequest);
+    if (selectedAmount < minAmount) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        `El monto mínimo permitido es ${minAmount}.`
+      );
+    }
+
+    if (selectedAmount > maxAmount) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        `El monto máximo permitido es ${maxAmount}.`
+      );
+    }
+
+    if (!allowedTerms.includes(selectedTermMonths)) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        `Plazo no permitido. Términos válidos: ${allowedTerms.join(", ")}.`
+      );
+    }
+
+    // Actualizar la aplicación
+    application.selectedAmount = selectedAmount;
+    application.selectedTermMonths = selectedTermMonths;
+    application.status = CreditApplicationStatus.SUBMITTED;
+    application.submittedAt = new Date();
+
+    // Actualizar historial
+    application.statusHistory = [
+      ...(application.statusHistory || []),
+      {
+        status: CreditApplicationStatus.UNDER_REVIEW,
+        timestamp: new Date(),
+        changedBy: userId,
+        reason: "Owner confirmó monto y plazo",
+      },
+    ];
+
+    await this.loanRepo.save(application);
 
     return {
-      id: loanRequest.id,
+      id: application.id,
+      applicationNumber: application.applicationNumber,
       legalName: company.legalName,
       annualRevenue: company.annualRevenue,
-      aplicationNumber: loanRequest.applicationNumber,
-      minAmount: loanRequest.minAmount!,
-      maxAmount: loanRequest.maxAmount!,
-      paymentOptions: {
-        paymentNumber: loanRequest.paymentNumber!,
-        interestRate: loanRequest.interestRate!,
+      offerDetails: application.offerDetails,
+      selectedDetails: {
+        amount: selectedAmount,
+        termMonths: selectedTermMonths,
       },
     };
+  }
+
+  // --- MÉTODOS DE CÁLCULO (adaptados para usar BD) ---
+  private computeAgeYears(foundedDate: any): number | null {
+  if (!foundedDate) return null;
+  
+  try {
+    // Intentar convertir a Date sin importar el tipo
+    const date = new Date(foundedDate);
+    
+    if (isNaN(date.getTime())) {
+      console.warn('Fecha inválida:', foundedDate);
+      return null;
+    }
+
+    const diffMs = Date.now() - date.getTime();
+    if (!isFinite(diffMs) || diffMs < 0) return 0;
+    return Math.floor(diffMs / (365.25 * 24 * 3600 * 1000));
+  } catch (error) {
+    console.error('Error calculando edad desde fecha:', foundedDate, error);
+    return null;
+  }
+}
+
+  private adjustTier(
+    tier: RiskTier,
+    ageYears: number | null,
+    revPerEmp: number | null
+  ): RiskTier {
+    let t = tier;
+
+    if (ageYears != null) {
+      if (ageYears >= 5) t = this.bumpBetter(t);
+      else if (ageYears < 1) t = this.bumpWorse(t);
+    }
+
+    if (revPerEmp != null) {
+      if (revPerEmp >= 1_000_000) t = this.bumpBetter(t);
+      else if (revPerEmp < 200_000) t = this.bumpWorse(t);
+    }
+
+    return t;
+  }
+
+  private bumpBetter(t: RiskTier): RiskTier {
+    return t === "D"
+      ? RiskTier.C
+      : t === "C"
+      ? RiskTier.B
+      : t === "B"
+      ? RiskTier.A
+      : RiskTier.A;
+  }
+
+  private bumpWorse(t: RiskTier): RiskTier {
+    return t === "A"
+      ? RiskTier.A
+      : t === "B"
+      ? RiskTier.C
+      : t === "C"
+      ? RiskTier.D
+      : RiskTier.D;
+  }
+
+  private allowedTermsFor(
+    tierConfig: RiskTierConfig,
+    ageYears: number | null,
+    hasRevenue: boolean
+  ): number[] {
+    if (!hasRevenue) return [6, 12];
+    return tierConfig.allowed_terms;
+  }
+
+  private interestRateFor(
+    BASE_RATE: number,
+    tierConfig: RiskTierConfig,
+    ageYears: number | null,
+    revPerEmp: number | null
+  ): number {
+    let rate = BASE_RATE + Number(tierConfig.spread);
+
+    if (ageYears != null && ageYears >= 5) rate -= 1;
+    if (revPerEmp != null && revPerEmp >= 1_000_000) rate -= 1;
+
+    return this.clamp(Number(rate.toFixed(2)), 8, 80);
+  }
+
+  private capsFor(
+    tierConfig: RiskTierConfig,
+    revenue: number
+  ): { min: number; max: number } {
+    const ABSOLUTE_MIN_LOAN = 1_000;
+    const ABSOLUTE_MAX_LOAN = 5_000_000;
+    const ROUND_TO = 1_000;
+
+    const factor = Number(tierConfig.factor);
+    const rawMax = revenue * factor;
+    const max = this.clamp(
+      this.roundTo(rawMax, ROUND_TO),
+      ABSOLUTE_MIN_LOAN,
+      ABSOLUTE_MAX_LOAN
+    );
+    const rawMin = revenue * 0.05;
+    const min = this.clamp(this.roundTo(rawMin, ROUND_TO), ROUND_TO, max);
+
+    return { min, max };
+  }
+
+  private clamp(v: number, lo: number, hi: number): number {
+    return Math.max(lo, Math.min(hi, v));
+  }
+
+  private roundTo(v: number, step: number): number {
+    return Math.round(v / step) * step;
   }
 
   async getCreditApplicationStatus(applicationId: string): Promise<string> {

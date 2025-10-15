@@ -63,7 +63,7 @@ export class Document extends BaseEntity {
     certificateThumbprint?: string;
 
     // Relations
-    @ManyToOne(() => CreditApplication, (application) => application.documents, { onDelete: "CASCADE", nullable: true })
+    @ManyToOne(() => CreditApplication, (application) => application.documents, { onDelete: "CASCADE" })
     @JoinColumn({ name: "credit_application_id" })
     creditApplication?: CreditApplication;
 

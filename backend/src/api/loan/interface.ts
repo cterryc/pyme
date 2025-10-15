@@ -1,15 +1,28 @@
 export interface responseLoanRequest {
     id?: string;
-    aplicationNumber?: string;
+    applicationNumber?: string;
     legalName?: string;
     annualRevenue?: number;
+    offerDetails: {
+        minAmount: number;
+        maxAmount: number;
+        interestRate: number;
+        allowedTerms: number[];
+    };
+    selectedDetails?: {
+        amount?: number;
+        termMonths?: number;
+    };
+}
+
+export interface LoanCalculationResult {
     minAmount: number;
     maxAmount: number;
-    paymentOptions: {
-        paymentNumber: number;
-        interestRate: number;
-    }
+    interestRate: number;
+    allowedTerms: number[];
+    calculationSnapshot?: any;
 }
+
 
 type RiskTier = "A" | "B" | "C" | "D";
 

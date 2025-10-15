@@ -3,7 +3,6 @@ import { HttpStatus } from "../../constants/HttpStatus";
 import apiResponse from "../../utils/apiResponse.utils";
 import LoanService from "./service";
 import { createCreditApplicationSchema, loanRequestSchema } from "./validator";
-import { create } from "domain";
 import { responseLoanRequest } from "./interface";
 
 export default class LoanController {
@@ -29,7 +28,7 @@ export default class LoanController {
         const userId = res.locals.user?.id as string;
         const loanData = createCreditApplicationSchema.parse(req.body);
 
-        const loanRequest : responseLoanRequest | null = await this.loanService.createCreditApplication(loanData, userId);
+        const loanRequest : responseLoanRequest | null = await this.loanService.createCreditApplication(loanData.id,loanData.selectedAmount, loanData.selectedTermMonths,userId);
 
         res.status(HttpStatus.CREATED).json(apiResponse(true, loanRequest));
       } catch (error) {
