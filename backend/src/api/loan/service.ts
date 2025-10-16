@@ -259,10 +259,10 @@ export default class LoanService {
       );
     }
 
-    if (application.status !== CreditApplicationStatus.SUBMITTED) {
+    if (application.status !== CreditApplicationStatus.APPLYING) {
       throw new HttpError(
         HttpStatus.BAD_REQUEST,
-        "Solo se pueden confirmar solicitudes en estado SUBMITTED."
+        "Esta solicitud ya fue confirmada."
       );
     }
 
