@@ -33,18 +33,15 @@ export default class LoanService {
   ): Promise<responseLoanRequest> {
     const company = await this.companyRepo.findOne({
       where: { id: companyId, owner: { id: userId } },
-      relations: ["industry"], 
+      relations: ["industry"],
     });
 
     if (!company) {
-      throw new HttpError(
-        HttpStatus.NOT_FOUND,
-        "La compañía no existe o no te pertenece."
-      );
+      throw new HttpError(HttpStatus.NOT_FOUND, "La compañía no existe");
     }
 
     const activeStatuses = [
-      CreditApplicationStatus.DRAFT,
+      CreditApplicationStatus.APPLYING,
       CreditApplicationStatus.SUBMITTED,
       CreditApplicationStatus.UNDER_REVIEW,
     ];
@@ -99,10 +96,10 @@ export default class LoanService {
           applicationNumber: code,
           company,
           offerDetails: loanOptions,
-          status: CreditApplicationStatus.DRAFT,
+          status: CreditApplicationStatus.APPLYING,
           statusHistory: [
             {
-              status: CreditApplicationStatus.DRAFT,
+              status: CreditApplicationStatus.APPLYING,
               timestamp: new Date(),
               changedBy: "system",
               reason: "Oferta generada automáticamente",
@@ -310,7 +307,7 @@ export default class LoanService {
     application.statusHistory = [
       ...(application.statusHistory || []),
       {
-        status: CreditApplicationStatus.UNDER_REVIEW,
+        status: CreditApplicationStatus.SUBMITTED,
         timestamp: new Date(),
         changedBy: userId,
         reason: "Owner confirmó monto y plazo",

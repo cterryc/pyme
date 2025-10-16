@@ -1,11 +1,9 @@
 export enum CreditApplicationStatus {
     DRAFT = "Draft",
+    APPLYING = "Applying",
     SUBMITTED = "Submitted",
     UNDER_REVIEW = "Under Review",
     DOCUMENTS_REQUIRED = "Documents Required",
-    KYC_PENDING = "KYC Pending",
-    KYC_APPROVED = "KYC Approved",
-    KYC_REJECTED = "KYC Rejected",
     APPROVED = "Approved",
     REJECTED = "Rejected",
     DISBURSED = "Disbursed",
