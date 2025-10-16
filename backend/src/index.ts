@@ -8,21 +8,29 @@ import HttpError from './utils/HttpError.utils';
 import apiResponse from './utils/apiResponse.utils';
 
 
+(async () => {
+  try {
+    const appCreator = new ExpressAppCreator();
+    const app = await appCreator.createExpressApp();
 
-const appCreator = new ExpressAppCreator();
-const app: express.Application = appCreator.createExpressApp();
-
-MiddlewaresConfig.config(app);
-
-app.use("/api", apiRouter);
-
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-    console.error("Error capturado:", err);
     
-    const status = err.status || 500;
-    const message = err.message || "Internal Server Error";
-    
-    res.status(status).json(apiResponse(false, { message }));
-});
+    MiddlewaresConfig.config(app);
 
-export default app;
+  
+    app.use("/api", apiRouter);
+
+  
+    app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+      console.error("Error capturado:", err);
+
+      const status = err.status || 500;
+      const message = err.message || "Internal Server Error";
+
+      res.status(status).json(apiResponse(false, { message }));
+    });
+
+  } catch (error) {
+    console.error("❌ Error al iniciar la aplicación:", error);
+    process.exit(1);
+  }
+})();
