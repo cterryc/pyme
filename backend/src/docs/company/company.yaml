@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Company API
+  version: 1.0.0
+  description: Endpoints de gestión de compañías y sus industrias
+
+tags:
+  - name: Company
+    description: Operaciones relacionadas con compañías
+
+paths:
+  /api/company:
+    post:
+      summary: Crear una nueva compañía
+      tags: [Company]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompanyInput"
+      responses:
+        "201":
+          description: Compañía creada exitosamente
+        "400":
+          description: Datos inválidos o duplicados
+
+    get:
+      summary: Listar compañías del usuario autenticado
+      tags: [Company]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de compañías del usuario
+
+  /api/company/all:
+    get:
+      summary: Listar todas las compañías (solo admin)
+      tags: [Company]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Número de página
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Límite de resultados por página
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Buscar por nombre o taxId
+      responses:
+        "200":
+          description: Lista paginada de compañías
+        "403":
+          description: No autorizado
+
+  /api/company/{id}:
+    get:
+      summary: Obtener compañía por ID
+      tags: [Company]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la compañía
+      responses:
+        "200":
+          description: Detalle de la compañía
+        "404":
+          description: No encontrada
+
+    patch:
+      summary: Actualizar una compañía
+      tags: [Company]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCompanyInput"
+      responses:
+        "200":
+          description: Compañía actualizada exitosamente
+        "404":
+          description: No encontrada
+
+    delete:
+      summary: Eliminar una compañía (soft delete)
+      tags: [Company]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Compañía eliminada
+        "404":
+          description: No encontrada
+
+  /api/company/industries:
+    get:
+      summary: Listar todas las industrias disponibles
+      tags: [Company]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de industrias disponibles
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateCompanyInput:
+      type: object
+      required:
+        - legalName
+        - taxId
+        - industryId
+      properties:
+        legalName:
+          type: string
+          example: "Tech Solutions SRL"
+        tradeName:
+          type: string
+          example: "TechSol"
+        industryId:
+          type: string
+          example: "b9c1f75d-8b8e-44a5-8e50-63c78e12a17d"
+        taxId:
+          type: string
+          example: "30-71580927-9"
+        email:
+          type: string
+          example: "info@techsol.com"
+        phone:
+          type: string
+          example: "+54 3794 555555"
+        city:
+          type: string
+          example: "Corrientes"
+        country:
+          type: string
+          example: "Argentina"
+
+    UpdateCompanyInput:
+      allOf:
+        - $ref: "#/components/schemas/CreateCompanyInput"
+      description: Campos opcionales para actualización
