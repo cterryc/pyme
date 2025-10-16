@@ -40,9 +40,9 @@ export default class AuthService {
       password: hashedPassword,
     });
 
-    const { id, email, role } = newUser;
+    const { id, role } = newUser;
 
-    const tokenPayload = { id, email, role };
+    const tokenPayload = { id, role };
 
     const token = generateToken(tokenPayload);
 
@@ -68,7 +68,6 @@ export default class AuthService {
     }
     const token = generateToken({
       id: user.id,
-      email: user.email,
       role: user.role,
     });
     return { token };

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { HttpStatus } from "../../constants/HttpStatus";
 import apiResponse from "../../utils/apiResponse.utils";
 import CompanyService from "./service";
-import { createCompanySchema, updateCompanySchema } from "./validator";
+import { createCompanySchema, updateCompanySchema, getAllCompaniesQuerySchema  } from "./validator";
 
 export default class CompanyController {
   private static companyService = new CompanyService();
@@ -121,4 +121,20 @@ export default class CompanyController {
   //     }
   // };
   }
+
+  static getAllCompanies = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const query = getAllCompaniesQuerySchema.parse(req.query);
+    
+    const result = await this.companyService.getAllCompanies(query);
+    
+    res.status(HttpStatus.OK).json(apiResponse(true, result));
+  } catch (error) {
+    return next(error);
+  }
+};
 }
