@@ -31,9 +31,11 @@ export const LoanRequest = () => {
         refNum: data.payload.applicationNumber,
         legalName: data.payload.legalName,
         interest: data.payload.offerDetails.interestRate.toString() || '0',
-        amount: data.payload.selectedDetalis?.amount.toString() || '0',
-        months: data.payload.selectedDetalis?.termMonths.toString() || '0'
+        amount: data.payload.selectedDetails?.amount.toString() || '0',
+        months: data.payload.selectedDetails?.termMonths.toString() || '0'
       }).toString()
+
+      // console.log(data.payload.selectedDetails)
 
       navigate(`/Dashboard/SolicitarCredito/Success?${searchParams}`)
     },
