@@ -12,7 +12,7 @@ export const getUserProfile = async (): Promise<getProfileResponse> => {
 
     const result = await response.json();
     if (!response.ok) throw result;
-    console.log(result)
+
     return result;
   } catch (error) {
     console.error("[getUserProfile]: Error fetching data:", error);
