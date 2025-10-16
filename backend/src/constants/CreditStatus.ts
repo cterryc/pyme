@@ -1,13 +1,13 @@
 export enum CreditApplicationStatus {
-    DRAFT = "Draft",
-    APPLYING = "Applying",
-    SUBMITTED = "Submitted",
-    UNDER_REVIEW = "Under Review",
-    DOCUMENTS_REQUIRED = "Documents Required",
-    APPROVED = "Approved",
-    REJECTED = "Rejected",
-    DISBURSED = "Disbursed",
-    CANCELLED = "Cancelled",
+    DRAFT = "No iniciado",
+    APPLYING = "No confirmado",
+    SUBMITTED = "Enviado",
+    UNDER_REVIEW = "En revisión",
+    DOCUMENTS_REQUIRED = "Documentos requeridos",
+    APPROVED = "Aprobado",
+    REJECTED = "Rechazado",
+    DISBURSED = "Desembolsado",
+    CANCELLED = "Cancelado",
 }
 
 export enum DocumentType {
