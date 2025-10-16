@@ -23,8 +23,9 @@ export const useUserAuthenticate = () => {
     const user = decodeToken(token || '')
 
     if (!user) queryClient.clear()
-
-    setGetUser(user?.email.split('@')[0] || '')
+    console.log(user)
+    // setGetUser(user?.email.split('@')[0] || '')
+    setGetUser(user?.id || 'User temporal')
     setIsLoading(false)
   }, [queryClient])
 
