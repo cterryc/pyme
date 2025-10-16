@@ -123,7 +123,7 @@ export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
 
     const result = await response.json()
     if (!response.ok) throw result
-
+    console.log(result)
     return result
   } catch (error) {
     console.error('[getPymesByUser]: Error fetching data:', error)

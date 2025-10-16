@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { useUpdateUserProfle, useUserProfile } from "@/hooks/useUser"
 import { userProfileSchema, type UserProfileFormData } from "@/schemas/user.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { UserProfileSkeleton } from "./Loaders/UserProfileSkeleton"
+import { useNavigate } from "react-router-dom"
+import { useQueryClient } from "@tanstack/react-query"
+
 
 export const UserProfile = () => {
   const imageDefault = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
@@ -18,7 +23,9 @@ export const UserProfile = () => {
     { name: 'phone', label: 'Teléfono', type: 'text' },
   ]
   // hooks
-  const { data: userProfile } = useUserProfile()
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { data: userProfile, isLoading, isError, error, refetch } = useUserProfile()
   const {
     register,
     handleSubmit,
@@ -28,8 +35,10 @@ export const UserProfile = () => {
     resolver: zodResolver(userProfileSchema)
   })
   const { mutate: updateProfile, isPending } = useUpdateUserProfle({
-    onSuccess: (data) => {
-      console.log(data)
+    onSuccess: () => {
+      toast.success("Usuario actualizado")
+      setIsEditProfile(false)
+      refetch()
     }
   })
   useEffect(() => {
@@ -42,7 +51,6 @@ export const UserProfile = () => {
         profileImage: userProfile.payload.profileImage || '',
       }
       setOriginalProfile(initialValues)
-      // inicializar inputs de react-hook-form con los datos del getProfile
       reset(initialValues)
     }
   }, [userProfile, reset])
@@ -50,92 +58,108 @@ export const UserProfile = () => {
 
   // methods
   const onSubmit = (data: UserProfileFormData) => {
-    // agregar el profileImage harcodeado por ahora
+    if (!userProfile) return null
+    if (data.email === userProfile.payload.email) {
+      delete data.email;
+    }
     updateProfile({ ...data, profileImage: imageDefault });
   }
   const handleCancelEdit = () => {
     setIsEditProfile(false)
-    // resetar inputs de react-hook-form con los datos del getProflie
     if (originalProfile) reset(originalProfile)
+  }
+  const deleteToken = () => {
+    localStorage.removeItem('tokenPyme')
+    queryClient.clear()
+    navigate('/Login')
   }
 
   return (
     <>
       <h2 className="text-2xl font-semibold mb-4 text-gray-700">Perfil de Usuario</h2>
-      <section className="flex">
-        <form onSubmit={handleSubmit(onSubmit)} className="rounded-2xl w-full">
-          <div className="flex p-4 w-full">
-            <div className="flex-1 flex items-center justify-center">
-              <img
-                src={userProfile?.payload?.profileImage || imageDefault}
-                className="rounded-full w-40 h-40"
-              />
-            </div>
+      {isLoading && <UserProfileSkeleton />}
+      {isError && <p className='text-red-400'>Error: {error.message}</p>}
+      {!isLoading && !isError && (
+        <section className="flex">
+          <form className="rounded-2xl w-full">
+            <div className="flex p-4 w-full">
+              <div className="flex-1 flex items-center justify-center">
+                <img
+                  src={userProfile?.payload?.profileImage || imageDefault}
+                  className="rounded-full w-40 h-40"
+                />
+              </div>
 
-            <div className="flex-1 flex flex-col justify-start gap-2 h-[350px]">
-              {fields.map((field, index) => (
-                <div key={index} className="flex flex-col gap-1">
-                  <label htmlFor={field.name} className="block text-lg text-gray-500 font-semibold">
-                    {field.label}
-                  </label>
-                  {isEditProfile ? (
-                    <div className='rounded-md border-2 border-gray-300 font-semibold'>
-                      <input
-                        id={field.name}
-                        type={field.type}
-                        {...register(field.name as keyof UserProfileFormData)}
-                        className='border-none p-2 w-full placeholder:text-[#7d7d7e] text-gray-600 outline-none'
-                      />
-                      {errors[field.name as keyof typeof errors] && (
-                        <span className='text-red-500 text-xs pl-3'>
-                          {errors[field.name as keyof typeof errors]?.message as string}
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="mt-1">
-                      {userProfile?.payload?.[field.name as keyof UserProfileFormData] || 'No Data'}
-                    </p>
-                  )}
+              <div className="flex-1 grid grid-cols-2 gap-2">
+                {fields.map((field, index) => (
+                  <div key={index} className="flex flex-col gap-1">
+                    <label htmlFor={field.name} className="block text-lg text-gray-500 font-semibold">
+                      {field.label}
+                    </label>
+                    {isEditProfile ? (
+                      <div className='rounded-md border-2 border-gray-300 font-semibold'>
+                        <input
+                          id={field.name}
+                          type={field.type}
+                          {...register(field.name as keyof UserProfileFormData)}
+                          className='border-none p-2 w-full placeholder:text-[#7d7d7e] text-gray-600 outline-none'
+                        />
+                        {errors[field.name as keyof typeof errors] && (
+                          <span className='text-red-500 text-xs pl-3'>
+                            {errors[field.name as keyof typeof errors]?.message as string}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="mt-1">
+                        {userProfile?.payload?.[field.name as keyof UserProfileFormData] || 'No Data'}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-10">
+              {!isEditProfile ? (
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={deleteToken}
+                    className="text-white py-3 text-xl rounded-md bg-[#c24949] hover:bg-[#c95353] transition-colors cursor-pointer w-full flex justify-center items-center gap-4"
+                  >
+                    Cerrar Sesion
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditProfile(!isEditProfile)}
+                    className="text-white py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] transition-colors cursor-pointer w-full flex justify-center items-center gap-4"
+                  >
+                    Actualizar perfil
+                  </button>
+
                 </div>
-              ))}
+              ) : (
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handleCancelEdit()}
+                    className="flex-1 py-3 text-xl rounded-md bg-gray-400 hover:bg-gray-500 text-white transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSubmit(onSubmit)}
+                    className="flex-1 py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] text-white transition-colors"
+                  >
+                    {isPending ? 'Actualizando. . .' : 'Actualizar'}
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-          <div className="mx-4 mb-4">
-            {!isEditProfile ? (
-              <div className="flex gap-4">
-                <button
-                  className="text-white py-3 text-xl rounded-md bg-[#c24949] hover:bg-[#c95353] transition-colors cursor-pointer w-full flex justify-center items-center gap-4"
-                >
-                  Cerrar Sesion
-                </button>
-                <button
-                  onClick={() => setIsEditProfile(true)}
-                  className="text-white py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] transition-colors cursor-pointer w-full flex justify-center items-center gap-4"
-                >
-                  Actualizar perfil
-                </button>
-
-              </div>
-            ) : (
-              <div className="flex gap-4">
-                <button
-                  onClick={() => handleCancelEdit()}
-                  className="flex-1 py-3 text-xl rounded-md bg-gray-400 hover:bg-gray-500 text-white transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] text-white transition-colors"
-                >
-                  {isPending ? 'Actualizando. . .' : 'Actualizar'}
-                </button>
-              </div>
-            )}
-          </div>
-        </form>
-      </section>
+          </form>
+        </section>
+      )}
     </>
   )
 }
