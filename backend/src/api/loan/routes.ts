@@ -25,4 +25,10 @@ loanRouter.post(
     LoanController.createCreditApplication
 );
 
+loanRouter.get(
+    "/user",
+    authenticate,
+    LoanController.listCreditApplicationsByUserId
+);
+
 export default loanRouter;

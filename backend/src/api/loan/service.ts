@@ -9,8 +9,9 @@ import { SystemConfig } from "../../entities/System_config.entity";
 import { Industry } from "../../entities/Industry.entity";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
 import { RiskTier } from "../../constants/RiskTier";
-import { responseLoanRequest, LoanCalculationResult } from "./interface";
+import { responseLoanRequest, LoanCalculationResult, responseLoanByUser } from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
+import { responseLoanByUserListDto } from "./dto";
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -327,6 +328,16 @@ export default class LoanService {
         termMonths: selectedTermMonths,
       },
     };
+  }
+
+  async listCreditApplicationsByUserId(userId: string): Promise<responseLoanByUser[]> {
+    const applications = await this.loanRepo.find({
+      where: { company: { owner: { id: userId } } },
+      relations: ["company"],
+      order: { createdAt: "DESC" },
+    });
+
+    return responseLoanByUserListDto(applications);
   }
 
   // --- MÉTODOS DE CÁLCULO (adaptados para usar BD) ---
