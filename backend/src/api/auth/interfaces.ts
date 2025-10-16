@@ -2,7 +2,6 @@ import { UserRole } from "../../constants/Roles";
 
 export interface ITokenPayload {
   id: string;
-  email: string;
   role: UserRole;
 }
 

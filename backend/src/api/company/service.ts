@@ -1,12 +1,12 @@
-import { IsNull, Not, Repository } from "typeorm";
+import { Between, ILike, In, LessThanOrEqual, MoreThanOrEqual, IsNull, Not, Repository } from "typeorm";
 import { AppDataSource } from "../../config/data-source";
 import HttpError from "../../utils/HttpError.utils";
 import { HttpStatus } from "../../constants/HttpStatus";
 import { Company } from "../../entities/Company.entity";
-import { toCompanyDto, toCompanyListDto, toIndustryListDto } from "./dto";
-import { responseCompanyDto } from "./interface";
+import { toCompanyDto, toCompanyListDto, toIndustryListDto, createPaginatedResponse, toAdminCompanyListDto } from "./dto";
+import { responseCompanyDto, PaginatedResponse } from "./interface";
 import { Industry } from "../../entities/Industry.entity";
-import { CreateCompanyInput } from "./validator";
+import { CreateCompanyInput, GetAllCompaniesQuery } from "./validator";
 
 export default class CompanyService {
   private readonly companyRepo: Repository<Company>;
@@ -170,6 +170,110 @@ export default class CompanyService {
 
     return toIndustryListDto(industries);
   }
+
+  async getAllCompanies(
+  query: GetAllCompaniesQuery
+): Promise<PaginatedResponse<any>> {
+  const {
+    page,
+    limit,
+    industryId,
+    status,
+    deleted,
+    search,
+    createdAtFrom,
+    createdAtTo,
+    foundedDateFrom,
+    foundedDateTo,
+    sortBy,
+    sortOrder,
+  } = query;
+
+  // Construir WHERE conditions
+  const whereConditions: any = {};
+
+  // Filtro de eliminados
+  if (deleted === 'true') {
+    whereConditions.deletedAt = Not(IsNull());
+  } else if (deleted === 'false') {
+    whereConditions.deletedAt = IsNull();
+  }
+  // Si deleted === 'all', no agregamos filtro
+
+  // Filtro por industria
+  if (industryId) {
+    whereConditions.industry = { id: industryId };
+  }
+
+  // Búsqueda por legalName o taxId
+  const searchConditions = [];
+  if (search) {
+    searchConditions.push(
+      { ...whereConditions, legalName: ILike(`%${search}%`) },
+      { ...whereConditions, taxId: ILike(`%${search}%`) }
+    );
+  }
+
+  // Filtro por rango de createdAt
+  if (createdAtFrom && createdAtTo) {
+    whereConditions.createdAt = Between(createdAtFrom, createdAtTo);
+  } else if (createdAtFrom) {
+    whereConditions.createdAt = MoreThanOrEqual(createdAtFrom);
+  } else if (createdAtTo) {
+    whereConditions.createdAt = LessThanOrEqual(createdAtTo);
+  }
+
+  // Filtro por rango de foundedDate
+  if (foundedDateFrom && foundedDateTo) {
+    whereConditions.foundedDate = Between(foundedDateFrom, foundedDateTo);
+  } else if (foundedDateFrom) {
+    whereConditions.foundedDate = MoreThanOrEqual(foundedDateFrom);
+  } else if (foundedDateTo) {
+    whereConditions.foundedDate = LessThanOrEqual(foundedDateTo);
+  }
+
+  // Construir query builder para filtro complejo de status
+  const queryBuilder = this.companyRepo
+    .createQueryBuilder("company")
+    .leftJoinAndSelect("company.industry", "industry")
+    .leftJoinAndSelect("company.documents", "documents")
+    .leftJoinAndSelect("company.creditApplications", "creditApplications")
+    .withDeleted(); // Incluye soft deleted para poder filtrarlos
+
+  // Aplicar whereConditions básicos
+  if (searchConditions.length > 0) {
+    searchConditions.forEach((condition, index) => {
+      if (index === 0) {
+        queryBuilder.where(condition);
+      } else {
+        queryBuilder.orWhere(condition);
+      }
+    });
+  } else {
+    queryBuilder.where(whereConditions);
+  }
+
+  // Filtro por status de creditApplications
+  if (status) {
+    queryBuilder.andWhere("creditApplications.status = :status", { status });
+  }
+
+  // Ordenamiento
+  const orderField = sortBy === 'legalName' ? 'company.legalName' : 'company.createdAt';
+  queryBuilder.orderBy(orderField, sortOrder);
+
+  // Paginación
+  const skip = (page - 1) * limit;
+  queryBuilder.skip(skip).take(limit);
+
+  // Ejecutar query
+  const [companies, total] = await queryBuilder.getManyAndCount();
+
+  // Transformar a DTO
+  const companiesDto = toAdminCompanyListDto(companies);
+
+  return createPaginatedResponse(companiesDto, total, page, limit);
+}
 
   // async getAllCompanies(): Promise<Company[]> {
   //     return this.companyRepo.find({ relations: ["user", "creditApplications", "documents"] });
