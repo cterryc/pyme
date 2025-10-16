@@ -105,8 +105,8 @@ export const UserPymesList = () => {
         </div>
       )}
       <NavLink
-        to='/Dashboard/RegistroPyme'
-        className='text-white mt-10 py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] transition-colors cursor-pointer text-nowrap w-full flex justify-center items-center gap-4'
+        to="/Dashboard/RegistroPyme"
+        className="text-white mt-10 py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] transition-colors cursor-pointer text-nowrap w-full flex justify-center items-center gap-4"
       >
         <FaPlus className='text-white ' /> Registrar Pyme
       </NavLink>
