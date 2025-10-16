@@ -11,7 +11,7 @@ export const userProfileSchema = z.object({
       "Formato de teléfono inválido. Debe ser un número válido de Perú (+51), Argentina (+54) o Paraguay (+595)",
   }),
   profileImage: z.string(),
-  email: z.string().email("Correo inválido"),
+  email: z.string().email("Correo inválido").optional(),
   // newPassword: z.string().min(8, "La nueva contraseña debe tener mínimo 8 caracteres").optional(),
   // currentPassword: z.string().min(8, "La contraseña actual debe tener mínimo 8 caracteres"),
 });

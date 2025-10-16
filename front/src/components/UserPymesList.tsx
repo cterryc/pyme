@@ -10,7 +10,7 @@ export const UserPymesList = () => {
   const navigate = useNavigate()
 
   const { data: pymesByUser, isLoading, isError, error, refetch } = useGetPymesByUser()
-  const tableHeaders = ['Nombre Legal', 'Dueño', 'Sector', 'Documentos', 'Solicitud de credito']
+  const tableHeaders = ['Nombre Legal', 'Sector', 'Documentos', 'Solicitud de credito']
 
   // temporal - para refrescar los datos cuando se actualice algun registro
   useEffect(() => {
@@ -21,7 +21,7 @@ export const UserPymesList = () => {
     <>
       <h2 className='text-2xl font-semibold mb-4 text-gray-700'>Pymes registradas</h2>
       {isLoading && <PymeTableSkeleton />}
-      {isError && <p>Error: {error.message}</p>}
+      {isError && <p className='text-red-400'>Error: {error.message}</p>}
       {!isLoading && !isError && (
         <div className='w-full overflow-x-auto rounded-lg border border-gray-200'>
           <table className='min-w-max border-collapse w-full'>
@@ -52,12 +52,10 @@ export const UserPymesList = () => {
                     const NotCredit =
                       (pyme.statusCredit === 'Activo' && pyme.hasDocuments) ||
                       (pyme.statusCredit !== 'Activo' && !pyme.hasDocuments)
-                    const hasFullName = pyme.ownerName && pyme.ownerSurname
                     return (
                       <tr key={pyme.id} className='hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200'>
                         <td className='p-3'>{pyme.legalName}</td>
-                        <td className='p-3'>{hasFullName ? `${pyme.ownerName} ${pyme.ownerSurname}` : 'Sin nombre'}</td>
-                        <td className='p-3'>{pyme.industry}</td>
+                        <td className='p-3'>{pyme.industryName}</td>
                         <td className='p-3'>
                           {pyme.hasDocuments ? (
                             <span className='py-2 rounded-full text-[#12b92f] font-bold'>Documentos Registrados</span>

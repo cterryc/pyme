@@ -52,9 +52,7 @@ export type DocumentResponse = {
 export type GetPymeResponse = {
   id: string
   legalName: string
-  industry: string
-  ownerName: string
-  ownerSurname: string
+  industryName: string
   statusCredit: string
   hasDocuments: boolean
 }
