@@ -4,7 +4,7 @@ import { Footer } from '@/components/Footer'
 import { useUserAuthenticate } from '@/hooks/useUser'
 
 export const Landing = () => {
-  const { getUser } = useUserAuthenticate()
+  const { hasUser } = useUserAuthenticate()
 
   const steps = [
     {
@@ -39,7 +39,7 @@ export const Landing = () => {
             adaptadas a tu crecimiento.
           </p>
           <Link
-            to={getUser ? '/Dashboard' : '/Login'}
+            to={hasUser ? '/Dashboard' : '/Login'}
             className='bg-[#0095d5] text-white flex items-center w-fit mx-auto px-6 py-3 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer'
           >
             Solicita tu crédito

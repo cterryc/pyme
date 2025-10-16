@@ -12,13 +12,6 @@ export const UserDashboard = () => {
         <aside className='flex flex-col gap-1 flex-1 py-5 px-3 border-r-2 border-gray-200'>
           <NavLink
             to="/Dashboard"
-            className="group flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]"
-          >
-            <FaUser className="h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]" />
-            Perfil
-          </NavLink>
-          <NavLink
-            to="/Dashboard/Pymes"
             className='group flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]'
           >
             <FaBuilding className='h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]' />
@@ -29,6 +22,13 @@ export const UserDashboard = () => {
             className='group flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]'>
             <HiMiniDocumentCheck className='h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]' />
             Solicitudes
+          </NavLink>
+          <NavLink
+            to="/Dashboard/Perfil"
+            className="group flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]"
+          >
+            <FaUser className="h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]" />
+            Perfil
           </NavLink>
         </aside>
         <div className="flex-[6] min-w-0 p-7 overflow-x-auto">

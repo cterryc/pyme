@@ -31,7 +31,7 @@ export const Register = () => {
     onSuccess: (data) => {
       localStorage.setItem('tokenPyme', data.payload.token)
       console.log('Register successful:', data)
-      navigate('/')
+      navigate('/Dashboard')
     }
   })
 
