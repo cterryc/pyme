@@ -1,18 +1,17 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi'
-import { useState } from 'react'
 import { useUserAuthenticate } from '@/hooks/useUser'
 import { useQueryClient } from '@tanstack/react-query'
 
-export const Header = (/*{ avatar }: { avatar?: string }*/) => {
+export const Header = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false)
-  const [avatar] = useState('')
 
   const imageDefault = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
 
-  const { getUser } = useUserAuthenticate()
+  const { hasUser } = useUserAuthenticate()
 
   const deleteToken = () => {
     localStorage.removeItem('tokenPyme')
@@ -26,7 +25,7 @@ export const Header = (/*{ avatar }: { avatar?: string }*/) => {
         <img src='/assets/logo.png' className='h-[25px]' alt='' />
         <h1 className='font-medium text-2xl text-[var(--font-title-light)]'>Financia</h1>
       </Link>
-      {getUser != '' ? (
+      {hasUser ? (
         <div className='relative'>
           <button
             className='h-[40px] flex gap-3 items-center hover:text-[var(--primary)] cursor-pointer'
@@ -34,8 +33,7 @@ export const Header = (/*{ avatar }: { avatar?: string }*/) => {
               setIsAvatarMenuOpen(!isAvatarMenuOpen)
             }}
           >
-            {getUser}
-            <img src={avatar != '' ? avatar : imageDefault} className='w-8 h-8 rounded-full' />
+            <img src={imageDefault} className='w-8 h-8 rounded-full' />
             <HiOutlineChevronDown className='text-xl' />
           </button>
           {isAvatarMenuOpen && (
