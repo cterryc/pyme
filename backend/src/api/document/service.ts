@@ -139,7 +139,10 @@ export default class DocumentService {
       return this.mapToDocumentResponse(savedDocument);
     });
 
-    return await Promise.all(uploadPromises);
+    const response = await Promise.all(uploadPromises);
+    // filtrar y devolver el archivo pdf
+    const pdfFile = response.filter((file) => file.mimeType === 'application/pdf')
+    return pdfFile
   }
 
   async getDocumentsByCompany(companyId: string): Promise<IDocumentResponse[]> {
