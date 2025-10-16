@@ -75,7 +75,7 @@ export type LoanRequestOptions = {
   legalName: string
   annualRevenue: number
   offerDetails: OfferDetails
-  selectedDetalis?: SelectedDetails
+  selectedDetails?: SelectedDetails
 }
 
 export type OfferDetails = {

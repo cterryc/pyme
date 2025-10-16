@@ -111,8 +111,9 @@ export const RegisterPyme = () => {
 
   useEffect(() => {
     const subscription = watch((value) => {
-      const formValues = { ...value, industry: industriesList?.find((pair) => pair.id == value.industryId)?.name }
-      localStorage.setItem('registerPymeBackup', JSON.stringify(formValues))
+      // const formValues = { ...value, industry: industriesList?.find((pair) => pair.id == value.industryId)?.name }
+      // localStorage.setItem('registerPymeBackup', JSON.stringify(formValues))
+      localStorage.setItem('registerPymeBackup', JSON.stringify(value))
     })
     return () => subscription.unsubscribe()
   }, [watch, industriesList])
@@ -464,7 +465,8 @@ export const RegisterPyme = () => {
                     </p>
                     <p className='border-b-1 border-[#ddd]'>
                       <span className='font-bold'>Industria : </span>
-                      {getStoredData().industry}
+                      {/* {getStoredData().industry} */}
+                      {getStoredData().industryId}
                     </p>
                     <p className='border-b-1 border-[#ddd]'>
                       <span className='font-bold'>Fecha fundacion : </span>
