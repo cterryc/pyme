@@ -9,9 +9,14 @@ import { SystemConfig } from "../../entities/System_config.entity";
 import { Industry } from "../../entities/Industry.entity";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
 import { RiskTier } from "../../constants/RiskTier";
-import { responseLoanRequest, LoanCalculationResult, responseLoanByUser } from "./interface";
+import {
+  responseLoanRequest,
+  LoanCalculationResult,
+  responseLoanByUser,
+} from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
 import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
+import { broadcastLoanStatusUpdate } from "../sse/controller";
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -82,6 +87,12 @@ export default class LoanService {
               reason: "Oferta generada automáticamente",
             },
           ],
+        });
+
+        broadcastLoanStatusUpdate(userId, {
+          id: newLoanRequest.id,
+          newStatus: newLoanRequest.status,
+          updatedAt: newLoanRequest.updatedAt,
         });
 
         const savedApplication = await this.loanRepo.save(newLoanRequest);
@@ -287,10 +298,18 @@ export default class LoanService {
 
     await this.loanRepo.save(application);
 
+    broadcastLoanStatusUpdate(userId, {
+      id: application.id,
+      newStatus: application.status,
+      updatedAt: application.updatedAt,
+    });
+
     return LoanResponseDto.fromConfirmed(application, company);
   }
 
-  async listCreditApplicationsByUserId(userId: string): Promise<responseLoanByUser[]> {
+  async listCreditApplicationsByUserId(
+    userId: string
+  ): Promise<responseLoanByUser[]> {
     const applications = await this.loanRepo.find({
       where: { company: { owner: { id: userId } } },
       relations: ["company"],
