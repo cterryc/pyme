@@ -33,10 +33,14 @@ export default class LoanService {
   ): Promise<responseLoanRequest> {
     const company = await this.companyRepo.findOne({
       where: { id: companyId, owner: { id: userId } },
+      relations: ["industry"], 
     });
 
     if (!company) {
-      throw new HttpError(HttpStatus.NOT_FOUND, "La compañía no existe.");
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La compañía no existe o no te pertenece."
+      );
     }
 
     const activeStatuses = [
@@ -46,66 +50,93 @@ export default class LoanService {
     ];
 
     const existingApplication = await this.loanRepo.findOne({
-      where: {
-        company: { id: company.id },
-        status: In(activeStatuses),
-      },
+      where: { company: { id: company.id }, status: In(activeStatuses) },
     });
 
     if (existingApplication) {
       if (!existingApplication.offerDetails) {
         throw new HttpError(
           HttpStatus.BAD_REQUEST,
+
           "La solicitud existe pero no tiene oferta calculada."
         );
       }
 
       return {
         id: existingApplication.id,
+
         applicationNumber: existingApplication.applicationNumber,
+
         legalName: company.legalName,
+
         annualRevenue: company.annualRevenue,
+
         offerDetails: {
           minAmount: existingApplication.offerDetails.minAmount,
+
           maxAmount: existingApplication.offerDetails.maxAmount,
+
           interestRate: existingApplication.offerDetails.interestRate,
+
           allowedTerms: existingApplication.offerDetails.allowedTerms,
         },
+
         selectedDetails: {
           amount: existingApplication.selectedAmount,
+
           termMonths: existingApplication.selectedTermMonths,
         },
       };
     }
-
     const loanOptions = await this.calculateLoanOptions(company);
 
-    const code = await generateUniqueCode("CRD");
+    const MAX_RETRIES = 3;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const code = await generateUniqueCode("CRD");
 
-    const newLoanRequest = this.loanRepo.create({
-      applicationNumber: code,
-      company,
-      offerDetails: loanOptions,
-      status: CreditApplicationStatus.SUBMITTED,
-      statusHistory: [
-        {
-          status: CreditApplicationStatus.SUBMITTED,
-          timestamp: new Date(),
-          changedBy: "system",
-          reason: "Oferta calculada automáticamente",
-        },
-      ],
-    });
+        const newLoanRequest = this.loanRepo.create({
+          applicationNumber: code,
+          company,
+          offerDetails: loanOptions,
+          status: CreditApplicationStatus.DRAFT,
+          statusHistory: [
+            {
+              status: CreditApplicationStatus.DRAFT,
+              timestamp: new Date(),
+              changedBy: "system",
+              reason: "Oferta generada automáticamente",
+            },
+          ],
+        });
 
-    await this.loanRepo.save(newLoanRequest);
+        const savedApplication = await this.loanRepo.save(newLoanRequest);
 
-    return {
-      id: newLoanRequest.id,
-      applicationNumber: newLoanRequest.applicationNumber,
-      legalName: company.legalName,
-      annualRevenue: company.annualRevenue,
-      offerDetails: loanOptions,
-    };
+        return {
+          id: savedApplication.id,
+          applicationNumber: savedApplication.applicationNumber,
+          legalName: company.legalName,
+          annualRevenue: company.annualRevenue,
+          offerDetails: loanOptions,
+        };
+      } catch (error: any) {
+        if (error.code === "23505" && attempt < MAX_RETRIES) {
+          console.warn(
+            `Intento ${attempt}: Colisión de applicationNumber. Reintentando...`
+          );
+        } else {
+          console.error("Error al guardar la solicitud de crédito:", error);
+          throw new HttpError(
+            HttpStatus.SERVER_ERROR,
+            "Error al crear la solicitud de crédito."
+          );
+        }
+      }
+    }
+    throw new HttpError(
+      HttpStatus.SERVER_ERROR,
+      "No se pudo crear una solicitud de crédito única después de varios intentos."
+    );
   }
 
   async calculateLoanOptions(company: Company): Promise<LoanCalculationResult> {
@@ -303,25 +334,25 @@ export default class LoanService {
 
   // --- MÉTODOS DE CÁLCULO (adaptados para usar BD) ---
   private computeAgeYears(foundedDate: any): number | null {
-  if (!foundedDate) return null;
-  
-  try {
-    // Intentar convertir a Date sin importar el tipo
-    const date = new Date(foundedDate);
-    
-    if (isNaN(date.getTime())) {
-      console.warn('Fecha inválida:', foundedDate);
+    if (!foundedDate) return null;
+
+    try {
+      // Intentar convertir a Date sin importar el tipo
+      const date = new Date(foundedDate);
+
+      if (isNaN(date.getTime())) {
+        console.warn("Fecha inválida:", foundedDate);
+        return null;
+      }
+
+      const diffMs = Date.now() - date.getTime();
+      if (!isFinite(diffMs) || diffMs < 0) return 0;
+      return Math.floor(diffMs / (365.25 * 24 * 3600 * 1000));
+    } catch (error) {
+      console.error("Error calculando edad desde fecha:", foundedDate, error);
       return null;
     }
-
-    const diffMs = Date.now() - date.getTime();
-    if (!isFinite(diffMs) || diffMs < 0) return 0;
-    return Math.floor(diffMs / (365.25 * 24 * 3600 * 1000));
-  } catch (error) {
-    console.error('Error calculando edad desde fecha:', foundedDate, error);
-    return null;
   }
-}
 
   private adjustTier(
     tier: RiskTier,
