@@ -36,6 +36,17 @@ export default class LoanController {
       }     
     };
 
+
+    static listCreditApplicationsByUserId = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const userId = res.locals.user?.id as string;
+        const applications = await this.loanService.listCreditApplicationsByUserId(userId);
+        res.status(HttpStatus.OK).json(apiResponse(true, applications));
+      } catch (error) {
+        return next(error);
+      }
+    };
+
     static getCreditApplicationStatus = async (req: Request, res: Response, next: NextFunction) => {
       try {
         // Lógica para obtener el estado de la solicitud de crédito

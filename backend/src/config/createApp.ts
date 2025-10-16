@@ -32,11 +32,11 @@ export default class ExpressAppCreator {
      * @description Creates and configures the Express application.
      * @returns {express.Application} The configured Express application.
      */
-    public createExpressApp(): express.Application {
+    public async  createExpressApp(): Promise<express.Application> {
         // Initialize database connection
-        TypeORMManager.connect();
+        await TypeORMManager.connect();
 
-         const status = TypeORMManager.getDatabaseStatus();
+         const status = await TypeORMManager.getDatabaseStatus();
         console.log("🎯 Estado final de la base de datos:", status);
 
         if (this.modeCluster && cluster.isPrimary) {

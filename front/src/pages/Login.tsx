@@ -30,7 +30,7 @@ export const Login = () => {
     onSuccess: (data) => {
       localStorage.setItem('tokenPyme', data.payload.token)
       console.log('Login successful:', data)
-      navigate('/')
+      navigate('/Dashboard')
     }
   })
 

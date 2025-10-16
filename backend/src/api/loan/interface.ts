@@ -15,6 +15,13 @@ export interface responseLoanRequest {
     };
 }
 
+export interface responseLoanByUser {
+    nameCompany?: string;
+    requestAmonut?: number;
+    subbmitedAt?: Date;
+    status?: string;
+}
+
 export interface LoanCalculationResult {
     minAmount: number;
     maxAmount: number;
