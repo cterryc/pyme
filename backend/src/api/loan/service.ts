@@ -9,9 +9,14 @@ import { SystemConfig } from "../../entities/System_config.entity";
 import { Industry } from "../../entities/Industry.entity";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
 import { RiskTier } from "../../constants/RiskTier";
-import { responseLoanRequest, LoanCalculationResult, responseLoanByUser } from "./interface";
+import {
+  responseLoanRequest,
+  LoanCalculationResult,
+  responseLoanByUser,
+} from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
-import { responseLoanByUserListDto } from "./dto";
+import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
+import { broadcastLoanStatusUpdate } from "../sse/controller";
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -60,31 +65,7 @@ export default class LoanService {
         );
       }
 
-      return {
-        id: existingApplication.id,
-
-        applicationNumber: existingApplication.applicationNumber,
-
-        legalName: company.legalName,
-
-        annualRevenue: company.annualRevenue,
-
-        offerDetails: {
-          minAmount: existingApplication.offerDetails.minAmount,
-
-          maxAmount: existingApplication.offerDetails.maxAmount,
-
-          interestRate: existingApplication.offerDetails.interestRate,
-
-          allowedTerms: existingApplication.offerDetails.allowedTerms,
-        },
-
-        selectedDetails: {
-          amount: existingApplication.selectedAmount,
-
-          termMonths: existingApplication.selectedTermMonths,
-        },
-      };
+      return LoanResponseDto.fromExisting(existingApplication, company);
     }
     const loanOptions = await this.calculateLoanOptions(company);
 
@@ -108,15 +89,15 @@ export default class LoanService {
           ],
         });
 
+        broadcastLoanStatusUpdate(userId, {
+          id: newLoanRequest.id,
+          newStatus: newLoanRequest.status,
+          updatedAt: newLoanRequest.updatedAt,
+        });
+
         const savedApplication = await this.loanRepo.save(newLoanRequest);
 
-        return {
-          id: savedApplication.id,
-          applicationNumber: savedApplication.applicationNumber,
-          legalName: company.legalName,
-          annualRevenue: company.annualRevenue,
-          offerDetails: loanOptions,
-        };
+        return LoanResponseDto.fromNew(savedApplication, company, loanOptions);
       } catch (error: any) {
         if (error.code === "23505" && attempt < MAX_RETRIES) {
           console.warn(
@@ -317,20 +298,18 @@ export default class LoanService {
 
     await this.loanRepo.save(application);
 
-    return {
+    broadcastLoanStatusUpdate(userId, {
       id: application.id,
-      applicationNumber: application.applicationNumber,
-      legalName: company.legalName,
-      annualRevenue: company.annualRevenue,
-      offerDetails: application.offerDetails,
-      selectedDetails: {
-        amount: selectedAmount,
-        termMonths: selectedTermMonths,
-      },
-    };
+      newStatus: application.status,
+      updatedAt: application.updatedAt,
+    });
+
+    return LoanResponseDto.fromConfirmed(application, company);
   }
 
-  async listCreditApplicationsByUserId(userId: string): Promise<responseLoanByUser[]> {
+  async listCreditApplicationsByUserId(
+    userId: string
+  ): Promise<responseLoanByUser[]> {
     const applications = await this.loanRepo.find({
       where: { company: { owner: { id: userId } } },
       relations: ["company"],

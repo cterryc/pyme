@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: Loan & Credit Application API
+  version: 1.0.0
+  description: >
+    Endpoints para el flujo completo de solicitud de crédito (oferta → confirmación → seguimiento).
+
+tags:
+  - name: Loans
+    description: Operaciones relacionadas con solicitudes de crédito empresariales
+
+paths:
+  /api/loan:
+    post:
+      summary: Generar oferta de préstamo para una empresa
+      description: Calcula automáticamente una oferta crediticia en base al perfil de la empresa.
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoanRequestInput"
+      responses:
+        "201":
+          description: Oferta generada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoanOfferResponse"
+        "400":
+          description: Datos inválidos o solicitud ya existente
+        "404":
+          description: Compañía no encontrada
+
+  /api/loan/confirm:
+    post:
+      summary: Confirmar solicitud de crédito
+      description: Confirma la oferta crediticia seleccionando monto y plazo.
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCreditApplicationInput"
+      responses:
+        "201":
+          description: Solicitud de crédito confirmada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoanOfferResponse"
+        "400":
+          description: Monto o plazo inválido
+        "403":
+          description: No autorizado
+        "404":
+          description: Solicitud no encontrada
+
+  /api/loan/user:
+    get:
+      summary: Listar solicitudes de crédito del usuario autenticado
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de solicitudes del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LoanSummaryResponse"
+
+  /api/loan/{id}:
+    get:
+      summary: Obtener detalle de una solicitud de crédito
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Detalle de la solicitud de crédito
+        "404":
+          description: No encontrada
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoanRequestInput:
+      type: object
+      required: [companyId]
+      properties:
+        companyId:
+          type: string
+          format: uuid
+          example: "b9c1f75d-8b8e-44a5-8e50-63c78e12a17d"
+
+    CreateCreditApplicationInput:
+      type: object
+      required:
+        - id
+        - selectedAmount
+        - selectedTermMonths
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID de la solicitud de crédito generada en la oferta
+        selectedAmount:
+          type: number
+          example: 250000
+          description: Monto seleccionado por el solicitante
+        selectedTermMonths:
+          type: integer
+          example: 24
+          description: Plazo seleccionado en meses
+
+    LoanOfferResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        applicationNumber:
+          type: string
+          example: "CRD-001245"
+        legalName:
+          type: string
+          example: "Tech Solutions SRL"
+        annualRevenue:
+          type: number
+          example: 20000000
+        offerDetails:
+          type: object
+          properties:
+            minAmount:
+              type: number
+              example: 10000
+            maxAmount:
+              type: number
+              example: 500000
+            interestRate:
+              type: number
+              example: 14.5
+            allowedTerms:
+              type: array
+              items:
+                type: integer
+              example: [12, 18, 24, 36]
+        selectedDetails:
+          type: object
+          nullable: true
+          properties:
+            amount:
+              type: number
+              example: 250000
+            termMonths:
+              type: integer
+              example: 24
+
+    LoanSummaryResponse:
+      type: object
+      properties:
+        nameCompany:
+          type: string
+          example: "InnovaPyme"
+        requestAmonut:
+          type: number
+          example: 150000
+        subbmitedAt:
+          type: string
+          format: date-time
+          example: "2025-02-14T10:00:00Z"
+        status:
+          type: string
+          enum: [APPLYING, SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED]
+          example: "SUBMITTED"

@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: Auth API
+  version: 1.0.0
+  description: Endpoints de autenticación y gestión de usuario
+
+tags:
+  - name: Auth
+    description: Endpoints de autenticación y gestión de usuario
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Registrar nuevo usuario
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPayload"
+      responses:
+        "201":
+          description: Usuario registrado exitosamente
+        "400":
+          description: Email ya en uso
+
+  /api/auth/login:
+    post:
+      summary: Iniciar sesión
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginPayload"
+      responses:
+        "200":
+          description: Inicio de sesión exitoso
+        "401":
+          description: Credenciales inválidas
+
+  /api/auth/profile:
+    patch:
+      summary: Actualizar perfil del usuario autenticado
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserPayload"
+      responses:
+        "200":
+          description: Perfil actualizado correctamente
+        "400":
+          description: Contraseña actual requerida
+        "401":
+          description: Token inválido
+
+  /api/auth/forgot-password:
+    post:
+      summary: Solicitar restablecimiento de contraseña
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordPayload"
+      responses:
+        "200":
+          description: Solicitud recibida (siempre OK por seguridad)
+
+  /api/auth/reset-password:
+    post:
+      summary: Restablecer contraseña con token
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordPayload"
+      responses:
+        "200":
+          description: Contraseña restablecida correctamente
+        "400":
+          description: Token inválido o expirado
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterPayload:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: "usuario@correo.com"
+        password:
+          type: string
+          example: "Password123"
+
+    LoginPayload:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    UpdateUserPayload:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        profileImage:
+          type: string
+        email:
+          type: string
+        newPassword:
+          type: string
+        currentPassword:
+          type: string
+
+    ForgotPasswordPayload:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          example: "usuario@correo.com"
+
+    ResetPasswordPayload:
+      type: object
+      required:
+        - token
+        - newPassword
+      properties:
+        token:
+          type: string
+        newPassword:
+          type: string

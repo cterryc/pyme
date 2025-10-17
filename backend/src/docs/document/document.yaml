@@ -1,0 +1,193 @@
+openapi: 3.0.3
+info:
+  title: Document API
+  version: 1.0.0
+  description: Endpoints para la gestión de documentos de compañías y solicitudes de crédito
+
+tags:
+  - name: Documents
+    description: Subida, descarga, listado y revisión de documentos
+
+paths:
+  /api/document/upload:
+    post:
+      summary: Subir documentos a una compañía
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                type:
+                  type: string
+                  example: "FINANCIAL_STATEMENT"
+                companyId:
+                  type: string
+                  format: uuid
+                creditApplicationId:
+                  type: string
+                  format: uuid
+                  nullable: true
+      responses:
+        "201":
+          description: Documentos subidos correctamente
+        "400":
+          description: Archivos inválidos o tamaño excedido
+
+  /api/document/company/{companyId}:
+    get:
+      summary: Listar documentos por compañía
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Lista de documentos asociados a la compañía
+        "404":
+          description: Empresa no encontrada
+
+  /api/document/{id}:
+    delete:
+      summary: Eliminar un documento
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Documento eliminado exitosamente
+        "404":
+          description: Documento no encontrado
+
+  /api/document/{id}/download:
+    get:
+      summary: Obtener URL de descarga firmada
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: URL generada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: "https://xyz.supabase.co/storage/v1/object/public/...signed=token"
+        "404":
+          description: Documento no encontrado
+
+  /api/document/{id}/status:
+    patch:
+      summary: Actualizar estado de un documento (revisión)
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDocumentStatusPayload"
+      responses:
+        "200":
+          description: Estado del documento actualizado
+        "400":
+          description: Motivo de rechazo requerido
+        "404":
+          description: Documento no encontrado
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UpdateDocumentStatusPayload:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED]
+        rejectionReason:
+          type: string
+          example: "Documento borroso o ilegible"
+
+    DocumentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          example: "FINANCIAL_STATEMENT"
+        fileName:
+          type: string
+          example: "balance2024.pdf"
+        fileUrl:
+          type: string
+          example: "https://xyz.supabase.co/storage/v1/object/public/docs/..."
+        mimeType:
+          type: string
+          example: "application/pdf"
+        fileSize:
+          type: integer
+          example: 1048576
+        status:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED]
+        companyId:
+          type: string
+          format: uuid
+        creditApplicationId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
