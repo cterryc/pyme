@@ -1,11 +1,11 @@
 export type CreditAppplication = {
   nameCompany: string
-  requestedAmount: number
-  submittedAt: string
+  requestAmonut: string
+  subbmitedAt: string
   status: string
 }
 
-export type ListCreditApplications = {
+export type ListCreditApplicationsResponse = {
   success: boolean
   payload: CreditAppplication[]
 }
