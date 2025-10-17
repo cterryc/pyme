@@ -18,7 +18,7 @@ export const verifyToken = (token: string): ITokenPayload => {
     try {
         return jwt.verify(token, config.JWT_SECRET) as ITokenPayload;
     } catch (error) {
-        throw new Error("Invalid or expired token");
+        throw new Error("Token inválido o expirado");
     }
 };
 
@@ -45,6 +45,6 @@ export const verifyResetPasswordToken = (token: string): { userId: string; email
   try {
     return jwt.verify(token, config.JWT_SECRET) as { userId: string; email: string };
   } catch (error) {
-    throw new Error("Invalid or expired reset password token");
+    throw new Error("Token de restablecimiento inválido o expirado");
   }
 };
