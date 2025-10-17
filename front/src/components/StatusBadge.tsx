@@ -22,13 +22,16 @@ export const StatusBadge = ({ status, variant = 'default' }: StatusBadgeProps) =
       case 'aprobado':
       case 'activa':
       case 'pagado':
+      case 'enviado':
         return 'success'
       case 'pendiente':
       case 'en revisión':
+      case 'no confirmado':
         return 'warning'
       case 'rechazado':
       case 'suspendida':
       case 'vencido':
+      case 'no aplica':
         return 'error'
       default:
         return 'default'
@@ -38,7 +41,11 @@ export const StatusBadge = ({ status, variant = 'default' }: StatusBadgeProps) =
   const finalVariant = variant === 'default' ? getStatusVariant(status) : variant
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getVariantClasses(finalVariant)}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getVariantClasses(
+        finalVariant
+      )}`}
+    >
       {status}
     </span>
   )

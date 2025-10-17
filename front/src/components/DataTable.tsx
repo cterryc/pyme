@@ -32,15 +32,17 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
     }
 
     // Auto-format based on column key
-    if (column.key.toLowerCase().includes('fecha') && value) {
+    if (column.key.toLowerCase().includes('fecha') || (column.key.toLowerCase().includes('createdat') && value)) {
+      // console.log('key = ' + column.key, 'Fecha = ' + value, 'FormatedDate = ' + formatDate(value))
       return formatDate(value)
     }
-    
-    if (column.key.toLowerCase().includes('monto') || column.key.toLowerCase().includes('amount')) {
+
+    if (column.key.toLowerCase().includes('monto')) {
       return formatCurrency(value)
     }
 
-    if (column.key.toLowerCase().includes('estado') || column.key.toLowerCase().includes('status')) {
+    if (column.key.toLowerCase().includes('estado') || column.key.toLowerCase().includes('statuscredit')) {
+      // console.log('key = ' + column.key, 'BADGE STATUS = ' + value)
       return <StatusBadge status={value} />
     }
 
@@ -59,15 +61,17 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+    <div className='bg-white rounded-lg shadow overflow-hidden'>
+      <div className='overflow-x-auto'>
+        <table className='min-w-full divide-y divide-gray-200'>
+          <thead className='bg-gray-50'>
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignmentClass(column.align)}`}
+                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignmentClass(
+                    column.align
+                  )}`}
                   style={{ width: column.width }}
                 >
                   {column.label}
@@ -75,7 +79,7 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className='bg-white divide-y divide-gray-200'>
             {data.map((row, index) => (
               <tr
                 key={index}
