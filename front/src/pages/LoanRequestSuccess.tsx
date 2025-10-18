@@ -72,7 +72,7 @@ export const LoanRequestSuccess = () => {
             }}
             className='bg-[var(--primary)] text-white px-5 py-3 rounded-md cursor-pointer hover:bg-[#10638d] duration-150 '
           >
-            Volvr al inicio
+            Volver al inicio
           </button>
         </div>
       </section>

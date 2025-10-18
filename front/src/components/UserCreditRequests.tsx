@@ -1,10 +1,12 @@
 import { formatDateToSpanish } from "@/helpers/formatDate";
 import { useGetListCreditApplicationsByUser } from "@/hooks/useLoan";
+import { useLoanStatusEvents } from "@/hooks/useLoanStatusEvents";
 import type { CreditAppplication } from "@/interfaces/loan.interface";
 import { useEffect } from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
 export const UserCreditRequests = () => {
+  useLoanStatusEvents()
   const { data: loansByUser, isLoading, isError, error, refetch } = useGetListCreditApplicationsByUser()
   const tableHeaders = ['Nombre Pyme', 'Monto Solicitado', 'Fecha', 'Estado']
 

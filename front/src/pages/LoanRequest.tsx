@@ -7,8 +7,12 @@ import { usePymeLoanRequest, usePymeLoanRequestConfirm } from '@/hooks/usePyme'
 import { formatToDolar } from '@/helpers/formatToDolar'
 import { toast } from 'sonner'
 import { Loading } from '@/components/Loading'
+import { useQueryClient } from '@tanstack/react-query'
+
+
 
 export const LoanRequest = () => {
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [loanOptions, setLoanOptions] = useState<LoanRequestOptions>()
   const [selectedTerm, setSelectedTerm] = useState(0)
@@ -27,6 +31,12 @@ export const LoanRequest = () => {
 
   const { mutate: confirmLoanRequest, isPending: isPendingLoanConfirm } = usePymeLoanRequestConfirm({
     onSuccess: (data) => {
+      toast.success("Crédito solicitado correctamente 🎉")
+      
+      // Invalidar ambas queries para actualizar el dashboard
+      queryClient.invalidateQueries({ queryKey: ['pymesByUser'] })
+      queryClient.invalidateQueries({ queryKey: ['loansByUser'] })
+      
       const searchParams = new URLSearchParams({
         refNum: data.payload.applicationNumber,
         legalName: data.payload.legalName,
@@ -35,6 +45,7 @@ export const LoanRequest = () => {
         months: data.payload.selectedDetails?.termMonths.toString() || '0'
       }).toString()
 
+      console.log("Response confirmLoanRequest:", data)
       // console.log(data.payload.selectedDetails)
 
       navigate(`/Dashboard/SolicitarCredito/Success?${searchParams}`)
@@ -82,6 +93,12 @@ export const LoanRequest = () => {
       })
       return
     }
+    console.log("Confirming loan with data:", {
+  id: loanOptions?.id,
+  companyId: pymeID,
+  selectedAmount,
+  selectedTermMonths: selectedTerm
+})
 
     confirmLoanRequest({
       id: loanOptions?.id,
@@ -90,6 +107,8 @@ export const LoanRequest = () => {
       selectedTermMonths: selectedTerm
     })
   }
+
+  
 
   return (
     <div className='flex flex-col min-h-screen'>
