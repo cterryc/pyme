@@ -6,6 +6,8 @@ import apiRouter from "./routers";
 import { Request, Response, NextFunction } from "express";
 import HttpError from './utils/HttpError.utils';
 import apiResponse from './utils/apiResponse.utils';
+import { handleSSEPreflight, subscribeLoanStatus } from './api/sse/controller';
+import authenticateSSE from './middlewares/authenticate.sse.middleware';
 
 
 (async () => {
@@ -16,6 +18,8 @@ import apiResponse from './utils/apiResponse.utils';
     
     MiddlewaresConfig.config(app);
 
+    app.options("/api/events", handleSSEPreflight);
+    app.get("/api/events", authenticateSSE, subscribeLoanStatus);
   
     app.use("/api", apiRouter);
 

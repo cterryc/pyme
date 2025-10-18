@@ -6,6 +6,9 @@ import path from "path";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
 import { rootPath } from "../utils/path.utils";
+import apiRouter from "../routers";
+import authenticate from "../middlewares/authenticate.middleware";
+import { subscribeLoanStatus } from "../api/sse/controller";
 
 /**
  * Configures the middleware for the Express application.
@@ -41,6 +44,8 @@ export default class MiddlewareConfig {
         );
         app.use(express.static(path.join(process.cwd(), "src", "public")));
         app.use(cookieParser());
+
+        
 
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
