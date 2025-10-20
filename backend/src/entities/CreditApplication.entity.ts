@@ -8,11 +8,10 @@ import {
 } from "typeorm";
 import { BaseEntity } from "./BaseEntity";
 import { Document } from "./Document.entity";
-import { CreditApplicationStatus, KYCStatus } from "../constants/CreditStatus";
+import { CreditApplicationStatus} from "../constants/CreditStatus";
 import { User } from "./User.entity";
 import { Company } from "./Company.entity";
 import { RiskTier } from "../constants/RiskTier";
-import { Industry } from "./Industry.entity";
 
 @Entity("credit_applications")
 export class CreditApplication extends BaseEntity {

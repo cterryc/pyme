@@ -18,6 +18,7 @@ export const verifyToken = (token: string): ITokenPayload => {
     try {
         return jwt.verify(token, config.JWT_SECRET) as ITokenPayload;
     } catch (error) {
+        console.error("Token verification failed:", error);
         throw new Error("Token inválido o expirado");
     }
 };
@@ -29,6 +30,7 @@ export const decodeToken = (token: string): ITokenPayload | null => {
     try {
         return jwt.decode(token) as ITokenPayload;
     } catch (error) {
+        console.error("Token decoding failed:", error);
         return null;
     }
 };
@@ -45,6 +47,7 @@ export const verifyResetPasswordToken = (token: string): { userId: string; email
   try {
     return jwt.verify(token, config.JWT_SECRET) as { userId: string; email: string };
   } catch (error) {
+    console.error("Token de restablecimiento inválido o expirado:", error);
     throw new Error("Token de restablecimiento inválido o expirado");
   }
 };
@@ -59,6 +62,7 @@ export const verifyEmailVerificationToken = (token: string): { email: string; co
   try {
     return jwt.verify(token, config.JWT_SECRET) as { email: string; code: string };
   } catch (error) {
+    console.error("Token de verificación inválido o expirado:", error);
     throw new Error("Token de verificación inválido o expirado");
   }
 };

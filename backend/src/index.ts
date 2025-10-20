@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import express from "express";
 import ExpressAppCreator from "./config/createApp";
 import MiddlewaresConfig from "./config/middlewares.config";
 import apiRouter from "./routers";
@@ -20,7 +19,7 @@ import apiResponse from './utils/apiResponse.utils';
     app.use("/api", apiRouter);
 
   
-    app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+    app.use((err: HttpError, req: Request, res: Response) => {
       console.error("Error capturado:", err);
 
       const status = err.status || 500;
