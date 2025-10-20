@@ -12,6 +12,7 @@ import { UserCreditRequests } from '@/components/UserCreditRequests'
 import { UserDashboard } from '@/pages/UserDashboard'
 import { LoanRequest } from '@/pages/LoanRequest'
 import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
+import { ResetPasword } from '@/pages/ResetPassword'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ export const mainRouter = createBrowserRouter([
   {
     path: '/Login',
     element: <Login />
+  },
+  {
+    path: '/ResetPassword',
+    element: <ResetPasword />
   },
   {
     path: '/Dashboard',
