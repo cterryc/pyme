@@ -45,4 +45,7 @@ export class User extends BaseEntity {
   // Relations
   @OneToMany(() => Company, (company) => company.owner)
   companies?: Company[];
+
+  @Column({ type: "varchar", length: 6, nullable: true })
+  emailVerificationToken?: string;
 }

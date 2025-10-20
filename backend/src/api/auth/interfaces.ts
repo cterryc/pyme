@@ -68,3 +68,18 @@ export interface IResetPasswordTokenPayload {
   email: string;
   exp?: number;
 }
+
+export interface IVerifyEmailPayload {
+  email: string;
+  code: string;
+}
+
+export interface IResendVerificationPayload {
+  email: string;
+}
+
+export interface IEmailVerificationTokenPayload {
+  email: string;
+  code: string;
+  exp?: number;
+}

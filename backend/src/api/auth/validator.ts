@@ -87,3 +87,12 @@ export const resetPasswordValidator = z.object({
       message: "La contraseña debe contener al menos un número",
     }),
 });
+
+export const verifyEmailValidator = z.object({
+  email: z.string().email({ message: "Dirección de email inválida" }),
+  code: z.string().length(6, { message: "El código debe tener 6 dígitos" }),
+});
+
+export const resendVerificationValidator = z.object({
+  email: z.string().email({ message: "Dirección de email inválida" }),
+});

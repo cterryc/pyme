@@ -8,6 +8,8 @@ import {
   IUpdateUserPayload,
   IForgotPasswordPayload,
   IResetPasswordPayload,
+  IVerifyEmailPayload,
+  IResendVerificationPayload,
 } from "./interfaces";
 
 export default class AuthController {
@@ -32,7 +34,6 @@ export default class AuthController {
       const payload: IRegisterPayload = { email, password };
 
       const result = await AuthController.authService.register(payload);
-      await AuthController.authService.sendWelcomeEmail(email);
       res.status(HttpStatus.CREATED).json(apiResponse(true, result));
     } catch (err: any) {
       next(err);
@@ -69,7 +70,11 @@ export default class AuthController {
     }
   };
 
-  static forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  static forgotPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { email } = req.body;
       const payload: IForgotPasswordPayload = { email };
@@ -82,13 +87,58 @@ export default class AuthController {
     }
   };
 
-  static resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  static resetPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { token, newPassword } = req.body;
       const payload: IResetPasswordPayload = { token, newPassword };
 
-      await AuthController.authService.resetPassword(payload.token, payload.newPassword);
+      await AuthController.authService.resetPassword(
+        payload.token,
+        payload.newPassword
+      );
       res.status(HttpStatus.OK).json(apiResponse(true, null));
+    } catch (err: any) {
+      next(err);
+    }
+  };
+
+  static verifyEmail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { email, code } = req.body;
+      const payload: IVerifyEmailPayload = { email, code };
+
+      await AuthController.authService.verifyEmail(payload);
+      res
+        .status(HttpStatus.OK)
+        .json(apiResponse(true, { message: "Email verificado exitosamente" }));
+    } catch (err: any) {
+      next(err);
+    }
+  };
+
+  static resendVerification = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { email } = req.body;
+      const payload: IResendVerificationPayload = { email };
+
+      await AuthController.authService.resendVerification(payload.email);
+      res
+        .status(HttpStatus.OK)
+        .json(
+          apiResponse(true, { message: "Código de verificación reenviado" })
+        );
     } catch (err: any) {
       next(err);
     }
