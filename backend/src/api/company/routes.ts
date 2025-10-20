@@ -19,6 +19,7 @@ companyRouter.get(
 companyRouter.get(
   "/industries",
   authenticate,
+  authorizeRoles([UserRole.ADMIN, UserRole.OWNER]),
   CompanyController.getIndustries
 );
 
@@ -26,6 +27,7 @@ companyRouter.get(
 companyRouter.post(
   "/",
   authenticate,
+  authorizeRoles([UserRole.ADMIN, UserRole.OWNER]),
   schemaValidator(createCompanySchema, null),
   CompanyController.createCompany
 );
@@ -33,6 +35,7 @@ companyRouter.post(
 companyRouter.get(
     "/",
     authenticate,
+    authorizeRoles([UserRole.ADMIN, UserRole.OWNER]),
     CompanyController.listCompaniesByUserId
 );
 
@@ -40,6 +43,7 @@ companyRouter.get(
 companyRouter.get(
   "/:id",
   validateUuid,
+  authorizeRoles([UserRole.ADMIN, UserRole.OWNER]),
   authenticate,
   CompanyController.getCompanyById
 );
@@ -51,6 +55,7 @@ companyRouter.patch(
   "/:id",
   validateUuid,
   authenticate,
+  authorizeRoles([UserRole.ADMIN, UserRole.OWNER]),
   schemaValidator(updateCompanySchema, null),
   CompanyController.updateCompany
 );
@@ -59,6 +64,7 @@ companyRouter.delete(
   "/:id",
   validateUuid,
   authenticate,
+  authorizeRoles([UserRole.ADMIN, UserRole.OWNER]),
   CompanyController.deleteCompanyByUser
 );
 
