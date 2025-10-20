@@ -30,6 +30,7 @@ export default async function authenticate(
         res.locals.user = user;
         next();
     } catch (error) {
+        console.error("Token de autenticación no válido:", error);
         const response =  {message: "El token de autenticación no es válido"};
         res.status(HTTP_STATUS.UNAUTHORIZED).json(apiResponse(false, response));
         return;

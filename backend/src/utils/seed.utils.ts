@@ -156,6 +156,7 @@ export class SeedService {
       const status = await this.getDatabaseStatus();
       return status.industries > 0 && status.riskTierConfigs > 0 && status.systemConfigs > 0;
     } catch (error) {
+      console.error("Database check failed:", error);
       return false;
     }
   }

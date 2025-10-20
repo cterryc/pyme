@@ -141,8 +141,8 @@ export default class DocumentService {
 
     const response = await Promise.all(uploadPromises);
     // filtrar y devolver el archivo pdf
-    const pdfFile = response.filter((file) => file.mimeType === 'application/pdf')
-    return pdfFile
+    const pdfFile = response.filter((file) => file.mimeType === 'application/pdf');
+    return pdfFile;
   }
 
   async getDocumentsByCompany(companyId: string): Promise<IDocumentResponse[]> {

@@ -15,7 +15,6 @@ import {
   generateToken,
   generateResetPasswordToken,
   verifyResetPasswordToken,
-  generateEmailVerificationToken,
   generateVerificationCode,
 } from "../../utils/jwt.utils";
 import { htmlWelcomeContent, htmlResetPasswordContent } from "./helpers";
@@ -286,6 +285,7 @@ export default class AuthService {
     try {
       payload = verifyResetPasswordToken(token);
     } catch (error) {
+      console.error("Error al verificar token de restablecimiento:", error);
       throw new HttpError(HttpStatus.UNAUTHORIZED, "Token inválido o expirado");
     }
 

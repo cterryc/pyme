@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, Index } from "typeorm";
+import { Entity, Column, OneToMany } from "typeorm";
 import { BaseEntity } from "./BaseEntity";
 import { UserRole } from "../constants/Roles";
 import { Company } from "./Company.entity";

@@ -120,7 +120,7 @@ export default class CompanyController {
   //         return next(error);
   //     }
   // };
-  }
+  };
 
   static getAllCompanies = async (
   req: Request,
