@@ -12,6 +12,9 @@ import { UserCreditRequests } from '@/components/UserCreditRequests'
 import { UserDashboard } from '@/pages/UserDashboard'
 import { LoanRequest } from '@/pages/LoanRequest'
 import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
+import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { PublicRoute } from '@/components/PublicRoute'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -21,15 +24,27 @@ export const mainRouter = createBrowserRouter([
   },
   {
     path: '/Registro',
-    element: <Register />
+    element: (
+      <PublicRoute>
+        <Register />
+      </PublicRoute>
+    )
   },
   {
     path: '/Login',
-    element: <Login />
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    )
   },
   {
     path: '/Dashboard',
-    element: <UserDashboard />,
+    element: (
+      <ProtectedRoute>
+        <UserDashboard />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -47,23 +62,43 @@ export const mainRouter = createBrowserRouter([
   },
   {
     path: '/admin/*',
-    element: <AdminDashboard />
+    element: (
+      <ProtectedAdminRoute>
+        <AdminDashboard />
+      </ProtectedAdminRoute>
+    )
   },
   {
     path: '/Dashboard/RegistroDocumentosPyme/:id',
-    element: <RegisterPymeDocuments />
+    element: (
+      <ProtectedRoute>
+        <RegisterPymeDocuments />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/Dashboard/RegistroPyme',
-    element: <RegisterPyme />
+    element: (
+      <ProtectedRoute>
+        <RegisterPyme />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/Dashboard/SolicitarCredito/:id',
-    element: <LoanRequest />
+    element: (
+      <ProtectedRoute>
+        <LoanRequest />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/Dashboard/SolicitarCredito/Success',
-    element: <LoanRequestSuccess />
+    element: (
+      <ProtectedRoute>
+        <LoanRequestSuccess />
+      </ProtectedRoute>
+    )
   },
   {
     // add pages

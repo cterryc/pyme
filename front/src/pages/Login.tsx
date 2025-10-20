@@ -7,6 +7,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { useAuthLogin } from '@/hooks/useAuth'
 import { loginSchema, type LoginFormData } from '@/schemas/auth.schema'
+import { decodeToken } from '@/helpers/decodeToken'
 
 export const Login = () => {
   // variables
@@ -28,9 +29,30 @@ export const Login = () => {
     error
   } = useAuthLogin({
     onSuccess: (data) => {
-      localStorage.setItem('tokenPyme', data.payload.token)
-      console.log('Login successful:', data)
-      navigate('/Dashboard')
+      const token = data.payload.token
+      localStorage.setItem('tokenPyme', token)
+      
+      // Decodificar el token para obtener el rol del usuario
+      const decoded = decodeToken(token)
+      
+      if (decoded) {
+        // Guardar el rol en localStorage
+        localStorage.setItem('userRole', decoded.role)
+        localStorage.setItem('userId', decoded.id)
+        localStorage.setItem('userEmail', decoded.email)
+        
+        console.log('Login successful:', { ...data, role: decoded.role })
+        
+        // Redirigir según el rol
+        if (decoded.role === 'Admin') {
+          navigate('/admin/loans')
+        } else {
+          navigate('/Dashboard')
+        }
+      } else {
+        // Si no se puede decodificar, ir al dashboard normal
+        navigate('/Dashboard')
+      }
     }
   })
 

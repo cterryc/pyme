@@ -3,12 +3,16 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { ModuleSelectionPage } from './ModuleSelectionPage'
 import { SubmoduleSelectionPage } from './SubmoduleSelectionPage'
 import { LeftAdminDashboard } from './LeftAdminDashboard'
+import { AdminLoansManagement } from './AdminLoansManagement'
 
 const AdminDashboardRoutes = () => {
   return (
     <Routes>
       {/* Main module selection page */}
       <Route path="/" element={<ModuleSelectionPage />} />
+
+      {/* Gestión de Solicitudes de Crédito */}
+      <Route path="/loans" element={<AdminLoansManagement />} />
 
       {/* Submodule selection for a specific module (optional, can be removed if not needed) */}
       <Route path="/modules/:moduleId" element={<SubmoduleSelectionPage />} />

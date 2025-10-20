@@ -3,18 +3,25 @@ import { Link, useNavigate } from 'react-router-dom'
 import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi'
 import { useUserAuthenticate } from '@/hooks/useUser'
 import { useQueryClient } from '@tanstack/react-query'
-
 export const Header = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false)
 
-  const imageDefault = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
+  const imageDefault = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMGl-f_LYBECs7tqwhgpXA&s'
 
   const { hasUser } = useUserAuthenticate()
+  const userRole = localStorage.getItem('userRole')
+
+  // Determinar el dashboard correcto según el rol
+  const dashboardPath = userRole === 'Admin' ? '/admin/loans' : '/Dashboard'
 
   const deleteToken = () => {
+    // Limpiar todo el localStorage
     localStorage.removeItem('tokenPyme')
+    localStorage.removeItem('userRole')
+    localStorage.removeItem('userId')
+    localStorage.removeItem('userEmail')
     queryClient.clear()
     navigate('/Login')
   }
@@ -39,8 +46,8 @@ export const Header = () => {
           {isAvatarMenuOpen && (
             <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1'>
               <li className='hover:text-[var(--primary)]'>
-                <Link to='/Dashboard' className='flex gap-4 items-center '>
-                  <HiOutlineUserCircle className='text-xl' /> Mi cuenta
+                <Link to={dashboardPath} className='flex gap-4 items-center '>
+                  <HiOutlineUserCircle className='text-xl' /> {userRole === 'Admin' ? 'Panel Admin' : 'Mi cuenta'}
                 </Link>
               </li>
               <li className='hover:text-[var(--primary)]'>
