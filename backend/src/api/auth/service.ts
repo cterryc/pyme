@@ -56,7 +56,7 @@ export default class AuthService {
       where: { email: normalizedEmail },
     });
     if (!user) {
-      throw new HttpError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+      throw new HttpError(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
     }
 
     const isPasswordValid = await BcryptUtils.isValidPassword(
@@ -64,7 +64,7 @@ export default class AuthService {
       payload.password
     );
     if (!isPasswordValid) {
-      throw new HttpError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+      throw new HttpError(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
     }
     const token = generateToken({
       id: user.id,

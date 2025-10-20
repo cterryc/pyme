@@ -24,10 +24,13 @@ export const useUserAuthenticate = () => {
     const token = localStorage.getItem('tokenPyme')
     const user = decodeToken(token || '')
 
-    if (!user) queryClient.clear()
-
-    setHasUser(!!user?.id)
-    setIsLoading(false)
+  if (typeof user === 'string') {
+    queryClient.clear()
+    setHasUser(false)
+  } else {
+    setHasUser(!!user.id)
+  }
+  setIsLoading(false)
   }, [queryClient])
 
   return { hasUser, isLoading }
