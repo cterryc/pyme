@@ -13,6 +13,7 @@ import { UserDashboard } from '@/pages/UserDashboard'
 import { LoanRequest } from '@/pages/LoanRequest'
 import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
 import { ProtectedRoute } from '@/pages/ProtectedRoute'
+import { ResetPasword } from '@/pages/ResetPassword'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -70,6 +71,47 @@ export const mainRouter = createBrowserRouter([
         element: <LoanRequestSuccess />
       },
     ]
+  {
+    path: '/ResetPassword',
+    element: <ResetPasword />
+  },
+  {
+    path: '/Dashboard',
+    element: <UserDashboard />,
+    children: [
+      {
+        index: true,
+        element: <UserPymesList />
+      },
+      {
+        path: 'Solicitudes',
+        element: <UserCreditRequests />
+      },
+      {
+        path: 'Perfil',
+        element: <UserProfile />
+      }
+    ]
+  },
+  {
+    path: '/admin/*',
+    element: <AdminDashboard />
+  },
+  {
+    path: '/Dashboard/RegistroDocumentosPyme/:id',
+    element: <RegisterPymeDocuments />
+  },
+  {
+    path: '/Dashboard/RegistroPyme',
+    element: <RegisterPyme />
+  },
+  {
+    path: '/Dashboard/SolicitarCredito/:id',
+    element: <LoanRequest />
+  },
+  {
+    path: '/Dashboard/SolicitarCredito/Success',
+    element: <LoanRequestSuccess />
   },
   {
     // add pages
