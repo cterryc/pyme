@@ -11,7 +11,13 @@ import {
   IUpdateUserPayload,
   UserDTO,
 } from "./interfaces";
-import { generateToken, generateResetPasswordToken, verifyResetPasswordToken } from "../../utils/jwt.utils";
+import {
+  generateToken,
+  generateResetPasswordToken,
+  verifyResetPasswordToken,
+  generateEmailVerificationToken,
+  generateVerificationCode,
+} from "../../utils/jwt.utils";
 import { htmlWelcomeContent, htmlResetPasswordContent } from "./helpers";
 import config from "../../config/enviroment.config";
 
@@ -33,11 +39,13 @@ export default class AuthService {
     }
 
     const hashedPassword = await BcryptUtils.createHash(payload.password);
+    const verificationCode = generateVerificationCode();
 
     const newUser = await this.userRepo.save({
       ...payload,
       email: normalizedEmail,
       password: hashedPassword,
+      emailVerificationToken: verificationCode, // Guardar el código
     });
 
     const { id, role } = newUser;
@@ -45,6 +53,9 @@ export default class AuthService {
     const tokenPayload = { id, role };
 
     const token = generateToken(tokenPayload);
+
+    // Enviar email con el código
+    await this.sendVerificationEmail(normalizedEmail, verificationCode);
 
     return { token };
   }
@@ -73,7 +84,7 @@ export default class AuthService {
     return { token };
   }
 
-  async sendWelcomeEmail(email: string) {
+  async sendVerificationEmail(email: string, code: string) {
     const url = "https://api.brevo.com/v3/smtp/email";
     const options = {
       method: "POST",
@@ -83,20 +94,25 @@ export default class AuthService {
         "api-key": config.BREVO_API_KEY,
       },
       body: JSON.stringify({
-        sender: { name: "Code", email: "nc.equipo21@gmail.com" },
-        replyTo: { email: "nc.equipo21@gmail.com", name: "Equipo 21" },
+        sender: { name: "Pyme", email: "nc.equipo21@gmail.com" },
+        replyTo: { email: "nc.equipo21@gmail.com", name: "Equipo Pyme" },
         to: [{ email: email, name: "Nuevo Usuario" }],
-        textContent:
-          "Hola Terry Martel, ¡Te damos la bienvenida a Pyme! Tu registro se ha completado exitosamente. Ahora puedes acceder a todos nuestros servicios de préstamos para Pymes. Si tienes alguna pregunta, no dudes en contactarnos. ¡Gracias por unirte a nuestra comunidad!",
-        subject: "¡Bienvenido a Pyme - Tu registro se ha completado!",
-        htmlContent: htmlWelcomeContent(),
+        subject: "Verifica tu email - Pyme",
+        htmlContent: htmlWelcomeContent(code),
       }),
     };
 
-    fetch(url, options)
-      .then((res) => res.json())
-      .then((json) => console.log(json))
-      .catch((err) => console.error(err));
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        console.error(
+          "Error al enviar email de verificación:",
+          await response.text()
+        );
+      }
+    } catch (err) {
+      console.error("Excepción al enviar email de verificación:", err);
+    }
   }
 
   async updateUser(
@@ -254,7 +270,10 @@ export default class AuthService {
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
-        console.error("Error al enviar email de restablecimiento:", await response.text());
+        console.error(
+          "Error al enviar email de restablecimiento:",
+          await response.text()
+        );
         // Opcional: lanzar error si es crítico, pero comúnmente se loguea y se responde OK por seguridad
       }
     } catch (err) {
@@ -282,10 +301,92 @@ export default class AuthService {
     // Evitar reutilizar la misma contraseña (opcional, pero recomendado)
     const isSamePassword = await BcryptUtils.isValidPassword(user, newPassword);
     if (isSamePassword) {
-      throw new HttpError(HttpStatus.BAD_REQUEST, "La nueva contraseña debe ser diferente a la actual");
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "La nueva contraseña debe ser diferente a la actual"
+      );
     }
 
     const hashedPassword = await BcryptUtils.createHash(newPassword);
     await this.userRepo.update(user.id, { password: hashedPassword });
+  }
+
+  async verifyEmail(payload: { email: string; code: string }): Promise<void> {
+    const normalizedEmail = payload.email.toLowerCase().trim();
+
+    const user = await this.userRepo.findOne({
+      where: { email: normalizedEmail },
+      select: ["id", "email", "isEmailVerified"],
+    });
+
+    if (!user) {
+      throw new HttpError(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+    }
+
+    if (user.isEmailVerified) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "El email ya está verificado"
+      );
+    }
+
+    // Aquí validamos el código
+    // Como usamos JWT sin guardar en BD, necesitamos que el frontend envíe el token
+    // O validamos directamente el código si lo guardamos en BD
+    // Por simplicidad, voy a guardar el código en la BD
+
+    const storedCode = await this.userRepo.findOne({
+      where: { email: normalizedEmail },
+      select: ["emailVerificationToken"],
+    });
+
+    if (!storedCode?.emailVerificationToken) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "No hay código de verificación pendiente"
+      );
+    }
+
+    if (storedCode.emailVerificationToken !== payload.code) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "Código de verificación incorrecto"
+      );
+    }
+
+    await this.userRepo.update(user.id, {
+      isEmailVerified: true,
+      emailVerificationToken: undefined,
+    });
+  }
+
+  async resendVerification(email: string): Promise<void> {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const user = await this.userRepo.findOne({
+      where: { email: normalizedEmail },
+      select: ["id", "email", "isEmailVerified"],
+    });
+
+    if (!user) {
+      // Por seguridad, no revelamos si el email existe
+      return;
+    }
+
+    if (user.isEmailVerified) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "El email ya está verificado"
+      );
+    }
+
+    const verificationCode = generateVerificationCode();
+
+    // Guardar el código en la base de datos
+    await this.userRepo.update(user.id, {
+      emailVerificationToken: verificationCode,
+    });
+
+    await this.sendVerificationEmail(normalizedEmail, verificationCode);
   }
 }

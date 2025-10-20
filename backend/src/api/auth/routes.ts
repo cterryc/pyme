@@ -6,6 +6,8 @@ import {
   userUpdatePayloadValidator,
   forgotPasswordValidator,
   resetPasswordValidator,
+  verifyEmailValidator,
+  resendVerificationValidator,
 } from "./validator";
 import schemaValidator from "../../middlewares/schemaValidators.middlewares";
 import authenticate from "../../middlewares/authenticate.middleware";
@@ -35,6 +37,18 @@ authRouter.post(
   "/reset-password",
   schemaValidator(resetPasswordValidator, null),
   AuthController.resetPassword
+);
+
+authRouter.post(
+  "/verify-email",
+  schemaValidator(verifyEmailValidator, null),
+  AuthController.verifyEmail
+);
+
+authRouter.post(
+  "/resend-verification",
+  schemaValidator(resendVerificationValidator, null),
+  AuthController.resendVerification
 );
 
 // Protected routes

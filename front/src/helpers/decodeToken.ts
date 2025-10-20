@@ -8,8 +8,8 @@ export type TokenPayload = {
   exp?: number
 }
 
-export function decodeToken(getToken: string): TokenPayload | null {
-  if (!getToken) return null
+export function decodeToken(getToken: string): TokenPayload | string {
+  if (!getToken) return 'invalid token'
 
   try {
     const decoded = jwtDecode<TokenPayload>(getToken)
@@ -17,11 +17,11 @@ export function decodeToken(getToken: string): TokenPayload | null {
 
     if (decoded.exp && decoded.exp < now) {
       localStorage.removeItem('tokenPyme')
-      return null
+      return 'expired token'
     }
 
     return decoded
   } catch {
-    return null
+    return 'invalid token'
   }
 }
