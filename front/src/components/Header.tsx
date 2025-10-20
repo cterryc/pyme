@@ -14,7 +14,8 @@ export const Header = () => {
   const { hasUser } = useUserAuthenticate()
 
   const deleteToken = () => {
-    localStorage.removeItem('tokenPyme')
+    // localStorage.removeItem('tokenPyme')
+    localStorage.clear()
     queryClient.clear()
     navigate('/Login')
   }
