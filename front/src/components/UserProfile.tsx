@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import { useUpdateUserProfle, useUserProfile } from "@/hooks/useUser"
-import { userProfileSchema, type UserProfileFormData } from "@/schemas/user.schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { UserProfileSkeleton } from "./Loaders/UserProfileSkeleton"
-import { useNavigate } from "react-router-dom"
-import { useQueryClient } from "@tanstack/react-query"
-
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useUpdateUserProfle, useUserProfile } from '@/hooks/useUser'
+import { userProfileSchema, type UserProfileFormData } from '@/schemas/user.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { UserProfileSkeleton } from './Loaders/UserProfileSkeleton'
+import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const UserProfile = () => {
   const imageDefault = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
@@ -20,7 +19,7 @@ export const UserProfile = () => {
     { name: 'firstName', label: 'Nombre de Usuario', type: 'text' },
     { name: 'lastName', label: 'Apellido de Usuario', type: 'text' },
     { name: 'email', label: 'Correo Electrónico', type: 'email' },
-    { name: 'phone', label: 'Teléfono', type: 'text' },
+    { name: 'phone', label: 'Teléfono', type: 'text' }
   ]
   // hooks
   const queryClient = useQueryClient()
@@ -36,7 +35,7 @@ export const UserProfile = () => {
   })
   const { mutate: updateProfile, isPending } = useUpdateUserProfle({
     onSuccess: () => {
-      toast.success("Usuario actualizado")
+      toast.success('Usuario actualizado')
       setIsEditProfile(false)
       refetch()
     }
@@ -48,21 +47,26 @@ export const UserProfile = () => {
         lastName: userProfile.payload.lastName || '',
         email: userProfile.payload.email || '',
         phone: userProfile.payload.phone || '',
-        profileImage: userProfile.payload.profileImage || '',
+        profileImage: userProfile.payload.profileImage || ''
       }
       setOriginalProfile(initialValues)
       reset(initialValues)
     }
   }, [userProfile, reset])
 
-
   // methods
   const onSubmit = (data: UserProfileFormData) => {
     if (!userProfile) return null
     if (data.email === userProfile.payload.email) {
-      delete data.email;
+      delete data.email
     }
-    updateProfile({ ...data, profileImage: imageDefault });
+
+    const dataKeys = Object.keys(data).filter((key) => data[key] != '')
+    const dataToSend = {}
+    dataKeys.forEach((key) => (dataToSend[key] = data[key]))
+
+    console.log('MANDANDO : ', { ...dataToSend })
+    updateProfile({ ...dataToSend, profileImage: imageDefault })
   }
   const handleCancelEdit = () => {
     setIsEditProfile(false)
@@ -76,24 +80,21 @@ export const UserProfile = () => {
 
   return (
     <>
-      <h2 className="text-2xl font-semibold mb-4 text-gray-700">Perfil de Usuario</h2>
+      <h2 className='text-2xl font-semibold mb-4 text-gray-700'>Perfil de Usuario</h2>
       {isLoading && <UserProfileSkeleton />}
       {isError && <p className='text-red-400'>Error: {error.message}</p>}
       {!isLoading && !isError && (
-        <section className="flex">
-          <form className="rounded-2xl w-full">
-            <div className="flex p-4 w-full">
-              <div className="flex-1 flex items-center justify-center">
-                <img
-                  src={userProfile?.payload?.profileImage || imageDefault}
-                  className="rounded-full w-40 h-40"
-                />
+        <section className='flex'>
+          <form className='rounded-2xl w-full'>
+            <div className='flex p-4 w-full'>
+              <div className='flex-1 flex items-center justify-center'>
+                <img src={userProfile?.payload?.profileImage || imageDefault} className='rounded-full w-40 h-40' />
               </div>
 
-              <div className="flex-1 grid grid-cols-2 gap-2">
+              <div className='flex-1 grid grid-cols-2 gap-2'>
                 {fields.map((field, index) => (
-                  <div key={index} className="flex flex-col gap-1">
-                    <label htmlFor={field.name} className="block text-lg text-gray-500 font-semibold">
+                  <div key={index} className='flex flex-col gap-1'>
+                    <label htmlFor={field.name} className='block text-lg text-gray-500 font-semibold'>
                       {field.label}
                     </label>
                     {isEditProfile ? (
@@ -111,7 +112,7 @@ export const UserProfile = () => {
                         )}
                       </div>
                     ) : (
-                      <p className="mt-1">
+                      <p className='mt-1'>
                         {userProfile?.payload?.[field.name as keyof UserProfileFormData] || 'No Data'}
                       </p>
                     )}
@@ -119,38 +120,37 @@ export const UserProfile = () => {
                 ))}
               </div>
             </div>
-            <div className="mt-10">
+            <div className='mt-10'>
               {!isEditProfile ? (
-                <div className="flex gap-4">
+                <div className='flex gap-4'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={deleteToken}
-                    className="text-white py-3 text-xl rounded-md bg-[#c24949] hover:bg-[#c95353] transition-colors cursor-pointer w-full flex justify-center items-center gap-4"
+                    className='text-white py-3 text-xl rounded-md bg-[#c24949] hover:bg-[#c95353] transition-colors cursor-pointer w-full flex justify-center items-center gap-4'
                   >
                     Cerrar Sesion
                   </button>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => setIsEditProfile(!isEditProfile)}
-                    className="text-white py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] transition-colors cursor-pointer w-full flex justify-center items-center gap-4"
+                    className='text-white py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] transition-colors cursor-pointer w-full flex justify-center items-center gap-4'
                   >
                     Actualizar perfil
                   </button>
-
                 </div>
               ) : (
-                <div className="flex gap-4">
+                <div className='flex gap-4'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => handleCancelEdit()}
-                    className="flex-1 py-3 text-xl rounded-md bg-gray-400 hover:bg-gray-500 text-white transition-colors"
+                    className='flex-1 py-3 text-xl rounded-md bg-gray-400 hover:bg-gray-500 text-white transition-colors'
                   >
                     Cancelar
                   </button>
                   <button
-                    type="button"
+                    type='button'
                     onClick={handleSubmit(onSubmit)}
-                    className="flex-1 py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] text-white transition-colors"
+                    className='flex-1 py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] text-white transition-colors'
                   >
                     {isPending ? 'Actualizando. . .' : 'Actualizar'}
                   </button>
