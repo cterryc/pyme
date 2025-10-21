@@ -6,6 +6,7 @@ import type { GetPymeResponse } from '@/interfaces/pyme.interface'
 import { useGetPymesByUser } from '@/hooks/usePyme'
 import { PymeTableSkeleton } from './Loaders/PymeTableSkeleton'
 import { toast } from 'sonner'
+import { BLOCKED_STATUSES } from '@/interfaces/loan.interface'
 
 export const UserPymesList = () => {
   const navigate = useNavigate()
@@ -50,9 +51,9 @@ export const UserPymesList = () => {
               <tbody>
                 {pymesByUser &&
                   pymesByUser.payload.map((pyme: GetPymeResponse) => {
-                    const NotCredit =
-                      (pyme.statusCredit === 'Activo' && pyme.hasDocuments) ||
-                      (pyme.statusCredit !== 'Activo' && !pyme.hasDocuments)
+                  const isBlocked = BLOCKED_STATUSES.includes(pyme.statusCredit)
+                    const canRequestCredit = pyme.hasDocuments && !isBlocked
+                    const buttonText = 'Solicitar credito';
                     return (
                       <tr key={pyme.id} className='hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200'>
                         <td className='p-3'>{pyme.legalName}</td>
@@ -91,32 +92,21 @@ export const UserPymesList = () => {
                           </button>
                           <button
                             onClick={() => {
-                              if (NotCredit) {
-                                toast.warning('Requisitos pendientes', {
-                                  style: { borderColor: '#f59e0b', backgroundColor: '#fffbeb', borderWidth: '2px' },
-                                  description: pyme.hasDocuments 
-                                    ? 'Ya tienes una solicitud de crédito activa.'
-                                    : 'Debes adjuntar los documentos antes de solicitar un crédito.',
-                                  duration: 3500
-                                })
-                                return
-                              }
-                              toast.info('Iniciando solicitud de crédito', {
-                                style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
-                                description: 'Te mostraremos las mejores opciones de financiamiento para tu MYPE.',
-                                duration: 3000
-                              })
-                              navigate(`/Dashboard/SolicitarCredito/${pyme.id}`)
+                              if (canRequestCredit)
+                                navigate(
+                                  `/Dashboard/SolicitarCredito/${pyme.id}`
+                                );
                             }}
-                            className={`px-4 py-2 rounded-md transition-colorsr text-nowrap font-semibold
-                          ${
-                            NotCredit
-                              ? 'bg-gray-200 cursor-default text-gray-400 select-none'
-                              : 'bg-[#5CCEFF] hover:bg-[#7DDCFF] cursor-pointer text-white'
-                          }  
-                          `}
+                            className={`px-4 py-2 rounded-md font-semibold transition-colors text-nowrap
+                              ${
+                                canRequestCredit
+                                  ? "bg-[#5CCEFF] hover:bg-[#7DDCFF] cursor-pointer text-white"
+                                  : "bg-gray-200 cursor-default text-gray-600 select-none opacity-70"
+                              }
+                            `}
+                            disabled={isBlocked}
                           >
-                            Solicitar credito
+                            {buttonText} 
                           </button>
                         </td>
                       </tr>

@@ -7,8 +7,10 @@ import { usePymeLoanRequest, usePymeLoanRequestConfirm } from '@/hooks/usePyme'
 import { formatToDolar } from '@/helpers/formatToDolar'
 import { toast } from 'sonner'
 import { Loading } from '@/components/Loading'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const LoanRequest = () => {
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [loanOptions, setLoanOptions] = useState<LoanRequestOptions>()
   const [selectedTerm, setSelectedTerm] = useState(0)
@@ -44,6 +46,11 @@ export const LoanRequest = () => {
         amount: data.payload.selectedDetails?.amount.toString() || '0',
         months: data.payload.selectedDetails?.termMonths.toString() || '0'
       }).toString()
+
+
+      queryClient.invalidateQueries({ queryKey: ['pymesByUser'] })
+      queryClient.invalidateQueries({ queryKey: ['loansByUser'] })
+
 
       // console.log(data.payload.selectedDetails)
       toast.success('¡Solicitud enviada con éxito!', {

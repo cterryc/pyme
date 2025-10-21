@@ -44,7 +44,7 @@ export const UserCreditRequests = () => {
               <tbody>
                 <tr>
                   <td colSpan={6} className='text-center text-gray-500 py-6'>
-                    No se encontraron solicitudes de creidto registradas.
+                    No se encontraron solicitudes de credito registradas.
                   </td>
                 </tr>
               </tbody>
