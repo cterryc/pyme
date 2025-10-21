@@ -40,13 +40,16 @@ export const UserProfile = () => {
         description: 'Tus datos personales han sido actualizados exitosamente.',
         duration: 3000
       })
+
       setIsEditProfile(false)
       refetch()
     },
-    onError: (dataError) => {
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : 'No se pudo actualizar tu perfil. Intenta nuevamente.'
+
       toast.error('Error al actualizar perfil', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: (dataError as any).payload?.message || 'No se pudo actualizar tu perfil. Intenta nuevamente.',
+        description: message,
         duration: 4000
       })
     }
@@ -72,13 +75,13 @@ export const UserProfile = () => {
       delete data.email
     }
 
-    const dataKeys = Object.keys(data).filter((key) => data[key] != '')
-    const dataToSend = {}
-    dataKeys.forEach((key) => (dataToSend[key] = data[key]))
+    // const dataToSend = Object.fromEntries(
+    //   Object.entries(data).filter(([, v]) => v !== '')
+    // ) as Partial<UserProfileFormData>;
 
-    console.log('MANDANDO : ', { ...dataToSend })
-    updateProfile({ ...dataToSend, profileImage: imageDefault })
+    updateProfile({ ...data, profileImage: imageDefault })
   }
+
   const handleCancelEdit = () => {
     setIsEditProfile(false)
     if (originalProfile) reset(originalProfile)
