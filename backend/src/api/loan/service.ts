@@ -9,6 +9,7 @@ import { SystemConfig } from "../../entities/System_config.entity";
 import { Industry } from "../../entities/Industry.entity";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
 import { RiskTier } from "../../constants/RiskTier";
+import { Document } from "../../entities/Document.entity";
 import {
   responseLoanRequest,
   LoanCalculationResult,
@@ -18,12 +19,14 @@ import { generateUniqueCode } from "../../utils/generateCode.utils";
 import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
 import { broadcastLoanStatusUpdate } from "../sse/controller";
 
+
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
   private readonly companyRepo: Repository<Company>;
   private readonly riskTierConfigRepo: Repository<RiskTierConfig>;
   private readonly systemConfigRepo: Repository<SystemConfig>;
   private readonly industryRepo: Repository<Industry>;
+  private readonly documentRepo: Repository<Document>;
 
   constructor() {
     this.loanRepo = AppDataSource.getRepository(CreditApplication);
@@ -31,6 +34,7 @@ export default class LoanService {
     this.riskTierConfigRepo = AppDataSource.getRepository(RiskTierConfig);
     this.systemConfigRepo = AppDataSource.getRepository(SystemConfig);
     this.industryRepo = AppDataSource.getRepository(Industry);
+    this.documentRepo = AppDataSource.getRepository(Document);
   }
 
   async loanRequest(
@@ -44,6 +48,17 @@ export default class LoanService {
 
     if (!company) {
       throw new HttpError(HttpStatus.NOT_FOUND, "La compañía no existe");
+    }
+
+    const documentCount = await this.documentRepo.count({
+      where: { company: { id: companyId } },
+    });
+
+    if (documentCount === 0) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "La compañía no tiene documentos requeridos para la solicitud de crédito."
+      );
     }
 
     const activeStatuses = [
@@ -215,10 +230,11 @@ export default class LoanService {
     applicationId: string,
     selectedAmount: number,
     selectedTermMonths: number,
+    companyId: string,
     userId: string
   ): Promise<responseLoanRequest> {
     const application = await this.loanRepo.findOne({
-      where: { id: applicationId },
+      where: { id: applicationId, company: { id: companyId } },
       relations: ["company"],
     });
 
@@ -229,7 +245,6 @@ export default class LoanService {
       );
     }
 
-    // Verificar que la compañía pertenece al usuario
     const company = await this.companyRepo.findOne({
       where: { id: application.companyId, owner: { id: userId } },
     });
@@ -237,7 +252,7 @@ export default class LoanService {
     if (!company) {
       throw new HttpError(
         HttpStatus.FORBIDDEN,
-        "No tienes permisos para esta solicitud."
+        "La solicitud de crédito no existe."
       );
     }
 
@@ -319,12 +334,10 @@ export default class LoanService {
     return responseLoanByUserListDto(applications);
   }
 
-  // --- MÉTODOS DE CÁLCULO (adaptados para usar BD) ---
   private computeAgeYears(foundedDate: any): number | null {
     if (!foundedDate) return null;
 
     try {
-      // Intentar convertir a Date sin importar el tipo
       const date = new Date(foundedDate);
 
       if (isNaN(date.getTime())) {

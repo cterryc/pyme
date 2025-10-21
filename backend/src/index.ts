@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import ExpressAppCreator from "./config/createApp";
 import MiddlewaresConfig from "./config/middlewares.config";
 import apiRouter from "./routers";
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import HttpError from './utils/HttpError.utils';
 import apiResponse from './utils/apiResponse.utils';
 
@@ -19,13 +19,13 @@ import apiResponse from './utils/apiResponse.utils';
     app.use("/api", apiRouter);
 
   
-    app.use((err: HttpError, req: Request, res: Response) => {
+    app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
       console.error("Error capturado:", err);
 
       const status = err.status || 500;
       const message = err.message || "Internal Server Error";
 
-      res.status(status).json(apiResponse(false, { message }));
+      res.status(status).json(apiResponse(false, { message, code: status }));
     });
 
   } catch (error) {
