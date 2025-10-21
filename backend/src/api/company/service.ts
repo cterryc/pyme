@@ -1,7 +1,6 @@
 import {
   Between,
   ILike,
-  In,
   LessThanOrEqual,
   MoreThanOrEqual,
   IsNull,
@@ -117,7 +116,7 @@ export default class CompanyService {
     companyId: string,
     companyData: Partial<Company>,
     userId: string
-  ): Promise<Object | null> {
+  ): Promise<Company  | null> {
     const company = await this.companyRepo.findOne({
       where: { id: companyId, owner: { id: userId } },
     });

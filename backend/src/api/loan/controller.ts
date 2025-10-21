@@ -28,7 +28,7 @@ export default class LoanController {
         const userId = res.locals.user?.id as string;
         const loanData = createCreditApplicationSchema.parse(req.body);
 
-        const loanRequest : responseLoanRequest | null = await this.loanService.createCreditApplication(loanData.id,loanData.selectedAmount, loanData.selectedTermMonths,userId);
+        const loanRequest : responseLoanRequest | null = await this.loanService.createCreditApplication(loanData.id,loanData.selectedAmount, loanData.selectedTermMonths, loanData.companyId, userId);
 
         res.status(HttpStatus.CREATED).json(apiResponse(true, loanRequest));
       } catch (error) {

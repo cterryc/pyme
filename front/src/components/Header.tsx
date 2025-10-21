@@ -15,12 +15,17 @@ export const Header = () => {
   const { hasUser } = useUserAuthenticate()
 
   const deleteToken = () => {
+
     toast.info('Cerrando sesión...', {
       style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
       description: 'Hasta pronto. Esperamos verte de nuevo.',
       duration: 2000
     })
     localStorage.removeItem('tokenPyme')
+
+    // localStorage.removeItem('tokenPyme')
+    localStorage.clear()
+
     queryClient.clear()
     setTimeout(() => {
       navigate('/Login')

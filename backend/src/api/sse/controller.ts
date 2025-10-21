@@ -8,27 +8,45 @@ interface SSEClient {
 
 let clients: SSEClient[] = [];
 
-// Limpieza y heartbeat
 setInterval(() => {
   clients = clients.filter((c) => !c.res.writableEnded);
   clients.forEach((c) => c.res.write(`: keep-alive\n\n`));
 }, 25000);
 
+
 export function subscribeLoanStatus(req: Request, res: Response) {
   const userId = res.locals.user?.id || req.query.userId?.toString() || "anon";
 
-  res.setHeader("Content-Type", "text/event-stream");
+  console.log(`[SSE] 🔗 Nueva conexión solicitada por usuario: ${userId}`);
+
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("X-Accel-Buffering", "no"); 
   res.flushHeaders();
 
+  res.write(`: connected ${new Date().toISOString()}\n\n`);
+
   clients.push({ res, userId, connectedAt: new Date() });
-  console.log(`👤 [SSE] Cliente conectado: ${userId} (${clients.length})`);
+  console.log(`👤 [SSE] ✅ Cliente conectado exitosamente: ${userId} (Total: ${clients.length})`);
 
   req.on("close", () => {
     clients = clients.filter((client) => client.res !== res);
-    console.log(`❌ [SSE] Cliente desconectado: ${userId}`);
+    console.log(`❌ [SSE] Cliente desconectado: ${userId} (Total: ${clients.length})`);
   });
+}
+
+export function handleSSEPreflight(req: Request, res: Response) {
+  console.log("[SSE] 📋 Recibida solicitud OPTIONS preflight");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.status(204).end();
 }
 
 export interface LoanStatusEvent {
@@ -37,10 +55,7 @@ export interface LoanStatusEvent {
   updatedAt: Date;
 }
 
-export function broadcastLoanStatusUpdate(
-  userId: string,
-  data: LoanStatusEvent
-) {
+export function broadcastLoanStatusUpdate(userId: string, data: LoanStatusEvent) {
   const msg = `data: ${JSON.stringify(data)}\n\n`;
   const targets = clients.filter((c) => c.userId === userId);
   console.log(`📢 [SSE] Enviando a ${userId} (${targets.length})`);

@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from "typeorm";
 import { BaseEntity } from "./BaseEntity";
-import { CreditApplicationStatus, DocumentType, DocumentStatus, KYCStatus } from "../constants/CreditStatus";
+import { DocumentType, DocumentStatus } from "../constants/CreditStatus";
 import { User } from "./User.entity";
 import { Company } from "./Company.entity";
 import { CreditApplication } from "./CreditApplication.entity";
