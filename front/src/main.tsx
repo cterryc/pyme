@@ -13,7 +13,8 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <InactivityModal>
-        <Toaster position='top-center' />
+        <Toaster position='top-center' closeButton
+          visibleToasts={1} />
         <RouterProvider router={mainRouter} />
       </InactivityModal>
     </QueryClientProvider>
