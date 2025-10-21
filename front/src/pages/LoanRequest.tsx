@@ -47,10 +47,8 @@ export const LoanRequest = () => {
         months: data.payload.selectedDetails?.termMonths.toString() || '0'
       }).toString()
 
-
       queryClient.invalidateQueries({ queryKey: ['pymesByUser'] })
       queryClient.invalidateQueries({ queryKey: ['loansByUser'] })
-
 
       // console.log(data.payload.selectedDetails)
       toast.success('¡Solicitud enviada con éxito!', {
