@@ -13,7 +13,6 @@ export type ListCreditApplicationsResponse = {
 
 export const BLOCKED_STATUSES = [
   'Enviado', // SUBMITTED
-  'No confirmado', // UNCONFIRMED
   'En revisión', // UNDER_REVIEW
   'Aprobado', // APPROVED
   'Rechazado', // REJECTED
