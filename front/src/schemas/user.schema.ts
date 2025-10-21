@@ -2,8 +2,8 @@ import { z } from 'zod'
 const phoneRegex = /^(\+51|51)?[9]\d{8}$|^(\+54|54)?[9]\d{9,10}$|^(\+595|595)?[9]\d{8}$/
 
 export const userProfileSchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+  firstName: z.string().min(3, 'El nombre debe tener mínimo 3 caracteres').optional(),
+  lastName: z.string().min(3, 'El apellido debe tener mínimo 3 caracteres').optional(),
   phone: z
     .string()
     .regex(phoneRegex, {
