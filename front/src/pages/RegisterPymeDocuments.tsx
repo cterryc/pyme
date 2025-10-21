@@ -34,9 +34,9 @@ export const RegisterPymeDocuments = () => {
     // error
   } = usePymeRegisterDocuments({
     onSuccess: (data) => {
-      toast.success('Los documentos fueron guardados correctamente', {
+      toast.success('¡Documentos guardados exitosamente!', {
         style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
-        description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la pyme.',
+        description: 'Tu MYPE está completamente registrada. Ya puedes solicitar un crédito.',
         duration: 4000
       })
 
@@ -47,7 +47,7 @@ export const RegisterPymeDocuments = () => {
       toast.error('Error al subir los documentos', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
         // description: `${data.payload[0].message}`,
-        description: `${data.payload.message}`,
+        description: `${data.payload.message}` || 'No se pudieron cargar los documentos. Verifica que estén firmados correctamente.',
         duration: 4000
       })
     }
@@ -84,28 +84,36 @@ export const RegisterPymeDocuments = () => {
 
   const onSubmit = (data: RegisterPymeDocumentsFormData) => {
     if (isPending) {
-      toast.loading('Subiendo archivos...', { duration: 1000 })
+      toast.loading('Subiendo archivos...', {
+        style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+        description: 'Estamos procesando y verificando tus documentos.',
+        duration: 1500
+      })
     }
     if (!data.isOwner && notarialSignedPDF == null) {
-      toast.error('', {
+      toast.error('Documento faltante', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la pyme.',
+        description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la MYPE.',
         duration: 4000
       })
       return
     }
 
     if (data.documents.length == 0) {
-      toast.error('', {
+      toast.error('Sin documentos', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: 'No hay documentos para enviar.',
+        description: 'Debes adjuntar al menos un documento firmado para continuar.',
         duration: 4000
       })
       return
     }
 
     if (!pymeID) {
-      toast.error('ERROR')
+      toast.error('Error de identificación', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: 'No se pudo identificar tu MYPE. Intenta nuevamente.',
+        duration: 4000
+      })
       return
     }
 

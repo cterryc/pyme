@@ -31,9 +31,9 @@ export const RegisterPyme = () => {
   } = usePymeRegister({
     onSuccess: (data) => {
       // console.log(data)
-      toast.success('La pyme fue registrada correctamente', {
+      toast.success('¡MYPE registrada exitosamente!', {
         style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
-        description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la pyme.',
+        description: 'Ahora debes adjuntar los documentos requeridos y firmarlos para completar el registro.',
         duration: 4000
       })
       localStorage.removeItem('registerPymeBackup')
@@ -41,9 +41,9 @@ export const RegisterPyme = () => {
       setPymeId(data.payload.id)
     },
     onError: (dataError) => {
-      toast.error('', {
+      toast.error('Error al registrar la MYPE', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: dataError.payload.message,
+        description: dataError.payload.message || 'No se pudo completar el registro. Verifica los datos ingresados.',
         duration: 4000
       })
     }
@@ -51,7 +51,11 @@ export const RegisterPyme = () => {
 
   useEffect(() => {
     if (isPending) {
-      toast('Guardando los cambios ...', { duration: 1000 })
+      toast.loading('Registrando tu MYPE...', {
+        style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+        description: 'Estamos procesando la información de tu empresa.',
+        duration: 1500
+      })
     }
   }, [isPending, isError, error])
 
@@ -506,3 +510,10 @@ export const RegisterPyme = () => {
     </>
   )
 }
+
+
+/**
+ * Fecha ultima compra
+ * (OPCIONAL) separar integracion con productos propios
+ * 
+ */

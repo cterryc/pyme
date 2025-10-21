@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi'
 import { useUserAuthenticate } from '@/hooks/useUser'
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 export const Header = () => {
   const queryClient = useQueryClient()
@@ -14,10 +15,16 @@ export const Header = () => {
   const { hasUser } = useUserAuthenticate()
 
   const deleteToken = () => {
-    // localStorage.removeItem('tokenPyme')
-    localStorage.clear()
+    toast.info('Cerrando sesión...', {
+      style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+      description: 'Hasta pronto. Esperamos verte de nuevo.',
+      duration: 2000
+    })
+    localStorage.removeItem('tokenPyme')
     queryClient.clear()
-    navigate('/Login')
+    setTimeout(() => {
+      navigate('/Login')
+    }, 500)
   }
 
   return (

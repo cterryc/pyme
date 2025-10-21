@@ -7,6 +7,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { useAuthRegister } from '@/hooks/useAuth'
 import { registerSchema, type RegisterFormData } from '@/schemas/auth.schema'
+import { toast } from 'sonner'
 
 export const Register = () => {
   // variables
@@ -31,7 +32,19 @@ export const Register = () => {
     onSuccess: (data) => {
       localStorage.setItem('tokenPyme', data.payload.token)
       console.log('Register successful:', data)
+      toast.success('¡Registro exitoso!', {
+        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
+        description: 'Tu cuenta ha sido creada. Ahora puedes registrar una MYPE para realizar una solicitud de crédito.',
+        duration: 4000
+      })
       navigate('/Dashboard')
+    },
+    onError: (dataError) => {
+      toast.error('Error al registrarse', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: (dataError as any).payload?.message || 'Hubo un problema al crear tu cuenta. Por favor, intenta nuevamente.',
+        duration: 4000
+      })
     }
   })
 

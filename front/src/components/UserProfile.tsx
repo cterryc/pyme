@@ -35,9 +35,20 @@ export const UserProfile = () => {
   })
   const { mutate: updateProfile, isPending } = useUpdateUserProfle({
     onSuccess: () => {
-      toast.success('Usuario actualizado')
+      toast.success('Perfil actualizado correctamente', {
+        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
+        description: 'Tus datos personales han sido actualizados exitosamente.',
+        duration: 3000
+      })
       setIsEditProfile(false)
       refetch()
+    },
+    onError: (dataError) => {
+      toast.error('Error al actualizar perfil', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: (dataError as any).payload?.message || 'No se pudo actualizar tu perfil. Intenta nuevamente.',
+        duration: 4000
+      })
     }
   })
   useEffect(() => {
@@ -73,9 +84,16 @@ export const UserProfile = () => {
     if (originalProfile) reset(originalProfile)
   }
   const deleteToken = () => {
+    toast.info('Cerrando sesión...', {
+      style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+      description: 'Hasta pronto. Esperamos verte de nuevo.',
+      duration: 2000
+    })
     localStorage.removeItem('tokenPyme')
     queryClient.clear()
-    navigate('/Login')
+    setTimeout(() => {
+      navigate('/Login')
+    }, 500)
   }
 
   return (
