@@ -14,11 +14,17 @@ import {
   responseLoanRequest,
   LoanCalculationResult,
   responseLoanByUser,
+  computeAgeYears,
+  calculateCompanyRiskScore,
+  getIndustryAdjustment,
+  clamp,
+  getTierFromScore,
+  capsFor,
+  interestRateFor,
 } from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
 import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
 import { broadcastLoanStatusUpdate } from "../sse/controller";
-
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -64,6 +70,7 @@ export default class LoanService {
     const activeStatuses = [
       CreditApplicationStatus.APPLYING,
       CreditApplicationStatus.SUBMITTED,
+      CreditApplicationStatus.DOCUMENTS_REQUIRED,
       CreditApplicationStatus.UNDER_REVIEW,
     ];
 
@@ -75,13 +82,12 @@ export default class LoanService {
       if (!existingApplication.offerDetails) {
         throw new HttpError(
           HttpStatus.BAD_REQUEST,
-
           "La solicitud existe pero no tiene oferta calculada."
         );
       }
-
       return LoanResponseDto.fromExisting(existingApplication, company);
     }
+
     const loanOptions = await this.calculateLoanOptions(company);
 
     const MAX_RETRIES = 3;
@@ -131,99 +137,6 @@ export default class LoanService {
       HttpStatus.SERVER_ERROR,
       "No se pudo crear una solicitud de crédito única después de varios intentos."
     );
-  }
-
-  async calculateLoanOptions(company: Company): Promise<LoanCalculationResult> {
-    const [baseRateConfig, riskTierConfigs] = await Promise.all([
-      this.systemConfigRepo.findOne({ where: { key: "BASE_RATE" } }),
-      this.riskTierConfigRepo.find(),
-    ]);
-
-    if (!baseRateConfig) {
-      throw new HttpError(
-        HttpStatus.SERVER_ERROR,
-        "Configuración BASE_RATE no encontrada."
-      );
-    }
-
-    const riskTierConfigMap = new Map<RiskTier, RiskTierConfig>();
-    riskTierConfigs.forEach((config) => {
-      riskTierConfigMap.set(config.tier, config);
-    });
-
-    const BASE_RATE = Number(baseRateConfig.value);
-    const revenue = Math.max(0, Number(company.annualRevenue ?? 0));
-    const employeeCount = company.employeeCount ?? null;
-    const ageYears = this.computeAgeYears(company.foundedDate);
-    const revPerEmp =
-      employeeCount && employeeCount > 0 ? revenue / employeeCount : null;
-
-    if (!revenue) {
-      return {
-        minAmount: 1000,
-        maxAmount: 5000,
-        interestRate: 10,
-        allowedTerms: [12],
-        calculationSnapshot: {
-          baseRate: BASE_RATE,
-          companyRiskTier: RiskTier.D,
-          industryRiskTier: RiskTier.D,
-          riskTierConfig: null,
-          systemConfigs: { BASE_RATE },
-          calculatedAt: new Date(),
-          note: "Sin revenue - valores por defecto",
-        },
-      };
-    }
-    // 2. Determinar risk tier
-    const industryTier = company.industry?.baseRiskTier ?? RiskTier.B;
-    const companyTier = this.adjustTier(industryTier, ageYears, revPerEmp);
-
-    const tierConfig = riskTierConfigMap.get(companyTier);
-    if (!tierConfig) {
-      throw new HttpError(
-        HttpStatus.SERVER_ERROR,
-        `Configuración para risk tier ${companyTier} no encontrada.`
-      );
-    }
-
-    // 3. Calcular montos y términos
-    const { min, max } = this.capsFor(tierConfig, revenue);
-    const allowedTerms = this.allowedTermsFor(
-      tierConfig,
-      ageYears,
-      revenue > 0
-    );
-    const interestRate = this.interestRateFor(
-      BASE_RATE,
-      tierConfig,
-      ageYears,
-      revPerEmp
-    );
-
-    return {
-      minAmount: min,
-      maxAmount: max,
-      interestRate,
-      allowedTerms,
-      // calculationSnapshot: {
-      //   baseRate: BASE_RATE,
-      //   companyRiskTier: companyTier,
-      //   industryRiskTier: industryTier,
-      //   riskTierConfig: {
-      //     tier: tierConfig.tier,
-      //     spread: Number(tierConfig.spread),
-      //     factor: Number(tierConfig.factor),
-      //   },
-      //   systemConfigs: { BASE_RATE },
-      //   companyData: {
-      //     revenue,
-      //     employeeCount,
-      //     ageYears,
-      //     revPerEmp,
-      //   },
-      //   calculatedAt: new Date(),
-    };
   }
 
   async createCreditApplication(
@@ -334,120 +247,115 @@ export default class LoanService {
     return responseLoanByUserListDto(applications);
   }
 
-  private computeAgeYears(foundedDate: any): number | null {
-    if (!foundedDate) return null;
-
-    try {
-      const date = new Date(foundedDate);
-
-      if (isNaN(date.getTime())) {
-        console.warn("Fecha inválida:", foundedDate);
-        return null;
-      }
-
-      const diffMs = Date.now() - date.getTime();
-      if (!isFinite(diffMs) || diffMs < 0) return 0;
-      return Math.floor(diffMs / (365.25 * 24 * 3600 * 1000));
-    } catch (error) {
-      console.error("Error calculando edad desde fecha:", foundedDate, error);
-      return null;
-    }
-  }
-
-  private adjustTier(
-    tier: RiskTier,
-    ageYears: number | null,
-    revPerEmp: number | null
-  ): RiskTier {
-    let t = tier;
-
-    if (ageYears != null) {
-      if (ageYears >= 5) t = this.bumpBetter(t);
-      else if (ageYears < 1) t = this.bumpWorse(t);
-    }
-
-    if (revPerEmp != null) {
-      if (revPerEmp >= 1_000_000) t = this.bumpBetter(t);
-      else if (revPerEmp < 200_000) t = this.bumpWorse(t);
-    }
-
-    return t;
-  }
-
-  private bumpBetter(t: RiskTier): RiskTier {
-    return t === "D"
-      ? RiskTier.C
-      : t === "C"
-      ? RiskTier.B
-      : t === "B"
-      ? RiskTier.A
-      : RiskTier.A;
-  }
-
-  private bumpWorse(t: RiskTier): RiskTier {
-    return t === "A"
-      ? RiskTier.A
-      : t === "B"
-      ? RiskTier.C
-      : t === "C"
-      ? RiskTier.D
-      : RiskTier.D;
-  }
-
-  private allowedTermsFor(
-    tierConfig: RiskTierConfig,
-    ageYears: number | null,
-    hasRevenue: boolean
-  ): number[] {
-    if (!hasRevenue) return [6, 12];
-    return tierConfig.allowed_terms;
-  }
-
-  private interestRateFor(
-    BASE_RATE: number,
-    tierConfig: RiskTierConfig,
-    ageYears: number | null,
-    revPerEmp: number | null
-  ): number {
-    let rate = BASE_RATE + Number(tierConfig.spread);
-
-    if (ageYears != null && ageYears >= 5) rate -= 1;
-    if (revPerEmp != null && revPerEmp >= 1_000_000) rate -= 1;
-
-    return this.clamp(Number(rate.toFixed(2)), 8, 80);
-  }
-
-  private capsFor(
-    tierConfig: RiskTierConfig,
-    revenue: number
-  ): { min: number; max: number } {
-    const ABSOLUTE_MIN_LOAN = 1_000;
-    const ABSOLUTE_MAX_LOAN = 5_000_000;
-    const ROUND_TO = 1_000;
-
-    const factor = Number(tierConfig.factor);
-    const rawMax = revenue * factor;
-    const max = this.clamp(
-      this.roundTo(rawMax, ROUND_TO),
-      ABSOLUTE_MIN_LOAN,
-      ABSOLUTE_MAX_LOAN
-    );
-    const rawMin = revenue * 0.05;
-    const min = this.clamp(this.roundTo(rawMin, ROUND_TO), ROUND_TO, max);
-
-    return { min, max };
-  }
-
-  private clamp(v: number, lo: number, hi: number): number {
-    return Math.max(lo, Math.min(hi, v));
-  }
-
-  private roundTo(v: number, step: number): number {
-    return Math.round(v / step) * step;
-  }
-
   async getCreditApplicationStatus(applicationId: string): Promise<string> {
     // Lógica para obtener el estado de la solicitud de crédito
     return "PENDING";
+  }
+
+  async calculateLoanOptions(company: Company): Promise<LoanCalculationResult> {
+    // 1. Cargar TODAS las configuraciones de la base de datos
+    const [systemConfigs, riskTierConfigs] = await Promise.all([
+      this.systemConfigRepo.find(),
+      this.riskTierConfigRepo.find(),
+    ]);
+
+    // 2. Procesar configuraciones en Mapas para fácil acceso
+    const configMap = new Map<string, number>();
+    systemConfigs.forEach((config) => {
+      configMap.set(config.key, config.value); 
+    });
+
+    const riskTierConfigMap = new Map<RiskTier, RiskTierConfig>();
+    riskTierConfigs.forEach((config) => {
+      riskTierConfigMap.set(config.tier, config);
+    });
+
+   
+    const BASE_RATE = configMap.get("BASE_RATE") ?? 5.5;
+    const ABSOLUTE_MIN_LOAN = configMap.get("ABSOLUTE_MIN_LOAN") ?? 1000;
+    const ABSOLUTE_MAX_LOAN = configMap.get("ABSOLUTE_MAX_LOAN") ?? 5000000;
+    const ROUND_TO = configMap.get("ROUND_TO") ?? 1000;
+
+    // 3. Obtener datos de la compañía
+    const revenue = Math.max(0, Number(company.annualRevenue ?? 0));
+    const employeeCount = company.employeeCount ?? null;
+    const ageYears = computeAgeYears(company.foundedDate);
+    const revPerEmp =
+      employeeCount && employeeCount > 0 ? revenue / employeeCount : null;
+
+    // 4. Caso Borde: Compañía sin ingresos
+    if (!revenue) {
+      const tierDConfig = riskTierConfigMap.get(RiskTier.D);
+      const defaultRate = BASE_RATE + Number(tierDConfig?.spread ?? 10.0);
+      return {
+        minAmount: ABSOLUTE_MIN_LOAN,
+        maxAmount: 5000,
+        interestRate: defaultRate,
+        allowedTerms: [6, 12],
+        calculationSnapshot: {
+          baseRate: BASE_RATE,
+          companyRiskTier: RiskTier.D,
+          industryRiskTier: company.industry?.baseRiskTier ?? RiskTier.D,
+          riskScore: 0,
+          riskTierConfig: null,
+          systemConfigs: { BASE_RATE },
+          companyData: { revenue, employeeCount, ageYears, revPerEmp },
+          calculatedAt: new Date(),
+          note: "Sin revenue - valores por defecto",
+        },
+      };
+    }
+
+    // 5. Lógica de Scoring
+    const companyMetrics = { revenue, ageYears, revPerEmp };
+    const baseScore = calculateCompanyRiskScore(companyMetrics);
+    const industryTier = company.industry?.baseRiskTier ?? RiskTier.C;
+    const industryAdjustment = getIndustryAdjustment(industryTier);
+    const finalScore = clamp(baseScore + industryAdjustment, 0, 100);
+    const companyTier = getTierFromScore(finalScore); // Mapea 0-100 -> A, B, C, D
+
+    // 6. Obtener la configuración para el Tier calculado
+    const tierConfig = riskTierConfigMap.get(companyTier);
+    if (!tierConfig) {
+      throw new HttpError(
+        HttpStatus.SERVER_ERROR,
+        `Configuración para risk tier ${companyTier} no encontrada.`
+      );
+    }
+
+    // 7. Calcular montos, plazos y tasa
+    const { min, max } = capsFor(tierConfig, revenue, {
+      ABSOLUTE_MIN_LOAN,
+      ABSOLUTE_MAX_LOAN,
+      ROUND_TO,
+    });
+
+    // Los plazos permitidos vienen directamente del seed
+    const allowedTerms = tierConfig.allowed_terms;
+
+    // La tasa usa el 'spread' del seed + el ajuste 'intra-tier'
+    const interestRate = interestRateFor(BASE_RATE, tierConfig, finalScore);
+
+    // 8. Retornar la oferta final
+    return {
+      minAmount: min,
+      maxAmount: max,
+      interestRate,
+      allowedTerms,
+      calculationSnapshot: {
+        baseRate: BASE_RATE,
+        companyRiskTier: companyTier,
+        industryRiskTier: industryTier,
+        riskScore: finalScore,
+        riskTierConfig: {
+          tier: tierConfig.tier,
+          spread: Number(tierConfig.spread),
+          factor: Number(tierConfig.factor),
+        },
+        systemConfigs: { BASE_RATE, ABSOLUTE_MIN_LOAN, ABSOLUTE_MAX_LOAN },
+        companyData: { revenue, employeeCount, ageYears, revPerEmp },
+        calculatedAt: new Date(),
+      },
+    };
   }
 }

@@ -21,21 +21,31 @@ import {
 import { responseCompanyDto, PaginatedResponse } from "./interface";
 import { Industry } from "../../entities/Industry.entity";
 import { CreateCompanyInput, GetAllCompaniesQuery } from "./validator";
+import { User } from "../../entities/User.entity";
 
 export default class CompanyService {
   private readonly companyRepo: Repository<Company>;
-  private readonly industryRepo: Repository<Industry> =
-    AppDataSource.getRepository(Industry);
+  private readonly industryRepo: Repository<Industry>;
+  private readonly userRepo: Repository<User>;
 
   constructor() {
     this.companyRepo = AppDataSource.getRepository(Company);
     this.industryRepo = AppDataSource.getRepository(Industry);
+    this.userRepo = AppDataSource.getRepository(User);
   }
 
   async createCompany(
     companyData: CreateCompanyInput,
     ownerUserId: string
   ): Promise<responseCompanyDto> {
+    const userExists = await this.userRepo.findOne({
+      where: { id: ownerUserId },
+    });
+
+    if (!userExists) {
+      throw new HttpError(HttpStatus.NOT_FOUND, "Usuario no encontrado.");
+    }
+
     const whereConditions: Array<{ taxId?: string; email?: string }> = [
       { taxId: companyData.taxId },
     ];
