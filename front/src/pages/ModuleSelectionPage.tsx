@@ -2,6 +2,7 @@ import { useDashboard } from '@/context/DashboardContext'
 import { useNavigate } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import { toast } from 'sonner'
 
 export const ModuleSelectionPage = () => {
   const { getActiveModules } = useDashboard()
@@ -9,6 +10,14 @@ export const ModuleSelectionPage = () => {
   const activeModules = getActiveModules()
 
   const handleModuleClick = (moduleId: string) => {
+    const module = activeModules.find(m => m.id === moduleId)
+    if (module) {
+      toast.info(`Accediendo a ${module.name}`, {
+        style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+        description: module.description,
+        duration: 2500
+      })
+    }
     navigate(`/admin/modules/${moduleId}`)
   }
 

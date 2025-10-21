@@ -48,3 +48,21 @@ export const verifyResetPasswordToken = (token: string): { userId: string; email
     throw new Error("Token de restablecimiento inválido o expirado");
   }
 };
+
+export const generateEmailVerificationToken = (payload: { email: string; code: string }): string => {
+  return jwt.sign(payload, config.JWT_SECRET, {
+    expiresIn: '1h',
+  });
+};
+
+export const verifyEmailVerificationToken = (token: string): { email: string; code: string } => {
+  try {
+    return jwt.verify(token, config.JWT_SECRET) as { email: string; code: string };
+  } catch (error) {
+    throw new Error("Token de verificación inválido o expirado");
+  }
+};
+
+export const generateVerificationCode = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};

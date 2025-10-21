@@ -5,6 +5,7 @@ import { MdKeyboardArrowDown } from 'react-icons/md'
 import type { GetPymeResponse } from '@/interfaces/pyme.interface'
 import { useGetPymesByUser } from '@/hooks/usePyme'
 import { PymeTableSkeleton } from './Loaders/PymeTableSkeleton'
+import { toast } from 'sonner'
 
 export const UserPymesList = () => {
   const navigate = useNavigate()
@@ -61,7 +62,14 @@ export const UserPymesList = () => {
                             <span className='py-2 rounded-full text-[#12b92f] font-bold'>Documentos Registrados</span>
                           ) : (
                             <span
-                              onClick={() => navigate(`/Dashboard/RegistroDocumentosPyme/${pyme.id}`)}
+                              onClick={() => {
+                                toast.info('Completar registro de documentos', {
+                                  style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+                                  description: 'Debes adjuntar y firmar los documentos para poder solicitar un crédito.',
+                                  duration: 3000
+                                })
+                                navigate(`/Dashboard/RegistroDocumentosPyme/${pyme.id}`)
+                              }}
                               className='bg-gray-500 hover:bg-gray-400 rounded-md text-white px-4 py-2'
                             >
                               Adjuntar Documentos
@@ -82,7 +90,24 @@ export const UserPymesList = () => {
                             Editar Pyme
                           </button>
                           <button
-                            onClick={() => navigate(`/Dashboard/SolicitarCredito/${pyme.id}`)}
+                            onClick={() => {
+                              if (NotCredit) {
+                                toast.warning('Requisitos pendientes', {
+                                  style: { borderColor: '#f59e0b', backgroundColor: '#fffbeb', borderWidth: '2px' },
+                                  description: pyme.hasDocuments 
+                                    ? 'Ya tienes una solicitud de crédito activa.'
+                                    : 'Debes adjuntar los documentos antes de solicitar un crédito.',
+                                  duration: 3500
+                                })
+                                return
+                              }
+                              toast.info('Iniciando solicitud de crédito', {
+                                style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+                                description: 'Te mostraremos las mejores opciones de financiamiento para tu MYPE.',
+                                duration: 3000
+                              })
+                              navigate(`/Dashboard/SolicitarCredito/${pyme.id}`)
+                            }}
                             className={`px-4 py-2 rounded-md transition-colorsr text-nowrap font-semibold
                           ${
                             NotCredit
