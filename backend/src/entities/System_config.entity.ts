@@ -11,7 +11,7 @@ export class SystemConfig extends BaseEntity {
   @Column({ type: "varchar", length: 100, nullable: false })
   key!: string; // e.g., 'BASE_RATE'
 
-  @Column({ type: "decimal", precision: 10, scale: 4, nullable: false })
+  @Column({ type: "decimal", precision: 100, scale: 7, nullable: false })
   value!: number; // e.g., 20.0000
 
   @Column({ type: "text", nullable: true })

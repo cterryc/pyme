@@ -1,3 +1,6 @@
+import { RiskTier } from "../../constants/RiskTier";
+import { RiskTierConfig } from "../../entities/Risk_tier_config.entity";
+
 export interface responseLoanRequest {
     id?: string;
     applicationNumber?: string;
@@ -30,107 +33,147 @@ export interface LoanCalculationResult {
     calculationSnapshot?: any;
 }
 
+export function calculateCompanyRiskScore(metrics: {
+    revenue: number;
+    ageYears: number | null;
+    revPerEmp: number | null;
+  }): number {
+    let score = 0;
+    const age = metrics.ageYears ?? 0;
+    if (age < 1) score += 0;
+    else if (age < 3) score += 10;
+    else if (age < 5) score += 20;
+    else score += 30;
 
-type RiskTier = "A" | "B" | "C" | "D";
+    const revenue = metrics.revenue;
+    if (revenue < 50000) score += 0;
+    else if (revenue < 250000) score += 10;
+    else if (revenue < 1000000) score += 20;
+    else if (revenue < 5000000) score += 30;
+    else score += 40;
 
-const BASE_RATE = 20; // % anual base
-const SPREAD_BY_TIER: Record<RiskTier, number> = { A: 8, B: 12, C: 18, D: 28 };
-const FACTOR_BY_TIER: Record<RiskTier, number> = { A: 0.35, B: 0.25, C: 0.15, D: 0.10 };
+    const revPerEmp = metrics.revPerEmp ?? 0;
+    if (revPerEmp < 50000) score += 0;
+    else if (revPerEmp < 150000) score += 10;
+    else if (revPerEmp < 300000) score += 20;
+    else score += 30;
 
-const TERMS_A = [12, 18, 24, 36];
-const TERMS_B = [12, 18, 24, 36];
-const TERMS_C = [12, 18, 24];
-const TERMS_D = [6, 12];
-
-const ABSOLUTE_MIN_LOAN = 1_000;
-const ABSOLUTE_MAX_LOAN = 5_000_000;
-const ROUND_TO = 1_000;
-
-// Industria → tier base
-const INDUSTRY_BASE: Record<string, RiskTier> = {
-  software: "A",
-  services: "B",
-  retail: "C",
-  hospitality: "C",
-  construction: "C",
-  agriculture: "B",
-};
-
-// ------------------ Helpers ------------------
-const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-const roundTo = (v: number, step: number) => Math.round(v / step) * step;
-
-export function toDate(val: unknown): Date | null {
-  if (!val) return null;
-  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
-  if (typeof val === "number") {
-      const d = new Date(val);
-      return isNaN(d.getTime()) ? null : d;
+    return score; // Puntaje total (0-100)
   }
-  if (typeof val === "string") {
-    const s = val.trim();
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-    if (m) {
-      const [, y, mo, day] = m;
-      const d = new Date(Number(y), Number(mo) - 1, Number(day));
-      return isNaN(d.getTime()) ? null : d;
+
+  /**
+   * Asigna un modificador al puntaje basado en el riesgo de la industria.
+   * Usa los Tiers definidos en el Seed.
+   */
+export function getIndustryAdjustment(industryTier: RiskTier): number {
+    switch (industryTier) {
+      case RiskTier.A: return 10; // Industrias Top (Software) suman puntos
+      case RiskTier.B: return 0; // Neutro
+      case RiskTier.C: return -10; // Riesgo moderado (Retail)
+      case RiskTier.D: return -20; // Alto riesgo (Construcción)
+      default: return -10;
     }
-    const d = new Date(s);
-    return isNaN(d.getTime()) ? null : d;
   }
-  return null;
-}
 
-export function computeAgeYears(d: unknown): number | null {
-  const date = toDate(d);
-  if (!date) return null;
-  const diffMs = Date.now() - date.getTime();
-  if (!isFinite(diffMs) || diffMs < 0) return 0;
-  return Math.floor(diffMs / (365.25 * 24 * 3600 * 1000));
-}
-
-export function baseTierByIndustry(industry?: string | null): RiskTier {
-  if (!industry) return "B";
-  const key = industry.trim().toLowerCase();
-  return INDUSTRY_BASE[key] ?? "B";
-}
-
-const bumpBetter = (t: RiskTier): RiskTier => (t === "D" ? "C" : t === "C" ? "B" : t === "B" ? "A" : "A");
-const bumpWorse  = (t: RiskTier): RiskTier => (t === "A" ? "B" : t === "B" ? "C" : t === "C" ? "D" : "D");
-
-export function adjustTier(tier: RiskTier, ageYears: number | null, revPerEmp: number | null): RiskTier {
-  let t = tier;
-  if (ageYears != null) {
-    if (ageYears >= 5) t = bumpBetter(t);
-    else if (ageYears < 1) t = bumpWorse(t);
+  /**
+   * Mapea el puntaje numérico final (0-100) a un Tier de Riesgo.
+   */
+export function getTierFromScore(score: number): RiskTier {
+    if (score >= 80) return RiskTier.A; // (80-100)
+    if (score >= 60) return RiskTier.B; // (60-79)
+    if (score >= 30) return RiskTier.C; // (30-59)
+    return RiskTier.D; // (0-29)
   }
-  if (revPerEmp != null) {
-    if (revPerEmp >= 1_000_000) t = bumpBetter(t);
-    else if (revPerEmp < 200_000) t = bumpWorse(t);
+
+  /**
+   * Calcula la tasa de interés final.
+   * Tasa = BASE_RATE + spread (del seed) + ajuste sutil "intra-tier"
+   */
+export function interestRateFor(
+    BASE_RATE: number,
+    tierConfig: RiskTierConfig,
+    score: number
+  ): number {
+    // Usa el spread realista del SeedService (ej. 1.5, 3.0, 6.0, 10.0)
+    const tierSpread = Number(tierConfig.spread);
+    let rate = BASE_RATE + tierSpread;
+
+    // Ajuste "intra-tier" (mejora la tasa si estás en el extremo
+    // superior de tu score)
+    let scoreFloor = 0;
+    let scoreCeiling = 100;
+
+    switch (tierConfig.tier) {
+      case RiskTier.A: [scoreFloor, scoreCeiling] = [80, 100]; break;
+      case RiskTier.B: [scoreFloor, scoreCeiling] = [60, 79]; break;
+      case RiskTier.C: [scoreFloor, scoreCeiling] = [30, 59]; break;
+      case RiskTier.D: [scoreFloor, scoreCeiling] = [0, 29]; break;
+    }
+
+    const tierWidth = scoreCeiling - scoreFloor;
+    if (tierWidth > 0) {
+      const adjustmentFactor = (score - scoreFloor) / tierWidth;
+      const intraTierDiscount = clamp(adjustmentFactor * 0.5, 0, 0.5); // Max 0.5% de descuento
+      rate -= intraTierDiscount;
+    }
+
+    // Rango final realista
+    return clamp(Number(rate.toFixed(2)), 3.0, 25.0);
   }
-  return t;
-}
 
-export function allowedTermsFor(tier: RiskTier, ageYears: number | null, hasRevenue: boolean): number[] {
-  if (!hasRevenue) return TERMS_D;
-  if (tier === "A") return ageYears != null && ageYears >= 3 ? TERMS_A : TERMS_B;
-  if (tier === "B") return ageYears != null && ageYears >= 3 ? TERMS_B : TERMS_C;
-  if (tier === "C") return TERMS_C;
-  return TERMS_D;
-}
+  /**
+   * Calcula los montos mínimos y máximos del préstamo.
+   * Usa el 'factor' (del seed) y los límites absolutos (del seed).
+   */
+export function capsFor(
+    tierConfig: RiskTierConfig,
+    revenue: number,
+    configs: {
+      ABSOLUTE_MIN_LOAN: number;
+      ABSOLUTE_MAX_LOAN: number;
+      ROUND_TO: number;
+    }
+  ): { min: number; max: number } {
+    // Usa el factor realista del SeedService (ej. 0.50, 0.30, 0.15, 0.10)
+    const factor = Number(tierConfig.factor);
+    const rawMax = revenue * factor;
 
-export function interestRateFor(tier: RiskTier, ageYears: number | null, revPerEmp: number | null): number {
-  let rate = BASE_RATE + SPREAD_BY_TIER[tier];
-  if (ageYears != null && ageYears >= 5) rate -= 1;
-  if (revPerEmp != null && revPerEmp >= 1_000_000) rate -= 1;
-  return clamp(Number(rate.toFixed(2)), 8, 80);
-}
+    const max = clamp(
+      roundTo(rawMax, configs.ROUND_TO),
+      configs.ABSOLUTE_MIN_LOAN,
+      configs.ABSOLUTE_MAX_LOAN // Usa el límite de 5M del seed
+    );
 
- export function capsFor(tier: RiskTier, revenue: number): { min: number; max: number } {
-  const factor = FACTOR_BY_TIER[tier];
-  const rawMax = revenue * factor;
-  const max = clamp(roundTo(rawMax, ROUND_TO), ABSOLUTE_MIN_LOAN, ABSOLUTE_MAX_LOAN);
-  const rawMin = revenue * 0.05;
-  const min = clamp(roundTo(rawMin, ROUND_TO), ROUND_TO, max);
-  return { min, max };
-}
+    const rawMin = Math.min(revenue * 0.05, max * 0.1); // 5% de ingresos o 10% del max
+    const min = clamp(
+     roundTo(rawMin, configs.ROUND_TO),
+      configs.ABSOLUTE_MIN_LOAN, // Usa el límite de 1k del seed
+      max
+    );
+
+    return { min, max };
+  }
+
+  // --- OTROS HELPERS GENÉRICOS ---
+
+export function computeAgeYears(foundedDate: any): number | null {
+    if (!foundedDate) return null;
+    try {
+      const date = new Date(foundedDate);
+      if (isNaN(date.getTime())) return null;
+      const diffMs = Date.now() - date.getTime();
+      if (!isFinite(diffMs) || diffMs < 0) return 0;
+      return Math.floor(diffMs / (365.25 * 24 * 3600 * 1000));
+    } catch (error) {
+      console.error("Error computing age years:", error);
+      return null;
+    }
+  }
+
+export function clamp(v: number, lo: number, hi: number): number {
+    return Math.max(lo, Math.min(hi, v));
+  }
+
+export function roundTo(v: number, step: number): number {
+    return Math.round(v / step) * step;
+  }

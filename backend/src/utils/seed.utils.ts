@@ -1,4 +1,3 @@
-// src/services/SeedService.ts
 import { Repository, DataSource } from "typeorm";
 import { Industry } from "../entities/Industry.entity";
 import { RiskTierConfig } from "../entities/Risk_tier_config.entity";
@@ -11,7 +10,6 @@ export class SeedService {
   private systemConfigRepo: Repository<SystemConfig>;
 
   constructor(private dataSource: DataSource) {
-    // Usar el dataSource que se pasa como parámetro
     this.industryRepo = this.dataSource.getRepository(Industry);
     this.riskTierConfigRepo = this.dataSource.getRepository(RiskTierConfig);
     this.systemConfigRepo = this.dataSource.getRepository(SystemConfig);
@@ -21,7 +19,6 @@ export class SeedService {
     try {
       console.log("🔧 Inicializando datos de la base de datos...");
 
-      // Verificar que las conexiones estén listas
       await this.verifyConnections();
 
       await this.seedIndustries();
@@ -39,36 +36,97 @@ export class SeedService {
   }
 
   private async verifyConnections(): Promise<void> {
-    // Verificar que los repositorios estén inicializados
-    if (!this.industryRepo || !this.riskTierConfigRepo || !this.systemConfigRepo) {
+    if (
+      !this.industryRepo ||
+      !this.riskTierConfigRepo ||
+      !this.systemConfigRepo
+    ) {
       throw new Error("Repositorios no inicializados correctamente");
     }
   }
-
-  // ... (el resto de los métodos seedIndustries, seedRiskTierConfigs, etc. se mantienen igual)
   private async seedIndustries(): Promise<void> {
     const industriesData = [
-      { name: "software", baseRiskTier: RiskTier.A, description: "Desarrollo de software y tecnología" },
-      { name: "servicios", baseRiskTier: RiskTier.B, description: "Servicios profesionales y consultoría" },
-      { name: "comercio", baseRiskTier: RiskTier.C, description: "Comercio minorista" },
-      { name: "hoteleria", baseRiskTier: RiskTier.C, description: "Hotelería y turismo" },
-      { name: "construccion", baseRiskTier: RiskTier.C, description: "Construcción e ingeniería civil" },
-      { name: "agricultura", baseRiskTier: RiskTier.B, description: "Agricultura y ganadería" },
-      { name: "manufactura", baseRiskTier: RiskTier.B, description: "Manufactura y producción industrial" },
-      { name: "salud", baseRiskTier: RiskTier.A, description: "Salud y servicios médicos" },
-      { name: "educacion", baseRiskTier: RiskTier.A, description: "Educación y formación" },
-      { name: "finanzas", baseRiskTier: RiskTier.A, description: "Servicios financieros y bancarios" },
-      { name: "bienes_raices", baseRiskTier: RiskTier.B, description: "Bienes raíces y propiedades" },
-      { name: "transporte", baseRiskTier: RiskTier.C, description: "Transporte y logística" },
-      { name: "energia", baseRiskTier: RiskTier.B, description: "Energía y utilities" },
-      { name: "entretenimiento", baseRiskTier: RiskTier.B, description: "Entretenimiento y medios" },
-      { name: "alimentos y bebidas", baseRiskTier: RiskTier.C, description: "Alimentos y bebidas" }
+      {
+        name: "Software",
+        baseRiskTier: RiskTier.A,
+        description: "Desarrollo de software y tecnología",
+      },
+      {
+        name: "Servicios",
+        baseRiskTier: RiskTier.B,
+        description: "Servicios profesionales y consultoría",
+      },
+      {
+        name: "Comercio",
+        baseRiskTier: RiskTier.C,
+        description: "Comercio minorista",
+      },
+      {
+        name: "Hotelería",
+        baseRiskTier: RiskTier.C,
+        description: "Hotelería y turismo",
+      },
+      {
+        name: "Construcción",
+        baseRiskTier: RiskTier.C,
+        description: "Construcción e ingeniería civil",
+      },
+      {
+        name: "Agricultura",
+        baseRiskTier: RiskTier.B,
+        description: "Agricultura y ganadería",
+      },
+      {
+        name: "Manufactura",
+        baseRiskTier: RiskTier.B,
+        description: "Manufactura y producción industrial",
+      },
+      {
+        name: "Salud",
+        baseRiskTier: RiskTier.A,
+        description: "Salud y servicios médicos",
+      },
+      {
+        name: "Educación",
+        baseRiskTier: RiskTier.A,
+        description: "Educación y formación",
+      },
+      {
+        name: "Finanzas",
+        baseRiskTier: RiskTier.A,
+        description: "Servicios financieros y bancarios",
+      },
+      {
+        name: "Bienes Raíces",
+        baseRiskTier: RiskTier.B,
+        description: "Bienes raíces y propiedades",
+      },
+      {
+        name: "Transporte",
+        baseRiskTier: RiskTier.C,
+        description: "Transporte y logística",
+      },
+      {
+        name: "Energía",
+        baseRiskTier: RiskTier.B,
+        description: "Energía y utilities",
+      },
+      {
+        name: "Entretenimiento",
+        baseRiskTier: RiskTier.B,
+        description: "Entretenimiento y medios",
+      },
+      {
+        name: "Alimentos y Bebidas",
+        baseRiskTier: RiskTier.C,
+        description: "Alimentos y bebidas",
+      },
     ];
 
     for (const industryData of industriesData) {
       try {
         const existing = await this.industryRepo.findOne({
-          where: { name: industryData.name }
+          where: { name: industryData.name },
         });
 
         if (!existing) {
@@ -77,23 +135,41 @@ export class SeedService {
           console.log(`✅ Industria creada: ${industryData.name}`);
         }
       } catch (error) {
-        console.error(`❌ Error creando industria ${industryData.name}:`, error);
+        console.error(
+          `❌ Error creando industria ${industryData.name}:`,
+          error
+        );
       }
     }
   }
 
   private async seedRiskTierConfigs(): Promise<void> {
     const riskTierConfigs = [
-      { tier: RiskTier.A, spread: 8.00, factor: 0.3500, allowed_terms: [12, 18, 24, 36] },
-      { tier: RiskTier.B, spread: 12.00, factor: 0.2500, allowed_terms: [12, 18, 24, 36] },
-      { tier: RiskTier.C, spread: 18.00, factor: 0.1500, allowed_terms: [12, 18, 24] },
-      { tier: RiskTier.D, spread: 28.00, factor: 0.1000, allowed_terms: [6, 12] }
+      {
+        tier: RiskTier.A,
+        spread: 1.5,
+        factor: 0.5,
+        allowed_terms: [12, 18, 24, 36],
+      },
+      {
+        tier: RiskTier.B,
+        spread: 3.0,
+        factor: 0.3,
+        allowed_terms: [12, 18, 24, 36],
+      },
+      {
+        tier: RiskTier.C,
+        spread: 6.0,
+        factor: 0.15,
+        allowed_terms: [12, 18, 24],
+      },
+      { tier: RiskTier.D, spread: 10.0, factor: 0.1, allowed_terms: [6, 12] },
     ];
 
     for (const configData of riskTierConfigs) {
       try {
         const existing = await this.riskTierConfigRepo.findOne({
-          where: { tier: configData.tier }
+          where: { tier: configData.tier },
         });
 
         if (!existing) {
@@ -109,16 +185,32 @@ export class SeedService {
 
   private async seedSystemConfigs(): Promise<void> {
     const systemConfigs = [
-      { key: "BASE_RATE", value: 20.0000, description: "Tasa de interés base anual (%)" },
-      { key: "ABSOLUTE_MIN_LOAN", value: 1000.0000, description: "Monto mínimo absoluto de préstamo" },
-      { key: "ABSOLUTE_MAX_LOAN", value: 500000.0000, description: "Monto máximo absoluto de préstamo" },
-      { key: "ROUND_TO", value: 1000.0000, description: "Redondeo de montos de préstamo" }
+      {
+        key: "BASE_RATE",
+        value: 3.5,
+        description: "Tasa de interés base anual (USA Prime Rate)",
+      }, 
+      {
+        key: "ABSOLUTE_MIN_LOAN",
+        value: 1000.0,
+        description: "Monto mínimo absoluto de préstamo",
+      },
+      {
+        key: "ABSOLUTE_MAX_LOAN",
+        value: 50000000.0,
+        description: "Monto máximo absoluto de préstamo",
+      }, 
+      {
+        key: "ROUND_TO",
+        value: 1000.0,
+        description: "Redondeo de montos de préstamo",
+      },
     ];
 
     for (const configData of systemConfigs) {
       try {
         const existing = await this.systemConfigRepo.findOne({
-          where: { key: configData.key }
+          where: { key: configData.key },
         });
 
         if (!existing) {
@@ -127,7 +219,10 @@ export class SeedService {
           console.log(`✅ Configuración ${configData.key} creada`);
         }
       } catch (error) {
-        console.error(`❌ Error creando system config ${configData.key}:`, error);
+        console.error(
+          `❌ Error creando system config ${configData.key}:`,
+          error
+        );
       }
     }
   }
@@ -141,7 +236,7 @@ export class SeedService {
       const [industries, riskTierConfigs, systemConfigs] = await Promise.all([
         this.industryRepo.count().catch(() => 0),
         this.riskTierConfigRepo.count().catch(() => 0),
-        this.systemConfigRepo.count().catch(() => 0)
+        this.systemConfigRepo.count().catch(() => 0),
       ]);
 
       return { industries, riskTierConfigs, systemConfigs };
@@ -154,7 +249,11 @@ export class SeedService {
   async isDatabaseSeeded(): Promise<boolean> {
     try {
       const status = await this.getDatabaseStatus();
-      return status.industries > 0 && status.riskTierConfigs > 0 && status.systemConfigs > 0;
+      return (
+        status.industries > 0 &&
+        status.riskTierConfigs > 0 &&
+        status.systemConfigs > 0
+      );
     } catch (error) {
       console.error("Database check failed:", error);
       return false;
