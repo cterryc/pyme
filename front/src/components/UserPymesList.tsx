@@ -5,6 +5,8 @@ import { MdKeyboardArrowDown } from 'react-icons/md'
 import type { GetPymeResponse } from '@/interfaces/pyme.interface'
 import { useGetPymesByUser } from '@/hooks/usePyme'
 import { PymeTableSkeleton } from './Loaders/PymeTableSkeleton'
+import { toast } from 'sonner'
+import { BLOCKED_STATUSES } from '@/interfaces/loan.interface'
 
 export const UserPymesList = () => {
   const navigate = useNavigate()
@@ -49,9 +51,9 @@ export const UserPymesList = () => {
               <tbody>
                 {pymesByUser &&
                   pymesByUser.payload.map((pyme: GetPymeResponse) => {
-                    const NotCredit =
-                      (pyme.statusCredit === 'Activo' && pyme.hasDocuments) ||
-                      (pyme.statusCredit !== 'Activo' && !pyme.hasDocuments)
+                  const isBlocked = BLOCKED_STATUSES.includes(pyme.statusCredit)
+                    const canRequestCredit = pyme.hasDocuments && !isBlocked
+                    const buttonText = 'Solicitar credito';
                     return (
                       <tr key={pyme.id} className='hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200'>
                         <td className='p-3'>{pyme.legalName}</td>
@@ -61,7 +63,14 @@ export const UserPymesList = () => {
                             <span className='py-2 rounded-full text-[#12b92f] font-bold'>Documentos Registrados</span>
                           ) : (
                             <span
-                              onClick={() => navigate(`/Dashboard/RegistroDocumentosPyme/${pyme.id}`)}
+                              onClick={() => {
+                                toast.info('Completar registro de documentos', {
+                                  style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+                                  description: 'Debes adjuntar y firmar los documentos para poder solicitar un crédito.',
+                                  duration: 3000
+                                })
+                                navigate(`/Dashboard/RegistroDocumentosPyme/${pyme.id}`)
+                              }}
                               className='bg-gray-500 hover:bg-gray-400 rounded-md text-white px-4 py-2'
                             >
                               Adjuntar Documentos
@@ -82,16 +91,22 @@ export const UserPymesList = () => {
                             Editar Pyme
                           </button>
                           <button
-                            onClick={() => navigate(`/Dashboard/SolicitarCredito/${pyme.id}`)}
-                            className={`px-4 py-2 rounded-md transition-colorsr text-nowrap font-semibold
-                          ${
-                            NotCredit
-                              ? 'bg-gray-200 cursor-default text-gray-400 select-none'
-                              : 'bg-[#5CCEFF] hover:bg-[#7DDCFF] cursor-pointer text-white'
-                          }  
-                          `}
+                            onClick={() => {
+                              if (canRequestCredit)
+                                navigate(
+                                  `/Dashboard/SolicitarCredito/${pyme.id}`
+                                );
+                            }}
+                            className={`px-4 py-2 rounded-md font-semibold transition-colors text-nowrap
+                              ${
+                                canRequestCredit
+                                  ? "bg-[#5CCEFF] hover:bg-[#7DDCFF] cursor-pointer text-white"
+                                  : "bg-gray-200 cursor-default text-gray-600 select-none opacity-70"
+                              }
+                            `}
+                            disabled={isBlocked}
                           >
-                            Solicitar credito
+                            {buttonText} 
                           </button>
                         </td>
                       </tr>

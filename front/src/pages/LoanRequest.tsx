@@ -7,8 +7,10 @@ import { usePymeLoanRequest, usePymeLoanRequestConfirm } from '@/hooks/usePyme'
 import { formatToDolar } from '@/helpers/formatToDolar'
 import { toast } from 'sonner'
 import { Loading } from '@/components/Loading'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const LoanRequest = () => {
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [loanOptions, setLoanOptions] = useState<LoanRequestOptions>()
   const [selectedTerm, setSelectedTerm] = useState(0)
@@ -19,9 +21,19 @@ export const LoanRequest = () => {
     onSuccess: (data) => {
       // console.log(data)
       setLoanOptions(data.payload)
+      toast.success('Opciones de crédito disponibles', {
+        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
+        description: 'Hemos calculado las mejores opciones de crédito para tu empresa.',
+        duration: 3000
+      })
     },
     onError: (dataError) => {
       console.log(dataError)
+      toast.error('Error al cargar opciones de crédito', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: 'No se pudieron obtener las opciones de crédito. Intenta nuevamente.',
+        duration: 4000
+      })
     }
   })
 
@@ -35,12 +47,26 @@ export const LoanRequest = () => {
         months: data.payload.selectedDetails?.termMonths.toString() || '0'
       }).toString()
 
-      // console.log(data.payload.selectedDetails)
 
+      queryClient.invalidateQueries({ queryKey: ['pymesByUser'] })
+      queryClient.invalidateQueries({ queryKey: ['loansByUser'] })
+
+
+      // console.log(data.payload.selectedDetails)
+      toast.success('¡Solicitud enviada con éxito!', {
+        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
+        description: 'Tu solicitud de crédito está siendo revisada. Nos contactaremos pronto contigo.',
+        duration: 4000
+      })
       navigate(`/Dashboard/SolicitarCredito/Success?${searchParams}`)
     },
     onError: (dataError) => {
       console.log(dataError)
+      toast.error('Error al enviar la solicitud', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: 'No se pudo procesar tu solicitud de crédito. Por favor, intenta nuevamente.',
+        duration: 4000
+      })
     }
   })
 

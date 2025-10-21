@@ -7,6 +7,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { useAuthLogin } from '@/hooks/useAuth'
 import { loginSchema, type LoginFormData } from '@/schemas/auth.schema'
+import { toast } from 'sonner'
 
 export const Login = () => {
   // variables
@@ -30,7 +31,19 @@ export const Login = () => {
     onSuccess: (data) => {
       localStorage.setItem('tokenPyme', data.payload.token)
       console.log('Login successful:', data)
+      toast.success('¡Bienvenido de nuevo!', {
+        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
+        description: 'Has iniciado sesión correctamente. Accede a tu panel de gestión.',
+        duration: 3000
+      })
       navigate('/Dashboard')
+    },
+    onError: (dataError) => {
+      toast.error('Error al iniciar sesión', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: (dataError as any).payload?.message || 'Credenciales incorrectas. Verifica tu correo y contraseña.',
+        duration: 4000
+      })
     }
   })
 

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+const phoneRegex = /^(\+51|51)?[9]\d{8}$|^(\+54|54)?[9]\d{9,10}$|^(\+595|595)?[9]\d{8}$/
 
 export const registerPymeSchema = z.object({
   // isOwner: z.boolean(),
@@ -21,9 +22,11 @@ export const registerPymeSchema = z.object({
   country: z.string().min(3, 'Debes ingresar una país con al menos 3 caracteres'),
   // }),
   // contact: z.object({
-  phone: z.string().min(8, 'Debes ingresar una telefono válido'), //Como definimos esto?
+  phone: z.string().regex(phoneRegex, {
+    message: 'Formato de teléfono inválido. Debe ser un número válido de Perú (+51), Argentina (+54) o Paraguay (+595)'
+  }),
   // ownerPhone: z.string().min(8, 'Debes ingresar una telefono válido'), //Como definimos esto?
-  website: z.string().optional(),
+  website: z.url().optional(),
   // }),
   description: z.string().min(120, 'Debes ingresar una descripción de al menos 120 caracteres')
   // documents: z.array(

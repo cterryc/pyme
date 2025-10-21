@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { usePymeRegister, useGetIndustries } from '@/hooks/usePyme'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useUserAuthenticate } from '@/hooks/useUser'
 import Confetti from 'react-confetti'
 
 export const RegisterPyme = () => {
@@ -16,7 +15,6 @@ export const RegisterPyme = () => {
   const maxStep = 4
   const [step, setStep] = useState(0)
   const [pymeId, setPymeId] = useState('')
-  const { getUser, isLoading } = useUserAuthenticate()
   const [industriesList, setIndustriesList] = useState<Array<{ id: string; name: string }>>()
 
   const { data: industries, isLoading: getIndustriesIsLoading, isError: getIndustriesError } = useGetIndustries()
@@ -33,35 +31,31 @@ export const RegisterPyme = () => {
   } = usePymeRegister({
     onSuccess: (data) => {
       // console.log(data)
-      toast.success('La pyme fue registrada correctamente', {
+      toast.success('¡MYPE registrada exitosamente!', {
         style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
-        description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la pyme.',
+        description: 'Ahora debes adjuntar los documentos requeridos y firmarlos para completar el registro.',
         duration: 4000
       })
       localStorage.removeItem('registerPymeBackup')
       localStorage.removeItem('registerPymeBackup')
-      //navigate(`/Dashboard/RegistroDocumentosPyme/${data.payload.id}`, { replace: true })
       setPymeId(data.payload.id)
     },
     onError: (dataError) => {
-      toast.error('', {
+      toast.error('Error al registrar la MYPE', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: dataError.payload.message,
+        description: dataError.payload.message || 'No se pudo completar el registro. Verifica los datos ingresados.',
         duration: 4000
       })
     }
   })
 
-  //checkear sesion
-  useEffect(() => {
-    if (!isLoading && getUser == '') {
-      navigate('/Login')
-    }
-  }, [getUser, isLoading, navigate])
-
   useEffect(() => {
     if (isPending) {
-      toast('Guardando los cambios ...', { duration: 1000 })
+      toast.loading('Registrando tu MYPE...', {
+        style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+        description: 'Estamos procesando la información de tu empresa.',
+        duration: 1500
+      })
     }
   }, [isPending, isError, error])
 
@@ -82,7 +76,9 @@ export const RegisterPyme = () => {
     formState: { errors }
   } = useForm<RegisterPymeFormData>({
     resolver: zodResolver(registerPymeSchema),
-    defaultValues: getStoredData()
+    defaultValues: getStoredData(),
+    criteriaMode: 'all',
+    mode: 'onChange'
   })
 
   useEffect(() => {
@@ -98,6 +94,10 @@ export const RegisterPyme = () => {
 
   const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
+    console.log('si hay error no sigas')
+    const formData = JSON.parse(localStorage.getItem('registerPymeBackup') || '{}') as RegisterPymeFormData
+    console.log(registerPymeSchema.safeParse(formData))
+
     if (step < maxStep) {
       setStep(step + 1)
     }
@@ -111,8 +111,6 @@ export const RegisterPyme = () => {
 
   useEffect(() => {
     const subscription = watch((value) => {
-      // const formValues = { ...value, industry: industriesList?.find((pair) => pair.id == value.industryId)?.name }
-      // localStorage.setItem('registerPymeBackup', JSON.stringify(formValues))
       localStorage.setItem('registerPymeBackup', JSON.stringify(value))
     })
     return () => subscription.unsubscribe()
@@ -163,56 +161,6 @@ export const RegisterPyme = () => {
                         />
                         {errors.tradeName && <p className='text-red-500 text-center'>{errors.tradeName.message}</p>}
                       </div>
-
-                      {/* <div className='flex flex-col gap-1'>
-                  <p className='text-sm'>Nombre del propietario</p>
-
-                  <input
-                    type='text'
-                    {...registerPyme('ownerName')}
-                    className='border p-2 border-[#D1D5DB] rounded-md'
-                    placeholder='Nombre del propietario de la empresa'
-                    style={{ borderColor: errors.ownerName ? 'red' : '' }}
-                  />
-                  {errors.ownerName && <p className='text-red-500 text-center'>{errors.ownerName.message}</p>}
-                </div>
-                <div className='flex flex-col gap-1'>
-                  <p className='text-sm'>Apellido del propietario</p>
-
-                  <input
-                    {...registerPyme('ownerSurname')}
-                    type='text'
-                    className='border p-2 border-[#D1D5DB] rounded-md'
-                    placeholder='Apellido del propietario de la empresa'
-                    style={{ borderColor: errors.ownerSurname ? 'red' : '' }}
-                  />
-                  {errors.ownerSurname && <p className='text-red-500 text-center'>{errors.ownerSurname.message}</p>}
-                </div> */}
-
-                      {/* <div className='flex flex-col gap-1'>
-                  <p className='text-sm'>Nombre del propietario</p>
-
-                  <input
-                    type='text'
-                    {...registerPyme('ownerName')}
-                    className='border p-2 border-[#D1D5DB] rounded-md'
-                    placeholder='Nombre del propietario de la empresa'
-                    style={{ borderColor: errors.ownerName ? 'red' : '' }}
-                  />
-                  {errors.ownerName && <p className='text-red-500 text-center'>{errors.ownerName.message}</p>}
-                </div>
-                <div className='flex flex-col gap-1'>
-                  <p className='text-sm'>Apellido del propietario</p>
-
-                  <input
-                    {...registerPyme('ownerSurname')}
-                    type='text'
-                    className='border p-2 border-[#D1D5DB] rounded-md'
-                    placeholder='Apellido del propietario de la empresa'
-                    style={{ borderColor: errors.ownerSurname ? 'red' : '' }}
-                  />
-                  {errors.ownerSurname && <p className='text-red-500 text-center'>{errors.ownerSurname.message}</p>}
-                </div> */}
 
                       <div className='flex flex-col gap-1'>
                         <p className='text-sm'>CUIT</p>
@@ -439,22 +387,6 @@ export const RegisterPyme = () => {
                       <span className='font-bold'>Nombre comercial : </span>
                       {getStoredData().tradeName}
                     </p>
-                    {/* <p className='border-b-1 border-[#ddd]'>
-                <span className='font-bold'>Nombre del propietario :</span>
-                {getStoredData().ownerName}
-              </p>
-              <p className='border-b-1 border-[#ddd]'>
-                <span className='font-bold'>Apellido del propietario : </span>
-                {getStoredData().ownerSurname}
-              </p> */}
-                    {/* <p className='border-b-1 border-[#ddd]'>
-                <span className='font-bold'>Nombre del propietario :</span>
-                {getStoredData().ownerName}
-              </p>
-              <p className='border-b-1 border-[#ddd]'>
-                <span className='font-bold'>Apellido del propietario : </span>
-                {getStoredData().ownerSurname}
-              </p> */}
                     <p className='border-b-1 border-[#ddd]'>
                       <span className='font-bold'>CUIT : </span>
                       {getStoredData().taxId}
@@ -564,7 +496,6 @@ export const RegisterPyme = () => {
               </button>
               <button
                 onClick={() => {
-                  // navigate(`/Dashboard/RegistroDocumentosPyme/${pymeId}`, { replace: true })
                   navigate(`/Dashboard/RegistroDocumentosPyme/${pymeId}`)
                 }}
                 className='bg-green-500 p-2 rounded-md cursor-pointer text-white hover:bg-green-700 duration-150'
@@ -579,3 +510,10 @@ export const RegisterPyme = () => {
     </>
   )
 }
+
+
+/**
+ * Fecha ultima compra
+ * (OPCIONAL) separar integracion con productos propios
+ * 
+ */
