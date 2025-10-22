@@ -21,7 +21,6 @@ export const Header = () => {
       description: 'Hasta pronto. Esperamos verte de nuevo.',
       duration: 2000
     })
-    localStorage.removeItem('tokenPyme')
 
     // localStorage.removeItem('tokenPyme')
     localStorage.clear()
