@@ -5,6 +5,7 @@ import { ImSpinner9 } from 'react-icons/im'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min?url'
 import type { SignedPDF } from '@/interfaces/sign.interface'
+import { toast } from 'sonner'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
@@ -41,7 +42,7 @@ export const SignSingleDocument = ({
 
   const convertirPDFaImagenes = async (file: File | null): Promise<Array<PDFImagesProcessed>> => {
     if (file == null) {
-      alert('Error a cargar el pdf')
+      // alert('Error a cargar el pdf')
       return []
     }
     const arrayBuffer = await file.arrayBuffer()
@@ -176,11 +177,13 @@ const SignFrame = ({
   const buildPdfWithSign = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     if (signDraw == '') {
-      alert('Debes firmar el pdf antes de enviarlo')
+      // alert('Debes firmar el pdf antes de enviarlo')
+      toast.error('Debes firmar el documento antes de enviarlo.')
       return
     }
     if (pdfFile == null) {
-      alert('Error al intentar firmar')
+      // alert('Error al intentar firmar')
+      toast.error('Error al intentar firmar')
       return
     }
 
@@ -282,7 +285,9 @@ const SignFrame = ({
         }}
       >
         {/*Barra de la izquierda */}
-        <div className='drag-handle w-[30px] bg-[var(--primary)] cursor-grab hover:bg-[#0d6794] duration-150'></div>
+        <div className='drag-handle w-[30px] [writing-mode:vertical-rl] text-white font-medium py-1 bg-[var(--primary)] cursor-grab hover:bg-[#0d6794] duration-150'>
+          M O V E R
+        </div>
 
         {/* Contenido del div */}
         <div className='relative'>

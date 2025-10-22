@@ -1,6 +1,6 @@
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import type { LoanRequestOptions } from '@/interfaces/pyme.interface'
 import { usePymeLoanRequest, usePymeLoanRequestConfirm } from '@/hooks/usePyme'
@@ -8,6 +8,7 @@ import { formatToDolar } from '@/helpers/formatToDolar'
 import { toast } from 'sonner'
 import { Loading } from '@/components/Loading'
 import { useQueryClient } from '@tanstack/react-query'
+import { ImSpinner8 } from 'react-icons/im'
 
 export const LoanRequest = () => {
   const queryClient = useQueryClient()
@@ -15,6 +16,8 @@ export const LoanRequest = () => {
   const [loanOptions, setLoanOptions] = useState<LoanRequestOptions>()
   const [selectedTerm, setSelectedTerm] = useState(0)
   const [selectedAmount, setSelectedAmount] = useState(0)
+  const [enableSend, setEnableSend] = useState(false)
+
   const { id: pymeID } = useParams<{ id: string }>()
 
   const { mutate: loanRequest, isPending } = usePymeLoanRequest({
@@ -47,10 +50,8 @@ export const LoanRequest = () => {
         months: data.payload.selectedDetails?.termMonths.toString() || '0'
       }).toString()
 
-
       queryClient.invalidateQueries({ queryKey: ['pymesByUser'] })
       queryClient.invalidateQueries({ queryKey: ['loansByUser'] })
-
 
       // console.log(data.payload.selectedDetails)
       toast.success('¡Solicitud enviada con éxito!', {
@@ -58,7 +59,7 @@ export const LoanRequest = () => {
         description: 'Tu solicitud de crédito está siendo revisada. Nos contactaremos pronto contigo.',
         duration: 4000
       })
-      navigate(`/Dashboard/SolicitarCredito/Success?${searchParams}`)
+      navigate(`/panel/solicitar-credito/hecho?${searchParams}`)
     },
     onError: (dataError) => {
       console.log(dataError)
@@ -72,11 +73,20 @@ export const LoanRequest = () => {
 
   useEffect(() => {
     if (!pymeID) {
-      navigate('/Dashboard')
+      navigate('/panel')
     } else {
       loanRequest({ companyId: pymeID })
     }
   }, [pymeID, navigate, loanRequest])
+
+  useEffect(() => {
+    setEnableSend(
+      loanOptions != undefined &&
+        selectedTerm > 0 &&
+        selectedAmount >= loanOptions?.offerDetails.minAmount &&
+        selectedAmount <= loanOptions?.offerDetails.maxAmount
+    )
+  }, [selectedAmount, selectedTerm, loanOptions?.offerDetails.minAmount, loanOptions?.offerDetails.maxAmount])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -121,7 +131,7 @@ export const LoanRequest = () => {
     <div className='flex flex-col min-h-screen'>
       <Header />
       {!isPending ? (
-        <section className='flex-1 flex justify-center items-center py-5'>
+        <section className='flex-1 flex flex-col gap-15 justify-center items-center py-5'>
           <form className='p-10 rounded-xl grid grid-cols-2 bg-white max-w-xl shadow-2xl gap-6' onSubmit={handleSubmit}>
             <div className='col-span-2'>
               <p className='text-[#334155] font-medium'>Nombre de la empresa:</p>
@@ -218,15 +228,26 @@ export const LoanRequest = () => {
                 </div>
               </div>
             )}
-
-            <input
-              type='submit'
-              className='bg-[var(--primary)] col-span-2 py-3 rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150'
-              value='Enviar solicitud'
-              style={{ background: isPendingLoanConfirm ? 'gray' : '' }}
-              disabled={isPendingLoanConfirm}
-            />
+            {!isPendingLoanConfirm ? (
+              <input
+                type='submit'
+                className='bg-[var(--primary)] col-span-2 py-3 rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150'
+                value='Enviar solicitud'
+                style={{ background: !enableSend ? 'gray' : '' }}
+                disabled={!enableSend}
+              />
+            ) : (
+              <div className='bg-[gray] text-center col-span-2 py-3 flex justify-center rounded-md text-white font-medium cursor-pointer'>
+                <ImSpinner8 className='animate-spin' />
+              </div>
+            )}
           </form>
+          <Link
+            to='/Dashboard'
+            className='bg-[var(--primary)] col-span-2 p-3  rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150'
+          >
+            Volver al panel
+          </Link>
         </section>
       ) : (
         <div className='flex-1'>

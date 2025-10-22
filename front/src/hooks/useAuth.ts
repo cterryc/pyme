@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { type LoginFormData, type RegisterFormData } from '@/schemas/auth.schema'
-import { authLogin, authRegister } from '@/services/auth.service'
+import { authLogin, authRegister, resetPassword } from '@/services/auth.service'
 import { type AuthSucessResponse, type AuthErrorResponse } from '@/interfaces/auth.interface'
 
 interface UseAuthRegisterProps {
@@ -26,6 +26,30 @@ interface UseAuthLoginProps {
 export const useAuthLogin = ({ onSuccess, onError }: UseAuthLoginProps) => {
   return useMutation<AuthSucessResponse, AuthErrorResponse, LoginFormData>({
     mutationFn: async (data) => authLogin(data),
+    onSuccess: (data) => {
+      if (onSuccess) onSuccess(data)
+    },
+    onError: (error) => {
+      if (onError) onError(error)
+    }
+  })
+}
+
+interface UseResetPasword {
+  onSuccess?: (data: UseResetPaswordResponse) => void
+  onError?: (error: UseResetPaswordResponse) => void
+}
+type UseResetPaswordResponse = {
+  success: boolean
+  payload?: unknown
+}
+
+type ResetPaswordFormData = {
+  email: string
+}
+export const useResetPasword = ({ onSuccess, onError }: UseResetPasword) => {
+  return useMutation<UseResetPaswordResponse, UseResetPaswordResponse, ResetPaswordFormData>({
+    mutationFn: async (data) => resetPassword(data),
     onSuccess: (data) => {
       if (onSuccess) onSuccess(data)
     },

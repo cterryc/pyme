@@ -34,15 +34,17 @@ export const Register = () => {
       console.log('Register successful:', data)
       toast.success('¡Registro exitoso!', {
         style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
-        description: 'Tu cuenta ha sido creada. Ahora puedes registrar una MYPE para realizar una solicitud de crédito.',
+        description:
+          'Tu cuenta ha sido creada. Ahora puedes registrar una MYPE para realizar una solicitud de crédito.',
         duration: 4000
       })
-      navigate('/Dashboard')
+      navigate('/panel')
     },
     onError: (dataError) => {
       toast.error('Error al registrarse', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: (dataError as any).payload?.message || 'Hubo un problema al crear tu cuenta. Por favor, intenta nuevamente.',
+        description:
+          (dataError as any).payload?.message || 'Hubo un problema al crear tu cuenta. Por favor, intenta nuevamente.',
         duration: 4000
       })
     }
@@ -66,8 +68,8 @@ export const Register = () => {
             <h3 className='text-3xl font-bold text-black'>Crea tu cuenta</h3>
             <p className='text-[#7d7d7e] text-sm mt-2'>
               No tienes una cuenta?
-              <Link to='/Login' className='text-[var(--primary)] pl-2 cursor-pointer'>
-                Iniciar Sesión
+              <Link to='/inicio-sesion' className='text-[var(--primary)] pl-2 cursor-pointer'>
+                Iniciar sesión
               </Link>
             </p>
           </div>

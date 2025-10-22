@@ -1,6 +1,6 @@
 @import 'tailwindcss';
-
 :root {
+  color-scheme: light !important;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -28,4 +28,7 @@ input[type='number']::-webkit-inner-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+input[type='date'].blue-icon::-webkit-calendar-picker-indicator {
+  filter: invert(35%) sepia(90%) saturate(2000%) hue-rotate(200deg);
 }
