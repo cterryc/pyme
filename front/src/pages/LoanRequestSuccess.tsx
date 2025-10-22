@@ -18,7 +18,7 @@ export const LoanRequestSuccess = () => {
 
   return (
     <div className='min-h-screen flex flex-col'>
-      <Confetti />
+      <Confetti recycle={false} numberOfPieces={500} />
       <Header />
       <section className='flex-1 flex justify-center items-center py-5'>
         <div className='flex flex-col items-center justify-center max-w-xl gap-7 '>
@@ -68,11 +68,11 @@ export const LoanRequestSuccess = () => {
           </div>
           <button
             onClick={() => {
-              navigate('/Dashboard')
+              navigate('/panel')
             }}
             className='bg-[var(--primary)] text-white px-5 py-3 rounded-md cursor-pointer hover:bg-[#10638d] duration-150 '
           >
-            Volvr al inicio
+            Volver al inicio
           </button>
         </div>
       </section>

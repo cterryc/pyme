@@ -28,7 +28,7 @@ export const registerPymeSchema = z.object({
   // ownerPhone: z.string().min(8, 'Debes ingresar una telefono válido'), //Como definimos esto?
   website: z.url().optional(),
   // }),
-  description: z.string().min(120, 'Debes ingresar una descripción de al menos 120 caracteres')
+  description: z.string().min(60, 'Debes ingresar una descripción de al menos 60 caracteres')
   // documents: z.array(
   //   z.object({
   //     data: z.instanceof(ArrayBuffer),

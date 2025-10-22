@@ -39,7 +39,7 @@ export const Landing = () => {
             adaptadas a tu crecimiento.
           </p>
           <Link
-            to={hasUser ? '/Dashboard' : '/Login'}
+            to={hasUser ? '/panel' : '/inicio-sesion'}
             className='bg-[#0095d5] text-white flex items-center w-fit mx-auto px-6 py-3 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer'
           >
             Solicita tu crédito
