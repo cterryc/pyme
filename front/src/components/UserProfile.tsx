@@ -107,13 +107,6 @@ export const UserProfile = () => {
     updateProfile({ ...dataToSend, profileImage: imageDefault })
   }
 
-    // const dataToSend = Object.fromEntries(
-    //   Object.entries(data).filter(([, v]) => v !== '')
-    // ) as Partial<UserProfileFormData>;
-
-    updateProfile({ ...data, profileImage: imageDefault })
-  }
-
   const handleCancelEdit = () => {
     setIsEditProfile(false)
     setIsEditEmail(false)

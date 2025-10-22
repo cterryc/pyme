@@ -274,7 +274,7 @@ export const RegisterPymeDocuments = () => {
             })}
           </ul>
           <Link
-            to='/Dashboard'
+            to='/panel'
             className='bg-[var(--primary)] p-2 px-5 rounded-md text-white curor-pointer hover:bg-[#1074a6] duration-150'
           >
             Volver al panel

@@ -35,8 +35,8 @@ export const mainRouter = createBrowserRouter([
   },
 
   {
-    path: '/panel',
-    element: <UserDashboard />,
+    path: '/',
+    element: <ProtectedRoute />,
     children: [
       {
         path: '/panel',
@@ -49,36 +49,37 @@ export const mainRouter = createBrowserRouter([
           {
             path: 'solicitudes',
             element: <UserCreditRequests />
+          },
+          {
+            path: 'perfil',
+            element: <UserProfile />
           }
-          // {
-          //   path: 'perfil',
-          //   element: <UserProfile />
-          // }
         ]
-      },
-      {
-        path: '/admin/*',
-        element: <AdminDashboard />
-      },
-      {
-        path: '/panel/registro-documentos/:id',
-        element: <RegisterPymeDocuments />
-      },
-      {
-        path: '/panel/registro-pyme',
-        element: <RegisterPyme />
-      },
-      {
-        path: '/panel/solicitar-credito/:id',
-        element: <LoanRequest />
-      },
-      {
-        path: '/panel/solicitar-credito/hecho',
-        element: <LoanRequestSuccess />
       }
     ]
   },
 
+  {
+    path: '/panel/registro-documentos/:id',
+    element: <RegisterPymeDocuments />
+  },
+  {
+    path: '/panel/registro-pyme',
+    element: <RegisterPyme />
+  },
+  {
+    path: '/panel/solicitar-credito/:id',
+    element: <LoanRequest />
+  },
+  {
+    path: '/panel/solicitar-credito/hecho',
+    element: <LoanRequestSuccess />
+  },
+
+  {
+    path: '/admin/*',
+    element: <AdminDashboard />
+  },
   {
     // add pages
   }

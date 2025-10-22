@@ -243,7 +243,7 @@ export const LoanRequest = () => {
             )}
           </form>
           <Link
-            to='/Dashboard'
+            to='/panel'
             className='bg-[var(--primary)] col-span-2 p-3  rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150'
           >
             Volver al panel
