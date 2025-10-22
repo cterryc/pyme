@@ -80,11 +80,12 @@ export const UserPymesList = () => {
                         </td>
                         <td className='p-3'>
                           <span
-                            className={`rounded-full px-6 py-2 text-gray-700
-                          ${pyme.statusCredit === 'Activo' ? 'bg-[#12b92f] text-white' : 'bg-gray-200 text-gray-500'}
+                            className={` rounded-full px-6 py-2 text-gray-700
+                          ${pyme.statusCredit === 'Enviado' ? 'bg-[#0095d5]/80 text-white' : 'bg-gray-200 text-gray-500'}
+                          ${!pyme.hasDocuments &&  'hidden'}
                         `}
                           >
-                            {pyme.statusCredit}
+                            {pyme.statusCredit === 'No aplica' ? 'No Solicitado' : pyme.statusCredit}
                           </span>
                         </td>
                         <td className='p-3 flex gap-3'>
@@ -98,7 +99,7 @@ export const UserPymesList = () => {
                             className={`px-4 py-2 rounded-md font-semibold transition-colors text-nowrap
                               ${
                                 canRequestCredit
-                                  ? 'bg-[#5CCEFF] hover:bg-[#7DDCFF] cursor-pointer text-white'
+                                  ? 'bg-[#4dbaea] hover:bg-[#56cdf8] cursor-pointer text-white'
                                   : 'bg-gray-200 cursor-default text-gray-600 select-none opacity-70'
                               }
                             `}

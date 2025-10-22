@@ -15,7 +15,7 @@ export const UserCreditRequests = () => {
   const typeStatus = (status: string) => {
     switch(status) {
       case 'Enviado':
-        return 'bg-[#0095d5] text-white'
+        return 'bg-[#0095d5]/80 text-white'
       case 'No confirmado':
         return 'bg-gray-200 text-black'
       default:

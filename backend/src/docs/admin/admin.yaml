@@ -1,0 +1,485 @@
+openapi: 3.0.3
+info:
+  title: Admin API
+  version: 1.0.0
+  description: Endpoints de administración para configuraciones del sistema, tiers de riesgo e industrias
+
+tags:
+  - name: Admin
+    description: Operaciones administrativas (requiere rol ADMIN)
+
+paths:
+  /api/admin/systemconfig:
+    get:
+      summary: Listar configuraciones del sistema
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de configuraciones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SystemConfigDto'
+    post:
+      summary: Crear configuración del sistema
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSystemConfigInput'
+      responses:
+        "201":
+          description: Configuración creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SystemConfigDto'
+
+  /api/admin/systemconfig/{id}:
+    get:
+      summary: Obtener configuración del sistema por ID
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Configuración encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SystemConfigDto'
+        "404":
+          description: No encontrada
+    patch:
+      summary: Actualizar configuración del sistema
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSystemConfigInput'
+      responses:
+        "200":
+          description: Configuración actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/SystemConfigDto'
+    delete:
+      summary: Eliminar configuración del sistema
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Eliminada
+
+  /api/admin/risktier:
+    get:
+      summary: Listar tiers de riesgo
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de tiers de riesgo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RiskTierConfigDto'
+    post:
+      summary: Crear tier de riesgo
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRiskTierConfigInput'
+      responses:
+        "201":
+          description: Tier creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/RiskTierConfigDto'
+
+  /api/admin/risktier/{id}:
+    get:
+      summary: Obtener tier de riesgo por ID
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tier encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/RiskTierConfigDto'
+        "404":
+          description: No encontrado
+    patch:
+      summary: Actualizar tier de riesgo
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRiskTierConfigInput'
+      responses:
+        "200":
+          description: Tier actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/RiskTierConfigDto'
+    delete:
+      summary: Eliminar tier de riesgo
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Eliminado
+
+  /api/admin/industries:
+    get:
+      summary: Listar industrias
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de industrias
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/IndustryDto'
+    post:
+      summary: Crear industria
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIndustryInput'
+      responses:
+        "201":
+          description: Industria creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/IndustryDto'
+
+  /api/admin/industries/{id}:
+    get:
+      summary: Obtener industria por ID
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Industria encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/IndustryDto'
+        "404":
+          description: No encontrada
+    patch:
+      summary: Actualizar industria
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIndustryInput'
+      responses:
+        "200":
+          description: Industria actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/IndustryDto'
+    delete:
+      summary: Eliminar industria
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Eliminada
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # DTOs
+    SystemConfigDto:
+      type: object
+      properties:
+        id:
+          type: string
+        key:
+          type: string
+        value:
+          type: number
+        description:
+          type: string
+          nullable: true
+
+    RiskTierConfigDto:
+      type: object
+      properties:
+        id:
+          type: string
+        tier:
+          $ref: '#/components/schemas/RiskTier'
+        spread:
+          type: number
+        factor:
+          type: number
+        allowed_terms:
+          type: array
+          items:
+            type: integer
+
+    IndustryDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        baseRiskTier:
+          $ref: '#/components/schemas/RiskTier'
+        description:
+          type: string
+          nullable: true
+
+    # Payloads
+    CreateSystemConfigInput:
+      type: object
+      required: [key, value]
+      properties:
+        key:
+          type: string
+        value:
+          type: number
+        description:
+          type: string
+          nullable: true
+
+    UpdateSystemConfigInput:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: number
+        description:
+          type: string
+          nullable: true
+
+    CreateRiskTierConfigInput:
+      type: object
+      required: [tier, spread, factor, allowed_terms]
+      properties:
+        tier:
+          $ref: '#/components/schemas/RiskTier'
+        spread:
+          type: number
+        factor:
+          type: number
+        allowed_terms:
+          type: array
+          items:
+            type: integer
+
+    UpdateRiskTierConfigInput:
+      type: object
+      properties:
+        tier:
+          $ref: '#/components/schemas/RiskTier'
+        spread:
+          type: number
+        factor:
+          type: number
+        allowed_terms:
+          type: array
+          items:
+            type: integer
+
+    CreateIndustryInput:
+      type: object
+      required: [name, baseRiskTier]
+      properties:
+        name:
+          type: string
+          description: Se normaliza a minúsculas
+        baseRiskTier:
+          $ref: '#/components/schemas/RiskTier'
+        description:
+          type: string
+          nullable: true
+
+    UpdateIndustryInput:
+      type: object
+      properties:
+        name:
+          type: string
+        baseRiskTier:
+          $ref: '#/components/schemas/RiskTier'
+        description:
+          type: string
+          nullable: true
+
+    RiskTier:
+      type: string
+      enum: [A, B, C, D]
+

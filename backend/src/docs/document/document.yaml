@@ -9,7 +9,7 @@ tags:
     description: Subida, descarga, listado y revisión de documentos
 
 paths:
-  /api/document/upload:
+  /api/documents/upload:
     post:
       summary: Subir documentos a una compañía
       tags: [Documents]
@@ -43,7 +43,7 @@ paths:
         "400":
           description: Archivos inválidos o tamaño excedido
 
-  /api/document/company/{companyId}:
+  /api/documents/company/{companyId}:
     get:
       summary: Listar documentos por compañía
       tags: [Documents]
@@ -62,7 +62,7 @@ paths:
         "404":
           description: Empresa no encontrada
 
-  /api/document/{id}:
+  /api/documents/{id}:
     delete:
       summary: Eliminar un documento
       tags: [Documents]
@@ -81,7 +81,7 @@ paths:
         "404":
           description: Documento no encontrado
 
-  /api/document/{id}/download:
+  /api/documents/{id}/download:
     get:
       summary: Obtener URL de descarga firmada
       tags: [Documents]
@@ -108,7 +108,7 @@ paths:
         "404":
           description: Documento no encontrado
 
-  /api/document/{id}/status:
+  /api/documents/{id}/status:
     patch:
       summary: Actualizar estado de un documento (revisión)
       tags: [Documents]
