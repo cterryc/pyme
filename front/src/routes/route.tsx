@@ -37,8 +37,22 @@ export const mainRouter = createBrowserRouter([
     element: <UserDashboard />,
     children: [
       {
-        index: true,
-        element: <UserPymesList />
+        path: '/Dashboard',
+        element: <UserDashboard />,
+        children: [
+          {
+            index: true,
+            element: <UserPymesList />
+          },
+          {
+            path: 'Solicitudes',
+            element: <UserCreditRequests />
+          },
+          {
+            path: 'Perfil',
+            element: <UserProfile />
+          }
+        ]
       },
       {
         path: 'solicitudes',
