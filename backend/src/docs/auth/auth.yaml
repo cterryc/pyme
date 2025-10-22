@@ -96,6 +96,53 @@ paths:
         "400":
           description: Token inválido o expirado
 
+  /api/auth/verify-email:
+    post:
+      summary: Verificar email
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyEmailPayload"
+      responses:
+        "200":
+          description: Email verificado correctamente
+        "400":
+          description: Token inválido o expirado
+
+  /api/auth/resend-verification:
+    post:
+      summary: Reenviar verificación de email
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResendVerificationPayload"
+      responses:
+        "200":
+          description: Email de verificación reenviado
+    post:
+      summary: Restablecer contraseña con token
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordPayload"
+      responses:
+        "200":
+          description: Contraseña restablecida correctamente
+        "400":
+          description: Token inválido o expirado
+
 components:
   securitySchemes:
     bearerAuth:
@@ -164,4 +211,18 @@ components:
         token:
           type: string
         newPassword:
+          type: string
+    VerifyEmailPayload:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+    ResendVerificationPayload:
+      type: object
+      required:
+        - email
+      properties:
+        email:
           type: string
