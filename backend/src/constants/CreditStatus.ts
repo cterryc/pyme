@@ -1,5 +1,5 @@
 export enum CreditApplicationStatus {
-    DRAFT = "No iniciado",
+    DRAFT = "No solicitado",
     APPLYING = "No confirmado",
     SUBMITTED = "Enviado",
     UNDER_REVIEW = "En revisión",

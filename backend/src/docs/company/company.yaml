@@ -9,7 +9,7 @@ tags:
     description: Operaciones relacionadas con compañías
 
 paths:
-  /api/company:
+  /api/companies:
     post:
       summary: Crear una nueva compañía
       tags: [Company]
@@ -36,7 +36,7 @@ paths:
         "200":
           description: Lista de compañías del usuario
 
-  /api/company/all:
+  /api/companies/all:
     get:
       summary: Listar todas las compañías (solo admin)
       tags: [Company]
@@ -64,7 +64,7 @@ paths:
         "403":
           description: No autorizado
 
-  /api/company/{id}:
+  /api/companies/{id}:
     get:
       summary: Obtener compañía por ID
       tags: [Company]
@@ -123,7 +123,7 @@ paths:
         "404":
           description: No encontrada
 
-  /api/company/industries:
+  /api/companies/industries:
     get:
       summary: Listar todas las industrias disponibles
       tags: [Company]

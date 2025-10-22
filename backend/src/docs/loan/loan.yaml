@@ -10,7 +10,7 @@ tags:
     description: Operaciones relacionadas con solicitudes de crédito empresariales
 
 paths:
-  /api/loan:
+  /api/loanRequest:
     post:
       summary: Generar oferta de préstamo para una empresa
       description: Calcula automáticamente una oferta crediticia en base al perfil de la empresa.
@@ -35,7 +35,7 @@ paths:
         "404":
           description: Compañía no encontrada
 
-  /api/loan/confirm:
+  /api/loanRequest/confirm:
     post:
       summary: Confirmar solicitud de crédito
       description: Confirma la oferta crediticia seleccionando monto y plazo.
@@ -62,7 +62,7 @@ paths:
         "404":
           description: Solicitud no encontrada
 
-  /api/loan/user:
+  /api/loanRequest/user:
     get:
       summary: Listar solicitudes de crédito del usuario autenticado
       tags: [Loans]
@@ -78,7 +78,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/LoanSummaryResponse"
 
-  /api/loan/{id}:
+  /api/loanRequest/{id}:
     get:
       summary: Obtener detalle de una solicitud de crédito
       tags: [Loans]

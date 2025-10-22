@@ -1,0 +1,53 @@
+ import { z } from "zod";
+ import { RiskTier } from "../../constants/RiskTier";
+
+ export const createSystemConfigSchema = z
+   .object({
+     key: z.string().min(1).max(100),
+     value: z.coerce.number(),
+     description: z.string().optional(),
+   })
+   .strict();
+
+ export const updateSystemConfigSchema = createSystemConfigSchema.partial();
+
+ export const createRiskTierConfigSchema = z
+   .object({
+     tier: z.nativeEnum(RiskTier),
+     spread: z.coerce.number(),
+     factor: z.coerce.number(),
+     allowed_terms: z.array(z.coerce.number().int().positive()).nonempty(),
+   })
+   .strict();
+
+ export const updateRiskTierConfigSchema = createRiskTierConfigSchema.partial();
+
+ export const idParamSchema = z.string().uuid({ message: "ID inválido" });
+
+ export type CreateSystemConfigInput = z.infer<typeof createSystemConfigSchema>;
+ export type UpdateSystemConfigInput = z.infer<typeof updateSystemConfigSchema>;
+ export type CreateRiskTierConfigInput = z.infer<
+   typeof createRiskTierConfigSchema
+ >;
+ export type UpdateRiskTierConfigInput = z.infer<
+   typeof updateRiskTierConfigSchema
+ >;
+ export type IdParam = z.infer<typeof idParamSchema>;
+
+// Industry validators
+export const createIndustrySchema = z
+  .object({
+    name: z
+      .string()
+      .min(1)
+      .max(100)
+      .transform((v) => v.toLowerCase()),
+    baseRiskTier: z.nativeEnum(RiskTier),
+    description: z.string().optional(),
+  })
+  .strict();
+
+export const updateIndustrySchema = createIndustrySchema.partial();
+
+export type CreateIndustryInput = z.infer<typeof createIndustrySchema>;
+export type UpdateIndustryInput = z.infer<typeof updateIndustrySchema>;
