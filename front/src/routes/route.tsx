@@ -22,18 +22,22 @@ export const mainRouter = createBrowserRouter([
     element: <Landing />
   },
   {
-    path: '/Registro',
+    path: '/registro',
     element: <Register />
   },
   {
-    path: '/Login',
+    path: '/inicio-sesion',
     element: <Login />
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPasword />
   },
   {
     element: <ProtectedRoute />,
     children: [
       {
-        path: '/Dashboard',
+        path: '/panel',
         element: <UserDashboard />,
         children: [
           {
@@ -41,11 +45,11 @@ export const mainRouter = createBrowserRouter([
             element: <UserPymesList />
           },
           {
-            path: 'Solicitudes',
+            path: 'solicitudes',
             element: <UserCreditRequests />
           },
           {
-            path: 'Perfil',
+            path: 'perfil',
             element: <UserProfile />
           }
         ]
@@ -55,64 +59,24 @@ export const mainRouter = createBrowserRouter([
         element: <AdminDashboard />
       },
       {
-        path: '/Dashboard/RegistroDocumentosPyme/:id',
+        path: '/panel/registro-documentos/:id',
         element: <RegisterPymeDocuments />
       },
       {
-        path: '/Dashboard/RegistroPyme',
+        path: '/panel/registro-pyme',
         element: <RegisterPyme />
       },
       {
-        path: '/Dashboard/SolicitarCredito/:id',
+        path: '/panel/solicitar-credito/:id',
         element: <LoanRequest />
       },
       {
-        path: '/Dashboard/SolicitarCredito/Success',
+        path: '/panel/solicitar-credito/hecho',
         element: <LoanRequestSuccess />
-      },
-    ]
-  {
-    path: '/ResetPassword',
-    element: <ResetPasword />
-  },
-  {
-    path: '/Dashboard',
-    element: <UserDashboard />,
-    children: [
-      {
-        index: true,
-        element: <UserPymesList />
-      },
-      {
-        path: 'Solicitudes',
-        element: <UserCreditRequests />
-      },
-      {
-        path: 'Perfil',
-        element: <UserProfile />
       }
     ]
   },
-  {
-    path: '/admin/*',
-    element: <AdminDashboard />
-  },
-  {
-    path: '/Dashboard/RegistroDocumentosPyme/:id',
-    element: <RegisterPymeDocuments />
-  },
-  {
-    path: '/Dashboard/RegistroPyme',
-    element: <RegisterPyme />
-  },
-  {
-    path: '/Dashboard/SolicitarCredito/:id',
-    element: <LoanRequest />
-  },
-  {
-    path: '/Dashboard/SolicitarCredito/Success',
-    element: <LoanRequestSuccess />
-  },
+
   {
     // add pages
   }

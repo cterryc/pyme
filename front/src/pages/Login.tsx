@@ -36,12 +36,13 @@ export const Login = () => {
         description: 'Has iniciado sesión correctamente. Accede a tu panel de gestión.',
         duration: 3000
       })
-      navigate('/Dashboard')
+      navigate('/panel')
     },
     onError: (dataError) => {
       toast.error('Error al iniciar sesión', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: (dataError as any).payload?.message || 'Credenciales incorrectas. Verifica tu correo y contraseña.',
+        description:
+          (dataError as any).payload?.message || 'Credenciales incorrectas. Verifica tu correo y contraseña.',
         duration: 4000
       })
     }

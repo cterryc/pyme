@@ -10,7 +10,7 @@ export const authRegister = async (data: RegisterFormData): Promise<AuthSucessRe
     })
 
     const result = await response.json()
-    if (!response.ok) throw result;
+    if (!response.ok) throw result
     return result
   } catch (error) {
     console.error('[authRegister]: Error fetching data:', error)
@@ -26,10 +26,28 @@ export const authLogin = async (data: LoginFormData): Promise<AuthSucessResponse
       body: JSON.stringify(data)
     })
     const result = await response.json()
-    if (!response.ok) throw result;
+    if (!response.ok) throw result
     return result
   } catch (error) {
     console.error('[authLogin]: Error fetching data:', error)
+    throw error
+  }
+}
+
+export const resetPassword = async (data: { email: string }) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+
+    const result = await response.json()
+    if (!response.ok) throw result
+
+    return result
+  } catch (error) {
+    console.error('[resetPassword]: Error fetching data:', error)
     throw error
   }
 }

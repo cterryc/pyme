@@ -70,7 +70,7 @@ export const UserPymesList = () => {
                                     'Debes adjuntar y firmar los documentos para poder solicitar un crédito.',
                                   duration: 3000
                                 })
-                                navigate(`/Dashboard/RegistroDocumentosPyme/${pyme.id}`)
+                                navigate(`/panel/registro-documentos/${pyme.id}`)
                               }}
                               className='bg-gray-500 hover:bg-gray-400 rounded-md text-white px-4 py-2'
                             >
@@ -93,7 +93,7 @@ export const UserPymesList = () => {
                           </button>
                           <button
                             onClick={() => {
-                              if (canRequestCredit) navigate(`/Dashboard/SolicitarCredito/${pyme.id}`)
+                              if (canRequestCredit) navigate(`/panel/solicitar-credito/${pyme.id}`)
                             }}
                             className={`px-4 py-2 rounded-md font-semibold transition-colors text-nowrap
                               ${
@@ -116,7 +116,7 @@ export const UserPymesList = () => {
         </div>
       )}
       <NavLink
-        to='/Dashboard/RegistroPyme'
+        to='/panel/registro-pyme'
         className='text-white mt-10 py-3 text-xl rounded-md bg-[#0095d5] hover:bg-[#28a9d6] transition-colors cursor-pointer text-nowrap w-full flex justify-center items-center gap-4'
       >
         <FaPlus className='text-white ' /> Registrar Pyme

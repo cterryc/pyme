@@ -81,23 +81,13 @@ export const RegisterPyme = () => {
     mode: 'onChange'
   })
 
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      setStep(0)
-    }
-  }, [errors, setStep])
-
   const onSubmit = (data: RegisterPymeFormData) => {
-    // localStorage.removeItem('registerPymeBackup')
+    localStorage.removeItem('registerPymeBackup')
     pymeRegister(data)
   }
 
   const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
-    console.log('si hay error no sigas')
-    const formData = JSON.parse(localStorage.getItem('registerPymeBackup') || '{}') as RegisterPymeFormData
-    console.log(registerPymeSchema.safeParse(formData))
-
     if (step < maxStep) {
       setStep(step + 1)
     }
@@ -109,6 +99,14 @@ export const RegisterPyme = () => {
     }
   }
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      toast.error('Hay errores en el formulario', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        duration: 2000
+      })
+    }
+  }, [errors])
   useEffect(() => {
     const subscription = watch((value) => {
       localStorage.setItem('registerPymeBackup', JSON.stringify(value))
@@ -128,7 +126,7 @@ export const RegisterPyme = () => {
 
               <ProgressBar percent={Math.floor(100 / maxStep) * step} title='Progreso' barHeight={10} padding={30} />
 
-              {Object.keys(errors).length > 0 && <p className='text-red-500 text-xl'>Hay errores en el formulario</p>}
+              {/* {Object.keys(errors).length > 0 && <p className='text-red-500 text-xl'>Hay errores en el formulario</p>} */}
 
               <form className='flex flex-col text-left px-10 md:px-20 mt-5' onSubmit={handleSubmit(onSubmit)}>
                 {step == 0 && (
@@ -354,7 +352,9 @@ export const RegisterPyme = () => {
                         <p className='text-sm'>Website (opcional)</p>
                         <input
                           type='text'
-                          {...(registerPyme('website'), { required: false })}
+                          {
+                            ...registerPyme('website', { required: false }) /*, { required: false }*/
+                          }
                           className='border p-2 border-[#D1D5DB] rounded-md'
                           placeholder='https://www.empresa.com'
                           style={{ borderColor: errors.website ? 'red' : '' }}
@@ -448,12 +448,24 @@ export const RegisterPyme = () => {
                 )}
 
                 <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
-                  <button
-                    className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                    onClick={prevStep}
-                  >
-                    Atrás
-                  </button>
+                  {step != 0 ? (
+                    <button
+                      className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
+                      onClick={prevStep}
+                    >
+                      Atrás
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        navigate('/panel')
+                      }}
+                      className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
+                    >
+                      Salir
+                    </button>
+                  )}
                   {step != maxStep && (
                     <button
                       className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
@@ -479,7 +491,7 @@ export const RegisterPyme = () => {
       )}
       {pymeId != '' && (
         <div className='fixed w-screen h-screen bg-[rgba(0,0,0,.4)] top-[0] left-[0] flex items-center '>
-          <Confetti />
+          <Confetti recycle={false} numberOfPieces={500} />
 
           <dialog open className='bg-[var(--bg-light)] p-7 m-auto text-black rounded-md'>
             <h3 className='text-xl text-center mb-5'>Tu pyme se ha registrado correctamente</h3>
@@ -489,14 +501,14 @@ export const RegisterPyme = () => {
               <button
                 className='bg-gray-500 p-2 rounded-md cursor-pointer text-white'
                 onClick={() => {
-                  navigate('/Dashboard')
+                  navigate('/panel')
                 }}
               >
                 Cancelar
               </button>
               <button
                 onClick={() => {
-                  navigate(`/Dashboard/RegistroDocumentosPyme/${pymeId}`)
+                  navigate(`/panel/registro-documentos/${pymeId}`)
                 }}
                 className='bg-green-500 p-2 rounded-md cursor-pointer text-white hover:bg-green-700 duration-150'
               >
@@ -511,9 +523,8 @@ export const RegisterPyme = () => {
   )
 }
 
-
 /**
  * Fecha ultima compra
  * (OPCIONAL) separar integracion con productos propios
- * 
+ *
  */
