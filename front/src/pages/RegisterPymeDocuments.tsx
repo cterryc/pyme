@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Header } from '@/components/Header'
 import { TbTrashX } from 'react-icons/tb'
-import { LuHardDriveUpload } from 'react-icons/lu'
 import { SignDocuments } from '@/components/SignDocuments'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SignSingleDocument } from '@/components/SignSingleDocument'
@@ -10,9 +9,10 @@ import type { SignedPDF } from '@/interfaces/sign.interface'
 import { usePymeRegisterDocuments } from '@/hooks/usePyme'
 import { registerPymeDocumentsSchema, type RegisterPymeDocumentsFormData } from '@/schemas/pyme.schema'
 import { type DocumentResponse } from '@/interfaces/pyme.interface'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Footer } from '@/components/Footer'
+import { IoIosAddCircle } from 'react-icons/io'
 
 export const RegisterPymeDocuments = () => {
   const [isOwner, setIsOwner] = useState(false)
@@ -47,7 +47,9 @@ export const RegisterPymeDocuments = () => {
       toast.error('Error al subir los documentos', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
         // description: `${data.payload[0].message}`,
-        description: `${data.payload.message}` || 'No se pudieron cargar los documentos. Verifica que estén firmados correctamente.',
+        description:
+          `${data.payload.message}` ||
+          'No se pudieron cargar los documentos. Verifica que estén firmados correctamente.',
         duration: 4000
       })
     }
@@ -166,7 +168,7 @@ export const RegisterPymeDocuments = () => {
                   </p>
                   {notarialPDF == null ? (
                     <label className='self-center'>
-                      <LuHardDriveUpload className='text-3xl text-[#12b92f] hover:text-[#18912d] duration-150 cursor-pointer' />
+                      <IoIosAddCircle className='text-3xl text-[var(--primary)] hover:text-[#1074a6] duration-150 cursor-pointer' />
                       <input
                         accept='.pdf'
                         disabled={notarialPDF != null}
@@ -222,8 +224,9 @@ export const RegisterPymeDocuments = () => {
             <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
               <button
                 className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                onClick={() => {
-                  navigate('/Dashboard/')
+                onClick={(e) => {
+                  e.preventDefault()
+                  navigate('/panel')
                 }}
               >
                 Cancelar
@@ -270,6 +273,12 @@ export const RegisterPymeDocuments = () => {
               )
             })}
           </ul>
+          <Link
+            to='/Dashboard'
+            className='bg-[var(--primary)] p-2 px-5 rounded-md text-white curor-pointer hover:bg-[#1074a6] duration-150'
+          >
+            Volver al panel
+          </Link>
         </section>
       )}
       <Footer />

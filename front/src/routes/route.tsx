@@ -12,7 +12,7 @@ import { UserCreditRequests } from '@/components/UserCreditRequests'
 import { UserDashboard } from '@/pages/UserDashboard'
 import { LoanRequest } from '@/pages/LoanRequest'
 import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
-import { ProtectedRoute } from '@/pages/ProtectedRoute'
+import { ResetPasword } from '@/pages/ResetPassword'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -21,15 +21,20 @@ export const mainRouter = createBrowserRouter([
     element: <Landing />
   },
   {
-    path: '/Registro',
+    path: '/registro',
     element: <Register />
   },
   {
-    path: '/Login',
+    path: '/inicio-sesion',
     element: <Login />
   },
   {
-    element: <ProtectedRoute />,
+    path: '/reset-password',
+    element: <ResetPasword />
+  },
+  {
+    path: '/panel',
+    element: <UserDashboard />,
     children: [
       {
         path: '/Dashboard',
@@ -50,26 +55,34 @@ export const mainRouter = createBrowserRouter([
         ]
       },
       {
-        path: '/admin/*',
-        element: <AdminDashboard />
+        path: 'solicitudes',
+        element: <UserCreditRequests />
       },
       {
-        path: '/Dashboard/RegistroDocumentosPyme/:id',
-        element: <RegisterPymeDocuments />
-      },
-      {
-        path: '/Dashboard/RegistroPyme',
-        element: <RegisterPyme />
-      },
-      {
-        path: '/Dashboard/SolicitarCredito/:id',
-        element: <LoanRequest />
-      },
-      {
-        path: '/Dashboard/SolicitarCredito/Success',
-        element: <LoanRequestSuccess />
-      },
+        path: 'perfil',
+        element: <UserProfile />
+      }
     ]
+  },
+  {
+    path: '/admin/*',
+    element: <AdminDashboard />
+  },
+  {
+    path: '/panel/registro-documentos/:id',
+    element: <RegisterPymeDocuments />
+  },
+  {
+    path: '/panel/registro-pyme',
+    element: <RegisterPyme />
+  },
+  {
+    path: '/panel/solicitar-credito/:id',
+    element: <LoanRequest />
+  },
+  {
+    path: '/panel/solicitar-credito/hecho',
+    element: <LoanRequestSuccess />
   },
   {
     // add pages

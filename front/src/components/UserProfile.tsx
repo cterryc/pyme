@@ -51,16 +51,13 @@ export const UserProfile = () => {
       refetch()
     },
     onError: (error) => {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'No se pudo actualizar tu perfil. Intenta nuevamente.';
+      const message = error instanceof Error ? error.message : 'No se pudo actualizar tu perfil. Intenta nuevamente.'
 
       toast.error('Error al actualizar perfil', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
         description: message,
-        duration: 4000,
-      });
+        duration: 4000
+      })
     }
   })
   useEffect(() => {
@@ -109,6 +106,13 @@ export const UserProfile = () => {
     console.log('Data to send:', dataToSend);
     updateProfile({ ...dataToSend, profileImage: imageDefault });
   };
+
+    // const dataToSend = Object.fromEntries(
+    //   Object.entries(data).filter(([, v]) => v !== '')
+    // ) as Partial<UserProfileFormData>;
+
+    updateProfile({ ...data, profileImage: imageDefault })
+  }
 
   const handleCancelEdit = () => {
     setIsEditProfile(false)
