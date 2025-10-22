@@ -33,8 +33,10 @@ export const mainRouter = createBrowserRouter([
     path: '/reset-password',
     element: <ResetPasword />
   },
+
   {
-    element: <ProtectedRoute />,
+    path: '/panel',
+    element: <UserDashboard />,
     children: [
       {
         path: '/panel',
@@ -47,11 +49,11 @@ export const mainRouter = createBrowserRouter([
           {
             path: 'solicitudes',
             element: <UserCreditRequests />
-          },
-          {
-            path: 'perfil',
-            element: <UserProfile />
           }
+          // {
+          //   path: 'perfil',
+          //   element: <UserProfile />
+          // }
         ]
       },
       {
