@@ -127,21 +127,6 @@ paths:
       responses:
         "200":
           description: Email de verificación reenviado
-    post:
-      summary: Restablecer contraseña con token
-      tags:
-        - Auth
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ResetPasswordPayload"
-      responses:
-        "200":
-          description: Contraseña restablecida correctamente
-        "400":
-          description: Token inválido o expirado
 
 components:
   securitySchemes:
