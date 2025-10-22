@@ -13,9 +13,9 @@ export const userProfileSchema = z.object({
     .optional()
     .nullable(),
   profileImage: z.string().optional(),
-  email: z.email('Correo inválido').optional()
-  // newPassword: z.string().min(8, "La nueva contraseña debe tener mínimo 8 caracteres").optional(),
-  // currentPassword: z.string().min(8, "La contraseña actual debe tener mínimo 8 caracteres"),
+  email: z.email('Correo inválido').optional(),
+  newPassword: z.string().min(8, "La nueva contraseña debe tener mínimo 8 caracteres").optional(),
+  currentPassword: z.string().min(8, "La contraseña actual debe tener mínimo 8 caracteres").optional(),
 })
 
 export type UserProfileFormData = z.infer<typeof userProfileSchema>
