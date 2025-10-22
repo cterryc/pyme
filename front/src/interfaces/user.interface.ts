@@ -7,6 +7,8 @@ export type getProfile = {
   role: string;
   isEmailVerified: boolean;
   profileImage: string | null;
+  newPassword?: string;
+  currentPassword?: string;
   createdAt: string;
   updatedAt: string;
 };
