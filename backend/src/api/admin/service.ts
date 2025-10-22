@@ -26,8 +26,6 @@ import { SystemConfigDto, RiskTierConfigDto, mapSystemConfigToDto, mapRiskTierCo
     this.industryRepo = AppDataSource.getRepository(Industry);
   }
 
-  // Mappers movidos a dto.ts
-
   // SystemConfig CRUD
   async createSystemConfig(data: CreateSystemConfigInput): Promise<SystemConfigDto> {
     const exists = await this.systemConfigRepo.findOne({ where: { key: data.key } });

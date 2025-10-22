@@ -6,7 +6,7 @@ info:
 
 tags:
   - name: Admin
-    description: Operaciones administrativas (requiere rol ADMIN u OWNER)
+    description: Operaciones administrativas (requiere rol ADMIN)
 
 paths:
   /api/admin/systemconfig:
