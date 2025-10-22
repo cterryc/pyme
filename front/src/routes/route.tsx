@@ -12,6 +12,7 @@ import { UserCreditRequests } from '@/components/UserCreditRequests'
 import { UserDashboard } from '@/pages/UserDashboard'
 import { LoanRequest } from '@/pages/LoanRequest'
 import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
+import { ProtectedRoute } from '@/pages/ProtectedRoute'
 import { ResetPasword } from '@/pages/ResetPassword'
 
 export const mainRouter = createBrowserRouter([
@@ -32,12 +33,13 @@ export const mainRouter = createBrowserRouter([
     path: '/reset-password',
     element: <ResetPasword />
   },
+
   {
-    path: '/panel',
-    element: <UserDashboard />,
+    path: '/',
+    element: <ProtectedRoute />,
     children: [
       {
-        path: '/Dashboard',
+        path: '/panel',
         element: <UserDashboard />,
         children: [
           {
@@ -45,29 +47,18 @@ export const mainRouter = createBrowserRouter([
             element: <UserPymesList />
           },
           {
-            path: 'Solicitudes',
+            path: 'solicitudes',
             element: <UserCreditRequests />
           },
           {
-            path: 'Perfil',
+            path: 'perfil',
             element: <UserProfile />
           }
         ]
-      },
-      {
-        path: 'solicitudes',
-        element: <UserCreditRequests />
-      },
-      {
-        path: 'perfil',
-        element: <UserProfile />
       }
     ]
   },
-  {
-    path: '/admin/*',
-    element: <AdminDashboard />
-  },
+
   {
     path: '/panel/registro-documentos/:id',
     element: <RegisterPymeDocuments />
@@ -83,6 +74,11 @@ export const mainRouter = createBrowserRouter([
   {
     path: '/panel/solicitar-credito/hecho',
     element: <LoanRequestSuccess />
+  },
+
+  {
+    path: '/admin/*',
+    element: <AdminDashboard />
   },
   {
     // add pages
