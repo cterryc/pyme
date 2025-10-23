@@ -86,7 +86,7 @@ export const LoanRequest = () => {
         selectedAmount >= loanOptions?.offerDetails.minAmount &&
         selectedAmount <= loanOptions?.offerDetails.maxAmount
     )
-  }, [selectedAmount, selectedTerm, loanOptions?.offerDetails.minAmount, loanOptions?.offerDetails.maxAmount])
+  }, [selectedAmount, selectedTerm, loanOptions])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

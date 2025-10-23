@@ -77,7 +77,7 @@ export const RegisterPyme = () => {
   } = useForm<RegisterPymeFormData>({
     resolver: zodResolver(registerPymeSchema),
     defaultValues: getStoredData(),
-    criteriaMode: 'all',
+    // criteriaMode: 'all',
     mode: 'onChange'
   })
 
@@ -103,10 +103,12 @@ export const RegisterPyme = () => {
     if (Object.keys(errors).length > 0) {
       toast.error('Hay errores en el formulario', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: 'Revisa los datos ingresados',
         duration: 2000
       })
     }
   }, [errors])
+
   useEffect(() => {
     const subscription = watch((value) => {
       localStorage.setItem('registerPymeBackup', JSON.stringify(value))
@@ -450,6 +452,7 @@ export const RegisterPyme = () => {
                 <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
                   {step != 0 ? (
                     <button
+                      type='button'
                       className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
                       onClick={prevStep}
                     >
@@ -457,6 +460,7 @@ export const RegisterPyme = () => {
                     </button>
                   ) : (
                     <button
+                      type='button'
                       onClick={(e) => {
                         e.preventDefault()
                         navigate('/panel')
