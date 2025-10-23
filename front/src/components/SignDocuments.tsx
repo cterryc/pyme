@@ -36,7 +36,7 @@ export const SignDocuments = ({ onSignDocument }: { onSignDocument: (signedPDFs:
     [PDFFiles]
   )
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: { 'application/pdf': ['.pdf'] } })
 
   const handleSignedPDF = (data: SignedPDF): void => {
     setIsSigningPDF(false)

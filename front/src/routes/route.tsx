@@ -13,6 +13,7 @@ import { UserDashboard } from '@/pages/UserDashboard'
 import { LoanRequest } from '@/pages/LoanRequest'
 import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
 import { ProtectedRoute } from '@/pages/ProtectedRoute'
+import { ResetPasword } from '@/pages/ResetPassword'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -21,18 +22,24 @@ export const mainRouter = createBrowserRouter([
     element: <Landing />
   },
   {
-    path: '/Registro',
+    path: '/registro',
     element: <Register />
   },
   {
-    path: '/Login',
+    path: '/inicio-sesion',
     element: <Login />
   },
   {
+    path: '/reset-password',
+    element: <ResetPasword />
+  },
+
+  {
+    path: '/',
     element: <ProtectedRoute />,
     children: [
       {
-        path: '/Dashboard',
+        path: '/panel',
         element: <UserDashboard />,
         children: [
           {
@@ -40,36 +47,38 @@ export const mainRouter = createBrowserRouter([
             element: <UserPymesList />
           },
           {
-            path: 'Solicitudes',
+            path: 'solicitudes',
             element: <UserCreditRequests />
           },
           {
-            path: 'Perfil',
+            path: 'perfil',
             element: <UserProfile />
           }
         ]
-      },
-      {
-        path: '/admin/*',
-        element: <AdminDashboard />
-      },
-      {
-        path: '/Dashboard/RegistroDocumentosPyme/:id',
-        element: <RegisterPymeDocuments />
-      },
-      {
-        path: '/Dashboard/RegistroPyme',
-        element: <RegisterPyme />
-      },
-      {
-        path: '/Dashboard/SolicitarCredito/:id',
-        element: <LoanRequest />
-      },
-      {
-        path: '/Dashboard/SolicitarCredito/Success',
-        element: <LoanRequestSuccess />
-      },
+      }
     ]
+  },
+
+  {
+    path: '/panel/registro-documentos/:id',
+    element: <RegisterPymeDocuments />
+  },
+  {
+    path: '/panel/registro-pyme',
+    element: <RegisterPyme />
+  },
+  {
+    path: '/panel/solicitar-credito/:id',
+    element: <LoanRequest />
+  },
+  {
+    path: '/panel/solicitar-credito/hecho',
+    element: <LoanRequestSuccess />
+  },
+
+  {
+    path: '/admin/*',
+    element: <AdminDashboard />
   },
   {
     // add pages

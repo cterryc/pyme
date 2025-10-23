@@ -15,19 +15,15 @@ export const Header = () => {
   const { hasUser } = useUserAuthenticate()
 
   const deleteToken = () => {
-
     toast.info('Cerrando sesión...', {
       style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
       description: 'Hasta pronto. Esperamos verte de nuevo.',
       duration: 2000
     })
-
-    // localStorage.removeItem('tokenPyme')
-    localStorage.clear()
-
+    localStorage.removeItem('tokenPyme')
     queryClient.clear()
     setTimeout(() => {
-      navigate('/Login')
+      navigate('/inicio-sesion')
     }, 500)
   }
 
@@ -51,7 +47,7 @@ export const Header = () => {
           {isAvatarMenuOpen && (
             <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1'>
               <li className='hover:text-[var(--primary)]'>
-                <Link to='/Dashboard' className='flex gap-4 items-center '>
+                <Link to='/panel' className='flex gap-4 items-center '>
                   <HiOutlineUserCircle className='text-xl' /> Mi cuenta
                 </Link>
               </li>
@@ -66,14 +62,14 @@ export const Header = () => {
       ) : (
         <div className='flex gap-2'>
           <button
-            onClick={() => navigate('/Login')}
+            onClick={() => navigate('/inicio-sesion')}
             className=' text-[#0095d5] outline-1 h-10 w-32 rounded-md hover:outline-1 transition-colors
             cursor-pointer hover:bg-[#F0F0F2]'
           >
             Iniciar sesión
           </button>
           <button
-            onClick={() => navigate('/Registro')}
+            onClick={() => navigate('/registro')}
             className='bg-[#0095d5] text-white outline-1 h-10 w-32 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer'
           >
             Registrate

@@ -26,9 +26,9 @@ export const registerPymeSchema = z.object({
     message: 'Formato de teléfono inválido. Debe ser un número válido de Perú (+51), Argentina (+54) o Paraguay (+595)'
   }),
   // ownerPhone: z.string().min(8, 'Debes ingresar una telefono válido'), //Como definimos esto?
-  website: z.url().optional(),
+  website: z.url('Debes ingresar una url con formato https://miPagina.com').nullable().optional(),
   // }),
-  description: z.string().min(120, 'Debes ingresar una descripción de al menos 120 caracteres')
+  description: z.string().min(60, 'Debes ingresar una descripción de al menos 60 caracteres')
   // documents: z.array(
   //   z.object({
   //     data: z.instanceof(ArrayBuffer),
