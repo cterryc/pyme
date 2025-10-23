@@ -1,7 +1,22 @@
 export interface responseCompanyDto {
     id: string;
     legalName: string;
+    tradeName?: string;
+    taxId: string;
+    email?: string;
+    industryId?: string;
     industryName?: string;
+    foundedDate?: Date;
+    employeeCount?: number;
+    annualRevenue?: number;
+    address?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    phone?: string;
+    website?: string;
+    description?: string;
     statusCredit: string;
     hasDocuments: boolean;
 }
