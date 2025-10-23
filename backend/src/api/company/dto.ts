@@ -30,7 +30,22 @@ export function toCompanyDto(company: Company): responseCompanyDto {
     return {
         id: company.id,
         legalName: company.legalName,
+        tradeName: company.tradeName,
+        taxId: company.taxId,
+        email: company.email,
+        industryId: company.industry?.id,
         industryName: company.industry?.name,
+        foundedDate: company.foundedDate,
+        employeeCount: company.employeeCount,
+        annualRevenue: company.annualRevenue,
+        address: company.address,
+        city: company.city,
+        state: company.state,
+        postalCode: company.postalCode,
+        country: company.country,
+        phone: company.phone,
+        website: company.website,
+        description: company.description,
         statusCredit,
         hasDocuments: company.documents && company.documents.length > 0
             ? true
