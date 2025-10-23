@@ -58,6 +58,9 @@ export class Company extends BaseEntity {
   @Column({ type: "varchar", length: 255, nullable: true })
   website?: string;
 
+  @Column({ type: "boolean", default: true })
+  canApplyForCredit?: boolean;
+
   @Column({ type: "text", nullable: true })
   description?: string;
 

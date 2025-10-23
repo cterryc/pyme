@@ -8,6 +8,7 @@ export enum CreditApplicationStatus {
     REJECTED = "Rechazado",
     DISBURSED = "Desembolsado",
     CANCELLED = "Cancelado",
+    NOT_APPLICABLE = "No aplica"
 }
 
 export enum DocumentType {

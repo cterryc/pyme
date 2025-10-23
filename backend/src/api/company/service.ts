@@ -22,16 +22,98 @@ import { responseCompanyDto, PaginatedResponse } from "./interface";
 import { Industry } from "../../entities/Industry.entity";
 import { CreateCompanyInput, GetAllCompaniesQuery } from "./validator";
 import { User } from "../../entities/User.entity";
+import { SystemConfig } from "../../entities/System_config.entity";
+import { CreditApplication } from "../../entities/CreditApplication.entity";
+import { CreditApplicationStatus } from "../../constants/CreditStatus";
 
 export default class CompanyService {
   private readonly companyRepo: Repository<Company>;
   private readonly industryRepo: Repository<Industry>;
   private readonly userRepo: Repository<User>;
+  private readonly systemConfigRepo: Repository<SystemConfig>;
+  private readonly creditApplicationRepo: Repository<CreditApplication>;
 
   constructor() {
     this.companyRepo = AppDataSource.getRepository(Company);
     this.industryRepo = AppDataSource.getRepository(Industry);
     this.userRepo = AppDataSource.getRepository(User);
+    this.systemConfigRepo = AppDataSource.getRepository(SystemConfig);
+    this.creditApplicationRepo = AppDataSource.getRepository(CreditApplication);
+  }
+
+  private async getSystemLimits(): Promise<{ maxAnnualRevenue?: number; maxEmployeeCount?: number }> {
+    const limits: { maxAnnualRevenue?: number; maxEmployeeCount?: number } = {};
+    
+    try {
+      const maxRevenueConfig = await this.systemConfigRepo.findOne({
+        where: { key: 'MAX_ANNUAL_REVENUE' }
+      });
+      
+      const maxEmployeeConfig = await this.systemConfigRepo.findOne({
+        where: { key: 'MAX_EMPLOYEE_COUNT' }
+      });
+
+      if (maxRevenueConfig) {
+        limits.maxAnnualRevenue = maxRevenueConfig.value;
+      }
+      
+      if (maxEmployeeConfig) {
+        limits.maxEmployeeCount = maxEmployeeConfig.value;
+      }
+    } catch (error) {
+      console.warn('Error obteniendo límites del sistema:', error);
+    }
+    
+    return limits;
+  }
+
+  private async validateCompanyLimits(
+    annualRevenue: number, 
+    employeeCount: number
+  ): Promise<{ exceedsLimits: boolean; reasons: string[] }> {
+    const limits = await this.getSystemLimits();
+    const reasons: string[] = [];
+    let exceedsLimits = false;
+
+    const maxRevenue = limits.maxAnnualRevenue ?? 50000000; // 50M por defecto
+    const maxEmployees = limits.maxEmployeeCount ?? 250; // 250 empleados por defecto
+
+    if (annualRevenue > maxRevenue) {
+      exceedsLimits = true;
+      reasons.push(`Los ingresos anuales (${annualRevenue}) superan el límite permitido (${maxRevenue})`);
+    }
+
+    if (employeeCount > maxEmployees) {
+      exceedsLimits = true;
+      reasons.push(`La cantidad de empleados (${employeeCount}) supera el límite permitido (${maxEmployees})`);
+    }
+
+    return { exceedsLimits, reasons };
+  }
+
+  private async createCreditApplicationWithNotApplicableStatus(
+    companyId: string, 
+    reasons: string[]
+  ): Promise<void> {
+    try {
+      const applicationNumber = `APP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      const creditApplication = this.creditApplicationRepo.create({
+        applicationNumber,
+        company: { id: companyId },
+        status: CreditApplicationStatus.NOT_APPLICABLE,
+        rejectionReason: `No aplica: ${reasons.join(', ')}`,
+        statusHistory: [{
+          status: CreditApplicationStatus.NOT_APPLICABLE,
+          timestamp: new Date(),
+          reason: `No aplica: ${reasons.join(', ')}`
+        }]
+      });
+
+      await this.creditApplicationRepo.save(creditApplication);
+    } catch (error) {
+      console.error('Error creando solicitud de crédito con estado no aplica:', error);
+    }
   }
 
   async createCompany(
@@ -85,6 +167,11 @@ export default class CompanyService {
       );
     }
 
+    const validation = await this.validateCompanyLimits(
+      companyData.annualRevenue, 
+      companyData.employeeCount
+    );
+
     const newCompany = this.companyRepo.create({
       ...companyData,
       owner: { id: ownerUserId },
@@ -93,7 +180,20 @@ export default class CompanyService {
 
     const savedCompany = await this.companyRepo.save(newCompany);
 
-    return toCompanyDto(savedCompany);
+    if (validation.exceedsLimits) {
+      await this.createCreditApplicationWithNotApplicableStatus(
+        savedCompany.id, 
+        validation.reasons
+      );
+    }
+
+    // Recargar la company con las relaciones para el DTO
+    const companyWithRelations = await this.companyRepo.findOne({
+      where: { id: savedCompany.id },
+      relations: ["industry", "creditApplications"],
+    });
+
+    return toCompanyDto(companyWithRelations!);
   }
 
   async listCompaniesByUserId(userId: string): Promise<responseCompanyDto[]> {
@@ -112,7 +212,7 @@ export default class CompanyService {
   ): Promise<responseCompanyDto | null> {
     const company = await this.companyRepo.findOne({
       where: { id: companyId, owner: { id: userId } },
-      relations: ["industry"],
+      relations: ["industry", "creditApplications"],
     });
 
     if (!company) {
