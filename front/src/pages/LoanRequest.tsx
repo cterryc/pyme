@@ -243,9 +243,9 @@ export const LoanRequest = () => {
             )}
             <Link
               to='/panel'
-              className='bg-[var(--primary)] col-span-2 p-3  rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150 w-full'
+              className='bg-[var(--primary)] col-span-2 p-3  rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150 w-full text-center'
             >
-              Volver al panel
+              Volver al inicio
             </Link>
           </form>
         </section>
