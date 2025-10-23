@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import {
   type RegisterPymeSucessResponse,
   type RegisterPymeDocumentsSuccessResponse,
@@ -40,20 +39,10 @@ export const pymeRegister = async (data: RegisterPymeFormData): Promise<Register
     const response = await fetch(`${import.meta.env.VITE_API_URL}/companies`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-=======
-import { type PymeData } from '@/interfaces/pyme.interface'
-
-export const registerPyme = async (data: PymeData) => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
->>>>>>> Stashed changes
       body: JSON.stringify(data)
     })
 
     const result = await response.json()
-<<<<<<< Updated upstream
     if (!response.ok) throw result
 
     return result
@@ -138,12 +127,6 @@ export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
     return result
   } catch (error) {
     console.error('[getPymesByUser]: Error fetching data:', error)
-=======
-    if (!response.ok) throw new Error(result.message || 'Error registering user')
-    return result
-  } catch (error) {
-    console.error('[authRegister]: Error fetching data:', error)
->>>>>>> Stashed changes
     throw error
   }
 }
