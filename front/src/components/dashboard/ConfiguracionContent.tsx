@@ -1,17 +1,12 @@
 import { useState, useEffect } from 'react'
 import { 
   getSystemConfigs, 
-  createSystemConfig, 
   updateSystemConfig, 
-  deleteSystemConfig,
   getRiskTierConfigs,
-  createRiskTierConfig,
   updateRiskTierConfig,
-  deleteRiskTierConfig,
   getIndustries,
   createIndustry,
-  updateIndustry,
-  deleteIndustry
+  updateIndustry
 } from '@/services/admin.service'
 import type { SystemConfig, RiskTierConfig, Industry } from '@/interfaces/admin.interface'
 
@@ -54,48 +49,12 @@ export const ConfiguracionContent = () => {
     }
   }
 
-  const handleSystemConfigCreate = async (key: string, value: number, description?: string) => {
-    try {
-      await createSystemConfig({ key, value, description })
-      await loadData()
-    } catch (error) {
-      console.error('Error creating system config:', error)
-    }
-  }
-
-  const handleSystemConfigDelete = async (id: string) => {
-    try {
-      await deleteSystemConfig(id)
-      await loadData()
-    } catch (error) {
-      console.error('Error deleting system config:', error)
-    }
-  }
-
   const handleRiskTierConfigUpdate = async (id: string, data: { tier?: 'A' | 'B' | 'C' | 'D'; spread?: number; factor?: number; allowed_terms?: number[] }) => {
     try {
       await updateRiskTierConfig(id, data)
       await loadData()
     } catch (error) {
       console.error('Error updating risk tier config:', error)
-    }
-  }
-
-  const handleRiskTierConfigCreate = async (data: { tier: 'A' | 'B' | 'C' | 'D'; spread: number; factor: number; allowed_terms: number[] }) => {
-    try {
-      await createRiskTierConfig(data)
-      await loadData()
-    } catch (error) {
-      console.error('Error creating risk tier config:', error)
-    }
-  }
-
-  const handleRiskTierConfigDelete = async (id: string) => {
-    try {
-      await deleteRiskTierConfig(id)
-      await loadData()
-    } catch (error) {
-      console.error('Error deleting risk tier config:', error)
     }
   }
 
@@ -114,15 +73,6 @@ export const ConfiguracionContent = () => {
       await loadData()
     } catch (error) {
       console.error('Error creating industry:', error)
-    }
-  }
-
-  const handleIndustryDelete = async (id: string) => {
-    try {
-      await deleteIndustry(id)
-      await loadData()
-    } catch (error) {
-      console.error('Error deleting industry:', error)
     }
   }
 
@@ -188,8 +138,6 @@ export const ConfiguracionContent = () => {
             <SystemConfigTab 
               configs={systemConfigs}
               onUpdate={handleSystemConfigUpdate}
-              onCreate={handleSystemConfigCreate}
-              onDelete={handleSystemConfigDelete}
             />
           )}
           
@@ -197,8 +145,6 @@ export const ConfiguracionContent = () => {
             <RiskTierConfigTab 
               configs={riskTierConfigs}
               onUpdate={handleRiskTierConfigUpdate}
-              onCreate={handleRiskTierConfigCreate}
-              onDelete={handleRiskTierConfigDelete}
             />
           )}
           
@@ -207,47 +153,8 @@ export const ConfiguracionContent = () => {
               industries={industries}
               onUpdate={handleIndustryUpdate}
               onCreate={handleIndustryCreate}
-              onDelete={handleIndustryDelete}
             />
           )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Componente de confirmación para acciones de eliminación
-const ConfirmationModal = ({
-  isOpen,
-  message,
-  onConfirm,
-  onCancel
-}: {
-  isOpen: boolean
-  message: string
-  onConfirm: () => void
-  onCancel: () => void
-}) => {
-  if (!isOpen) return null
-
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-[9999] pointer-events-none">
-      <div className="bg-white p-6 rounded-lg shadow-xl border-2 border-gray-300 max-w-md w-full pointer-events-auto">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Confirmar acción</h3>
-        <p className="text-gray-700 mb-6">{message}</p>
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-          >
-            Confirmar
-          </button>
         </div>
       </div>
     </div>
@@ -266,10 +173,20 @@ const EditRiskTierForm = ({
 }) => {
   const [formData, setFormData] = useState({
     tier: config.tier,
-    spread: config.spread,
-    factor: config.factor,
-    allowed_terms: [...config.allowed_terms]
+    spread: String(config.spread),
+    factor: String(config.factor),
+    allowed_terms: [...config.allowed_terms],
+    termsInput: config.allowed_terms.join(',')
   })
+
+  const handleSave = () => {
+    onSave({
+      tier: formData.tier,
+      spread: Number(formData.spread) || 0,
+      factor: Number(formData.factor) || 0,
+      allowed_terms: formData.allowed_terms
+    })
+  }
 
   return (
     <div className="space-y-4">
@@ -292,10 +209,13 @@ const EditRiskTierForm = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">Spread (%)</label>
           <input
             type="text"
-            value={formData.spread === 0 ? '' : formData.spread}
+            value={formData.spread}
             onChange={(e) => {
-              const value = e.target.value === '' ? 0 : Number(e.target.value);
-              setFormData({ ...formData, spread: isNaN(value) ? 0 : value });
+              const value = e.target.value;
+              // Permitir vacío, números y un solo punto decimal
+              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                setFormData({ ...formData, spread: value });
+              }
             }}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Ej: 8.5"
@@ -305,10 +225,13 @@ const EditRiskTierForm = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">Factor</label>
           <input
             type="text"
-            value={formData.factor === 0 ? '' : formData.factor}
+            value={formData.factor}
             onChange={(e) => {
-              const value = e.target.value === '' ? 0 : Number(e.target.value);
-              setFormData({ ...formData, factor: isNaN(value) ? 0 : value });
+              const value = e.target.value;
+              // Permitir vacío, números y un solo punto decimal
+              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                setFormData({ ...formData, factor: value });
+              }
             }}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Ej: 0.35"
@@ -318,11 +241,15 @@ const EditRiskTierForm = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">Plazos Permitidos (meses)</label>
           <input
             type="text"
-            value={formData.allowed_terms.join(',')}
+            value={formData.termsInput}
             placeholder="Ej: 6,12,24,36"
             onChange={(e) => {
-              const terms = e.target.value.split(',').map(t => parseInt(t.trim())).filter(t => !isNaN(t))
-              setFormData({ ...formData, allowed_terms: terms })
+              const value = e.target.value;
+              // Permitir solo números, comas y espacios
+              if (/^[\d,\s]*$/.test(value)) {
+                const terms = value.split(',').map(t => parseInt(t.trim())).filter(t => !isNaN(t))
+                setFormData({ ...formData, allowed_terms: terms, termsInput: value })
+              }
             }}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -330,7 +257,7 @@ const EditRiskTierForm = ({
       </div>
       <div className="flex space-x-2 mt-4">
         <button
-          onClick={() => onSave(formData)}
+          onClick={handleSave}
           className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
         >
           Guardar
@@ -419,82 +346,17 @@ const EditIndustryForm = ({
 // Componente para configuración del sistema
 const SystemConfigTab = ({ 
   configs, 
-  onUpdate, 
-  onCreate, 
-  onDelete 
+  onUpdate
 }: { 
   configs: SystemConfig[]
   onUpdate: (id: string, key: string, value: number, description?: string) => void
-  onCreate: (key: string, value: number, description?: string) => void
-  onDelete: (id: string) => void
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [confirmationModal, setConfirmationModal] = useState<{isOpen: boolean, id: string | null}>({isOpen: false, id: null})
-  const [newConfig, setNewConfig] = useState({ key: '', value: 0, description: '' })
-  
-  const handleDelete = (id: string) => {
-    setConfirmationModal({isOpen: true, id})
-  }
-  
-  const confirmDelete = () => {
-    if (confirmationModal.id) {
-      onDelete(confirmationModal.id)
-      setConfirmationModal({isOpen: false, id: null})
-    }
-  }
 
   return (
     <div className="space-y-6">
-      <ConfirmationModal
-        isOpen={confirmationModal.isOpen}
-        message="¿Estás seguro de que quieres eliminar esta configuración?"
-        onConfirm={confirmDelete}
-        onCancel={() => setConfirmationModal({isOpen: false, id: null})}
-      />
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">Configuraciones del Sistema</h3>
-        <button
-          onClick={() => {
-            if (newConfig.key && newConfig.value) {
-              onCreate(newConfig.key, newConfig.value, newConfig.description)
-              setNewConfig({ key: '', value: 0, description: '' })
-            }
-          }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Agregar Configuración
-        </button>
-      </div>
-
-      {/* Formulario para nueva configuración */}
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <h4 className="text-sm font-medium text-gray-900 mb-3">Nueva Configuración</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            type="text"
-            placeholder="Clave"
-            value={newConfig.key}
-            onChange={(e) => setNewConfig({ ...newConfig, key: e.target.value })}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            placeholder="Valor"
-            value={newConfig.value === 0 ? '' : newConfig.value}
-            onChange={(e) => {
-              const value = e.target.value === '' ? 0 : Number(e.target.value);
-              setNewConfig({ ...newConfig, value: isNaN(value) ? 0 : value });
-            }}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            placeholder="Descripción (opcional)"
-            value={newConfig.description}
-            onChange={(e) => setNewConfig({ ...newConfig, description: e.target.value })}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
       </div>
 
       {/* Lista de configuraciones existentes */}
@@ -528,12 +390,6 @@ const SystemConfigTab = ({
                   >
                     Editar
                   </button>
-                  <button
-                    onClick={() => handleDelete(config.id)}
-                    className="px-3 py-1 text-sm text-red-600 hover:text-red-800"
-                  >
-                    Eliminar
-                  </button>
                 </div>
               </div>
             )}
@@ -560,9 +416,13 @@ const EditSystemConfigForm = ({
 }) => {
   const [formData, setFormData] = useState({
     key: config.key,
-    value: config.value,
+    value: String(config.value),
     description: config.description || ''
   })
+
+  const handleSave = () => {
+    onSave(formData.key, Number(formData.value) || 0, formData.description)
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -573,9 +433,16 @@ const EditSystemConfigForm = ({
         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <input
-        type="number"
+        type="text"
         value={formData.value}
-        onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
+        onChange={(e) => {
+          const value = e.target.value;
+          // Permitir vacío, números y un solo punto decimal
+          if (value === '' || /^\d*\.?\d*$/.test(value)) {
+            setFormData({ ...formData, value: value });
+          }
+        }}
+        placeholder="Ej: 13.45"
         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <div className="flex space-x-2">
@@ -587,7 +454,7 @@ const EditSystemConfigForm = ({
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
-          onClick={() => onSave(formData.key, formData.value, formData.description)}
+          onClick={handleSave}
           className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
         >
           Guardar
@@ -606,135 +473,18 @@ const EditSystemConfigForm = ({
 // Componente para niveles de riesgo
 const RiskTierConfigTab = ({ 
   configs, 
-  onUpdate,
-  onCreate, 
-  onDelete 
+  onUpdate
 }: { 
   configs: RiskTierConfig[]
   onUpdate: (id: string, data: { tier?: 'A' | 'B' | 'C' | 'D'; spread?: number; factor?: number; allowed_terms?: number[] }) => void
-  onCreate: (data: { tier: 'A' | 'B' | 'C' | 'D'; spread: number; factor: number; allowed_terms: number[] }) => void
-  onDelete: (id: string) => void
 }) => {
-  const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [confirmationModal, setConfirmationModal] = useState<{isOpen: boolean, id: string | null}>({isOpen: false, id: null})
-  const [newConfig, setNewConfig] = useState({
-    tier: 'A' as 'A' | 'B' | 'C' | 'D',
-    spread: 0,
-    factor: 0,
-    allowed_terms: [] as number[]
-  })
-
-  const handleCreate = () => {
-    if (newConfig.tier && newConfig.spread && newConfig.factor && newConfig.allowed_terms.length > 0) {
-      onCreate(newConfig)
-      setNewConfig({ tier: 'A', spread: 0, factor: 0, allowed_terms: [] })
-      setShowCreateForm(false)
-    }
-  }
-
-  const handleDelete = (id: string) => {
-    setConfirmationModal({isOpen: true, id})
-  }
-  
-  const confirmDelete = () => {
-    if (confirmationModal.id) {
-      onDelete(confirmationModal.id)
-      setConfirmationModal({isOpen: false, id: null})
-    }
-  }
 
   return (
     <div className="space-y-6">
-      <ConfirmationModal
-        isOpen={confirmationModal.isOpen}
-        message="¿Estás seguro de que quieres eliminar esta configuración?"
-        onConfirm={confirmDelete}
-        onCancel={() => setConfirmationModal({isOpen: false, id: null})}
-      />
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">Configuraciones de Nivel de Riesgo</h3>
-        <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          {showCreateForm ? 'Cancelar' : 'Agregar Nivel de Riesgo'}
-        </button>
       </div>
-
-      {/* Formulario para crear nueva configuración */}
-      {showCreateForm && (
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h4 className="text-lg font-medium text-gray-900 mb-4">Nueva Configuración de Riesgo</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Nivel de Riesgo</label>
-              <select
-                value={newConfig.tier}
-                onChange={(e) => setNewConfig({ ...newConfig, tier: e.target.value as 'A' | 'B' | 'C' | 'D' })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Spread (%)</label>
-              <input
-                type="text"
-                value={newConfig.spread === 0 ? '' : newConfig.spread}
-                onChange={(e) => {
-                  const value = e.target.value === '' ? 0 : Number(e.target.value);
-                  setNewConfig({ ...newConfig, spread: isNaN(value) ? 0 : value });
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: 8.5"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Factor</label>
-              <input
-                type="text"
-                value={newConfig.factor === 0 ? '' : newConfig.factor}
-                onChange={(e) => {
-                  const value = e.target.value === '' ? 0 : Number(e.target.value);
-                  setNewConfig({ ...newConfig, factor: isNaN(value) ? 0 : value });
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: 0.35"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Plazos Permitidos (meses)</label>
-              <input
-                type="text"
-                placeholder="Ej: 6,12,24,36"
-                onChange={(e) => {
-                  const terms = e.target.value.split(',').map(t => parseInt(t.trim())).filter(t => !isNaN(t))
-                  setNewConfig({ ...newConfig, allowed_terms: terms })
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-          <div className="mt-4 flex space-x-2">
-            <button
-              onClick={handleCreate}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-            >
-              Crear
-            </button>
-            <button
-              onClick={() => setShowCreateForm(false)}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {configs && configs.length > 0 ? configs.map((config) => (
@@ -788,15 +538,9 @@ const RiskTierConfigTab = ({
                 <div className="mt-4 flex space-x-2">
                   <button
                     onClick={() => setEditingId(config.id)}
-                    className="flex-1 px-3 py-2 text-sm text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md"
+                    className="w-full px-3 py-2 text-sm text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md"
                   >
                     Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(config.id)}
-                    className="flex-1 px-3 py-2 text-sm text-red-600 hover:text-red-800 border border-red-600 rounded-md"
-                  >
-                    Eliminar
                   </button>
                 </div>
               </>
@@ -816,17 +560,14 @@ const RiskTierConfigTab = ({
 const IndustriesTab = ({ 
   industries, 
   onUpdate,
-  onCreate, 
-  onDelete 
+  onCreate
 }: { 
   industries: Industry[]
   onUpdate: (id: string, data: { name?: string; baseRiskTier?: 'A' | 'B' | 'C' | 'D'; description?: string }) => void
   onCreate: (data: { name: string; baseRiskTier: 'A' | 'B' | 'C' | 'D'; description?: string }) => void
-  onDelete: (id: string) => void
 }) => {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [confirmationModal, setConfirmationModal] = useState<{isOpen: boolean, id: string | null}>({isOpen: false, id: null})
   const [newIndustry, setNewIndustry] = useState({
     name: '',
     baseRiskTier: 'A' as 'A' | 'B' | 'C' | 'D',
@@ -841,25 +582,8 @@ const IndustriesTab = ({
     }
   }
 
-  const handleDelete = (id: string) => {
-    setConfirmationModal({isOpen: true, id})
-  }
-  
-  const confirmDelete = () => {
-    if (confirmationModal.id) {
-      onDelete(confirmationModal.id)
-      setConfirmationModal({isOpen: false, id: null})
-    }
-  }
-
   return (
     <div className="space-y-6">
-      <ConfirmationModal
-        isOpen={confirmationModal.isOpen}
-        message="¿Estás seguro de que quieres eliminar esta industria?"
-        onConfirm={confirmDelete}
-        onCancel={() => setConfirmationModal({isOpen: false, id: null})}
-      />
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">Industrias</h3>
         <button
@@ -962,15 +686,9 @@ const IndustriesTab = ({
                 <div className="mt-4 flex space-x-2">
                   <button
                     onClick={() => setEditingId(industry.id)}
-                    className="flex-1 px-3 py-2 text-sm text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md"
+                    className="w-full px-3 py-2 text-sm text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md"
                   >
                     Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(industry.id)}
-                    className="flex-1 px-3 py-2 text-sm text-red-600 hover:text-red-800 border border-red-600 rounded-md"
-                  >
-                    Eliminar
                   </button>
                 </div>
               </>
