@@ -34,6 +34,40 @@ paths:
           description: Datos inválidos o solicitud ya existente
         "404":
           description: Compañía no encontrada
+    get:
+      summary: Listar todas las solicitudes de crédito con paginación
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [APPLYING, SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED]
+      responses:
+        "200":
+          description: Lista paginada de solicitudes de crédito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedCreditApplicationsResponse"
 
   /api/loanRequest/confirm:
     post:
@@ -78,6 +112,29 @@ paths:
                 items:
                   $ref: "#/components/schemas/LoanSummaryResponse"
 
+  /api/loanRequest/status/{id}:
+    get:
+      summary: Obtener estado de una solicitud de crédito
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Estado de la solicitud de crédito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditApplicationStatusResponse"
+        "404":
+          description: Solicitud no encontrada
+
   /api/loanRequest/{id}:
     get:
       summary: Obtener detalle de una solicitud de crédito
@@ -94,8 +151,38 @@ paths:
       responses:
         "200":
           description: Detalle de la solicitud de crédito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoanOfferResponse"
         "404":
-          description: No encontrada
+          description: Solicitud no encontrada
+
+    delete:
+      summary: Eliminar una solicitud de crédito
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Solicitud eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResponse"
+        "400":
+          description: No se puede eliminar la solicitud
+        "403":
+          description: No autorizado
+        "404":
+          description: Solicitud no encontrada
 
 components:
   securitySchemes:
@@ -194,3 +281,43 @@ components:
           type: string
           enum: [APPLYING, SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED]
           example: "SUBMITTED"
+
+    CreditApplicationStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [APPLYING, SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED]
+          example: "SUBMITTED"
+        applicationNumber:
+          type: string
+          example: "CRD-001245"
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-02-14T10:00:00Z"
+
+    PaginatedCreditApplicationsResponse:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: "#/components/schemas/LoanSummaryResponse"
+        total:
+          type: integer
+          example: 25
+        page:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 3
+
+    DeleteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Solicitud de crédito eliminada exitosamente."

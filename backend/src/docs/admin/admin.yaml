@@ -351,6 +351,87 @@ paths:
         "200":
           description: Eliminada
 
+  /api/admin/credit-applications:
+    get:
+      summary: Listar solicitudes de crédito para administradores
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/CreditApplicationStatus'
+        - name: companyName
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista paginada de solicitudes de crédito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminCreditApplicationsResponse'
+
+  /api/admin/credit-applications/{id}/status:
+    patch:
+      summary: Actualizar estado de solicitud de crédito
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCreditApplicationStatusInput'
+      responses:
+        "200":
+          description: Estado actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      application:
+                        $ref: '#/components/schemas/AdminCreditApplicationResponse'
+        "400":
+          description: Datos inválidos o transición de estado no permitida
+        "404":
+          description: Solicitud no encontrada
+
 components:
   securitySchemes:
     bearerAuth:
@@ -482,4 +563,97 @@ components:
     RiskTier:
       type: string
       enum: [A, B, C, D]
+
+    # Credit Application Management
+    CreditApplicationStatus:
+      type: string
+      enum: [DRAFT, APPLYING, SUBMITTED, UNDER_REVIEW, DOCUMENTS_REQUIRED, APPROVED, REJECTED, DISBURSED, CANCELLED, NOT_APPLICABLE]
+
+    UpdateCreditApplicationStatusInput:
+      type: object
+      required: [newStatus]
+      properties:
+        newStatus:
+          $ref: '#/components/schemas/CreditApplicationStatus'
+        rejectionReason:
+          type: string
+          nullable: true
+          description: Requerido cuando newStatus es REJECTED
+        internalNotes:
+          type: string
+          nullable: true
+        approvedAmount:
+          type: number
+          nullable: true
+          description: Requerido cuando newStatus es APPROVED
+        riskScore:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+
+    AdminCreditApplicationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        applicationNumber:
+          type: string
+        companyName:
+          type: string
+        selectedAmount:
+          type: number
+          nullable: true
+        approvedAmount:
+          type: number
+          nullable: true
+        status:
+          $ref: '#/components/schemas/CreditApplicationStatus'
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        reviewedAt:
+          type: string
+          format: date-time
+          nullable: true
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        rejectionReason:
+          type: string
+          nullable: true
+        internalNotes:
+          type: string
+          nullable: true
+        riskScore:
+          type: number
+          nullable: true
+        reviewedBy:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            email:
+              type: string
+
+    PaginatedAdminCreditApplicationsResponse:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminCreditApplicationResponse'
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
 

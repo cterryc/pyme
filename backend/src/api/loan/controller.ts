@@ -73,8 +73,9 @@ export default class LoanController {
     next: NextFunction
   ) => {
     try {
-      // Lógica para obtener el estado de la solicitud de crédito
-      res.status(HttpStatus.OK).json(apiResponse(true, { status: "PENDING" }));
+      const { id } = req.params;
+      const statusInfo = await this.loanService.getCreditApplicationStatus(id);
+      res.status(HttpStatus.OK).json(apiResponse(true, statusInfo));
     } catch (error) {
       return next(error);
     }
@@ -86,8 +87,13 @@ export default class LoanController {
     next: NextFunction
   ) => {
     try {
-      // Lógica para listar las solicitudes de crédito
-      res.status(HttpStatus.OK).json(apiResponse(true, { applications: [] }));
+      const { page, limit, status } = req.query;
+      const result = await this.loanService.listCreditApplications(
+        page as string | number, 
+        limit as string | number, 
+        status as string
+      );
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
     } catch (error) {
       return next(error);
     }
@@ -99,11 +105,9 @@ export default class LoanController {
     next: NextFunction
   ) => {
     try {
-      const applicationId = req.params.id;
-      // Lógica para obtener una solicitud de crédito por ID
-      res
-        .status(HttpStatus.OK)
-        .json(apiResponse(true, { application: { id: applicationId } }));
+      const { id } = req.params;
+      const application = await this.loanService.getCreditApplicationById(id);
+      res.status(HttpStatus.OK).json(apiResponse(true, application));
     } catch (error) {
       return next(error);
     }
@@ -115,11 +119,68 @@ export default class LoanController {
     next: NextFunction
   ) => {
     try {
+      const { id } = req.params;
+      const userId = res.locals.user?.id as string;
+      const result = await this.loanService.deleteCreditApplication(id, userId);
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+
+  // --- MÉTODOS ADMINISTRATIVOS ---
+
+  static updateCreditApplicationStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
       const applicationId = req.params.id;
-      // Lógica para eliminar una solicitud de crédito
-      res
-        .status(HttpStatus.OK)
-        .json(apiResponse(true, { message: "Solicitud de crédito eliminada" }));
+      const adminUserId = res.locals.user?.id as string;
+      const {
+        newStatus,
+        rejectionReason,
+        internalNotes,
+        approvedAmount,
+        riskScore,
+      } = req.body;
+
+      const result = await this.loanService.updateCreditApplicationStatus(
+        applicationId,
+        newStatus,
+        adminUserId,
+        rejectionReason,
+        internalNotes,
+        approvedAmount,
+        riskScore
+      );
+
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+
+  static getCreditApplicationsForAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const status = req.query.status as string;
+      const companyName = req.query.companyName as string;
+
+      const result = await this.loanService.getCreditApplicationsForAdmin(
+        page,
+        limit,
+        status as any,
+        companyName
+      );
+
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
     } catch (error) {
       return next(error);
     }

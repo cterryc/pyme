@@ -1,18 +1,20 @@
- import { Request, Response, NextFunction } from "express";
- import { HttpStatus } from "../../constants/HttpStatus";
- import apiResponse from "../../utils/apiResponse.utils";
- import AdminService from "./service";
- import {
-   createSystemConfigSchema,
-   updateSystemConfigSchema,
-   createRiskTierConfigSchema,
-   updateRiskTierConfigSchema,
-  createIndustrySchema,
-  updateIndustrySchema,
+import { Request, Response, NextFunction } from "express";
+import { HttpStatus } from "../../constants/HttpStatus";
+import apiResponse from "../../utils/apiResponse.utils";
+import AdminService from "./service";
+import LoanService from "../loan/service";
+import {
+  createSystemConfigSchema,
+  updateSystemConfigSchema,
+  createRiskTierConfigSchema,
+  updateRiskTierConfigSchema,
+ createIndustrySchema,
+ updateIndustrySchema,
  } from "./validator";
 
- export default class AdminController {
-   private static service = new AdminService();
+export default class AdminController {
+  private static service = new AdminService();
+  private static loanService = new LoanService();
 
    static listSystemConfigs = async (
      req: Request,
@@ -224,4 +226,57 @@
       return next(error);
     }
   };
- }
+
+  // CREDIT APPLICATIONS MANAGEMENT
+  static getCreditApplicationsForAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { page, limit, status, companyName } = req.query;
+      const result = await this.loanService.getCreditApplicationsForAdmin(
+        page as string | number,
+        limit as string | number,
+        status as string,
+        companyName as string
+      );
+
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+
+  static updateCreditApplicationStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { id } = req.params;
+      const adminUserId = res.locals.user?.id as string;
+      const {
+        newStatus,
+        rejectionReason,
+        internalNotes,
+        approvedAmount,
+        riskScore,
+      } = req.body;
+
+      const result = await this.loanService.updateCreditApplicationStatus(
+        id,
+        newStatus,
+        adminUserId,
+        rejectionReason,
+        internalNotes,
+        approvedAmount,
+        riskScore
+      );
+
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+}

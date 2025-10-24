@@ -50,7 +50,7 @@ export default class MiddlewareConfig {
                 openapi: "3.0.1",
                 info: {
                     title: "Fintech Credit Platform API",
-                    description: "API para plataforma de solicitud de créditos para PYMEs con KYC/AML",
+                    description: "API para plataforma de solicitud de créditos para PYMEs",
                     version: "1.0.0",
                 },
                 components: {

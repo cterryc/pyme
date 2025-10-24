@@ -5,14 +5,19 @@
  import { UserRole } from "../../constants/Roles";
  import schemaValidator from "../../middlewares/schemaValidators.middlewares";
  import { validateUuid } from "../../middlewares/validateParamId.middleware";
- import {
-   createSystemConfigSchema,
-   updateSystemConfigSchema,
-   createRiskTierConfigSchema,
-   updateRiskTierConfigSchema,
-  createIndustrySchema,
-  updateIndustrySchema,
+import {
+  createSystemConfigSchema,
+  updateSystemConfigSchema,
+  createRiskTierConfigSchema,
+  updateRiskTierConfigSchema,
+ createIndustrySchema,
+ updateIndustrySchema,
  } from "./validator";
+import { 
+  updateCreditApplicationStatusParamsSchema,
+  updateCreditApplicationStatusBodySchema,
+  getCreditApplicationsForAdminQuerySchema 
+} from "../loan/validator";
 
  const adminRouter = Router();
 
@@ -101,4 +106,16 @@ adminRouter.delete(
   AdminController.deleteIndustry
 );
 
- export default adminRouter;
+// CREDIT APPLICATIONS MANAGEMENT
+adminRouter.get(
+  "/credit-applications", 
+  schemaValidator(null, getCreditApplicationsForAdminQuerySchema),
+  AdminController.getCreditApplicationsForAdmin
+);
+adminRouter.patch(
+  "/credit-applications/:id/status",
+  schemaValidator(updateCreditApplicationStatusBodySchema, updateCreditApplicationStatusParamsSchema),
+  AdminController.updateCreditApplicationStatus
+);
+
+export default adminRouter;
