@@ -13,11 +13,18 @@ export const createCreditApplicationSchema = z
     companyId: z.string().uuid({ message: "ID de compañía inválido" }),
     selectedAmount: z
       .number()
-      .positive({ message: "Monto seleccionado debe ser mayor a 0" }),
+      .positive({ message: "Monto seleccionado debe ser mayor a 0" })
+      .refine((val) => !isNaN(val) && isFinite(val), {
+        message: "El monto seleccionado debe ser un número válido",
+      }),
     selectedTermMonths: z
       .number()
-      .int()
-      .min(1, { message: "El plazo seleccionado debe ser al menos 1 mes" }),
+      .int({ message: "El plazo debe ser un número entero" })
+      .min(1, { message: "El plazo seleccionado debe ser al menos 1 mes" })
+      .max(360, { message: "El plazo no puede exceder 360 meses (30 años)" })
+      .refine((val) => !isNaN(val) && isFinite(val), {
+        message: "El plazo debe ser un número válido",
+      }),
   })
   .strict();
 
@@ -89,11 +96,17 @@ export const updateCreditApplicationStatusBodySchema = z
     approvedAmount: z
       .number()
       .positive({ message: "Monto aprobado debe ser mayor a 0" })
+      .refine((val) => !isNaN(val) && isFinite(val), {
+        message: "El monto aprobado debe ser un número válido",
+      })
       .optional(),
     riskScore: z
       .number()
       .min(0, { message: "Score de riesgo no puede ser negativo" })
       .max(100, { message: "Score de riesgo no puede ser mayor a 100" })
+      .refine((val) => !isNaN(val) && isFinite(val), {
+        message: "El score de riesgo debe ser un número válido",
+      })
       .optional(),
   })
   .strict();

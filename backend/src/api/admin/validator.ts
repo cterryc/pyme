@@ -8,7 +8,10 @@ import { CreditApplicationStatus } from "../../constants/CreditStatus";
        .refine((val) => val.trim().length > 0, {
          message: "La clave no puede contener solo espacios en blanco",
        }),
-     value: z.coerce.number(),
+     value: z.coerce.number()
+       .refine((val) => !isNaN(val) && isFinite(val), {
+         message: "El valor debe ser un número válido",
+       }),
      description: z.string().trim().optional().or(z.literal('')),
    })
    .strict();
@@ -18,8 +21,16 @@ import { CreditApplicationStatus } from "../../constants/CreditStatus";
  export const createRiskTierConfigSchema = z
    .object({
      tier: z.nativeEnum(RiskTier),
-     spread: z.coerce.number(),
-     factor: z.coerce.number(),
+     spread: z.coerce.number()
+       .min(0, { message: "El spread no puede ser negativo" })
+       .refine((val) => !isNaN(val) && isFinite(val), {
+         message: "El spread debe ser un número válido",
+       }),
+     factor: z.coerce.number()
+       .min(0, { message: "El factor no puede ser negativo" })
+       .refine((val) => !isNaN(val) && isFinite(val), {
+         message: "El factor debe ser un número válido",
+       }),
      allowed_terms: z.array(z.coerce.number().int().positive()).nonempty(),
    })
    .strict();
@@ -73,8 +84,19 @@ export const updateCreditApplicationStatusSchema = z
         message: "Las notas internas no pueden contener solo espacios en blanco",
       })
       .optional(),
-    approvedAmount: z.coerce.number().positive().optional(),
-    riskScore: z.coerce.number().min(0).max(100).optional(),
+    approvedAmount: z.coerce.number()
+      .positive({ message: "El monto aprobado debe ser mayor a 0" })
+      .refine((val) => !isNaN(val) && isFinite(val), {
+        message: "El monto aprobado debe ser un número válido",
+      })
+      .optional(),
+    riskScore: z.coerce.number()
+      .min(0, { message: "El score de riesgo no puede ser negativo" })
+      .max(100, { message: "El score de riesgo no puede ser mayor a 100" })
+      .refine((val) => !isNaN(val) && isFinite(val), {
+        message: "El score de riesgo debe ser un número válido",
+      })
+      .optional(),
   })
   .strict()
   .refine(
