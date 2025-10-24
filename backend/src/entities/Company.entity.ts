@@ -99,6 +99,9 @@ export class Company extends BaseEntity {
   @RelationId((c: Company) => c.owner)
   ownerId!: string;
 
+  @RelationId((c: Company) => c.industry)
+  industryId?: string;
+
   @OneToMany(() => CreditApplication, (application) => application.company)
   creditApplications?: CreditApplication[];
 
