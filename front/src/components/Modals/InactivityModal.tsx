@@ -22,7 +22,7 @@ export const InactivityModal = ({ children }: { children: ReactNode }) => {
   }
   const closeSession = () => {
     localStorage.removeItem('tokenPyme')
-    window.location.href = '/Login'
+    window.location.href = '/inicio-sesion'
     setToggleModal(false)
   }
 
