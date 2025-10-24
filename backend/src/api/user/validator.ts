@@ -8,11 +8,17 @@ export const userUpdatePayloadValidator = z.object({
     .string()
     .min(3, { message: "El nombre debe tener al menos 3 caracteres" })
     .max(100, { message: "El nombre no puede exceder 100 caracteres" })
+    .refine((val) => val.trim().length >= 3, {
+      message: "El nombre debe tener al menos 3 caracteres sin contar espacios",
+    })
     .optional(),
   lastName: z
     .string()
     .min(3, { message: "El apellido debe tener al menos 3 caracteres" })
     .max(100, { message: "El apellido no puede exceder 100 caracteres" })
+    .refine((val) => val.trim().length >= 3, {
+      message: "El apellido debe tener al menos 3 caracteres sin contar espacios",
+    })
     .optional(),
   phone: z
     .string()
@@ -42,6 +48,9 @@ export const userUpdatePayloadValidator = z.object({
     })
     .regex(/[0-9]/, {
       message: "La nueva contraseña debe contener al menos un número",
+    })
+    .refine((val) => val.trim().length >= 8, {
+      message: "La nueva contraseña no puede contener solo espacios en blanco",
     })
     .optional(),
   currentPassword: z.string().optional(),

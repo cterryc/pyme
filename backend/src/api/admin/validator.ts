@@ -4,9 +4,12 @@ import { CreditApplicationStatus } from "../../constants/CreditStatus";
 
  export const createSystemConfigSchema = z
    .object({
-     key: z.string().min(1).max(100),
+     key: z.string().min(1).max(100)
+       .refine((val) => val.trim().length > 0, {
+         message: "La clave no puede contener solo espacios en blanco",
+       }),
      value: z.coerce.number(),
-     description: z.string().optional(),
+     description: z.string().trim().optional().or(z.literal('')),
    })
    .strict();
 
@@ -42,9 +45,12 @@ export const createIndustrySchema = z
       .string()
       .min(1)
       .max(100)
+      .refine((val) => val.trim().length > 0, {
+        message: "El nombre no puede contener solo espacios en blanco",
+      })
       .transform((v) => v.toLowerCase()),
     baseRiskTier: z.nativeEnum(RiskTier),
-    description: z.string().optional(),
+    description: z.string().trim().optional().or(z.literal('')),
   })
   .strict();
 
@@ -57,8 +63,16 @@ export type UpdateIndustryInput = z.infer<typeof updateIndustrySchema>;
 export const updateCreditApplicationStatusSchema = z
   .object({
     newStatus: z.nativeEnum(CreditApplicationStatus),
-    rejectionReason: z.string().optional(),
-    internalNotes: z.string().optional(),
+    rejectionReason: z.string()
+      .refine((val) => !val || val.trim().length > 0, {
+        message: "La razón de rechazo no puede contener solo espacios en blanco",
+      })
+      .optional(),
+    internalNotes: z.string()
+      .refine((val) => !val || val.trim().length > 0, {
+        message: "Las notas internas no pueden contener solo espacios en blanco",
+      })
+      .optional(),
     approvedAmount: z.coerce.number().positive().optional(),
     riskScore: z.coerce.number().min(0).max(100).optional(),
   })

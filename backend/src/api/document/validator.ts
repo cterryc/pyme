@@ -19,5 +19,8 @@ export const updateDocumentStatusValidator = z.object({
   rejectionReason: z
     .string()
     .min(10, { message: "El motivo de rechazo debe tener al menos 10 caracteres" })
+    .refine((val) => val.trim().length >= 10, {
+      message: "El motivo de rechazo debe tener al menos 10 caracteres sin contar espacios",
+    })
     .optional(),
 });

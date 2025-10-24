@@ -1,23 +1,40 @@
 import { z } from "zod";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
 
+// Validador para strings que no deben ser solo espacios
+const nonEmptyString = (minLength: number = 1, maxLength?: number) => {
+  let schema = z.string()
+    .min(minLength, { message: 'Campo requerido' })
+    .refine((val) => val.trim().length > 0, {
+      message: "El campo no puede contener solo espacios en blanco",
+    });
+  
+  if (maxLength) {
+    schema = schema.refine((val) => val.length <= maxLength, {
+      message: `El campo no puede exceder ${maxLength} caracteres`,
+    }) as any;
+  }
+  
+  return schema;
+};
+
 export const createCompanySchema = z.object({
-  legalName: z.string().min(1, { message: 'Nombre legal requerido' }).max(255),
-  tradeName: z.string().optional(),
+  legalName: nonEmptyString(1, 255),
+  tradeName: z.string().trim().optional().or(z.literal('')),
   industryId: z.string().uuid({ message: 'ID de industria inválido' }),
-  taxId: z.string().min(1, { message: 'Tax ID requerido' }).max(50), 
-  email: z.string().email({ message: 'Email inválido' }).optional(),
+  taxId: nonEmptyString(1, 50), 
+  email: z.string().email({ message: 'Email inválido' }).optional().or(z.literal('')),
   foundedDate: z.coerce.date().optional(),  
   employeeCount: z.number().int().min(0),
   annualRevenue: z.number().min(0),  
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  postalCode: z.string().optional(),
-  country: z.string().optional(),
-  phone: z.string().optional(),
-  website: z.string().url({ message: 'URL inválida' }).optional(),
-  description: z.string().optional(),
+  address: z.string().trim().optional().or(z.literal('')),
+  city: z.string().trim().optional().or(z.literal('')),
+  state: z.string().trim().optional().or(z.literal('')),
+  postalCode: z.string().trim().optional().or(z.literal('')),
+  country: z.string().trim().optional().or(z.literal('')),
+  phone: z.string().trim().optional().or(z.literal('')),
+  website: z.string().url({ message: 'URL inválida' }).optional().or(z.literal('')),
+  description: z.string().trim().optional().or(z.literal('')),
 }).strict();
 
 export const getAllCompaniesQuerySchema = z.object({
@@ -30,7 +47,7 @@ export const getAllCompaniesQuerySchema = z.object({
   deleted: z.enum(['true', 'false', 'all']).optional().default('false'),
   
   // Búsqueda
-  search: z.string().optional(), // Busca en legalName y taxId
+  search: z.string().trim().min(1).optional(), // Busca en legalName y taxId
   
   // Filtros de fecha - createdAt
   createdAtFrom: z.coerce.date().optional(),

@@ -18,8 +18,22 @@ import apiResponse from './utils/apiResponse.utils';
   
     app.use("/api", apiRouter);
 
-  
-    app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+    // Middleware para manejar errores de JSON mal formado
+    app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+      // Error de JSON mal formado
+      if (err instanceof SyntaxError && 'body' in err && (err as any).type === 'entity.parse.failed') {
+        return res.status(400).json(apiResponse(false, { 
+          message: "JSON mal formado. Por favor verifica la sintaxis del JSON enviado.",
+          details: err.message,
+          code: 400 
+        }));
+      }
+      
+      next(err);
+    });
+
+    // Middleware para manejar otros errores
+    app.use((err: HttpError, req: Request, res: Response, _next: NextFunction) => {
       console.error("Error capturado:", err);
 
       const status = err.status || 500;

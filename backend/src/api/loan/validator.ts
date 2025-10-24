@@ -75,10 +75,16 @@ export const updateCreditApplicationStatusBodySchema = z
       .string()
       .min(1, { message: "Razón de rechazo no puede estar vacía" })
       .max(1000, { message: "Razón de rechazo muy larga" })
+      .refine((val) => val.trim().length > 0, {
+        message: "La razón de rechazo no puede contener solo espacios en blanco",
+      })
       .optional(),
     internalNotes: z
       .string()
       .max(2000, { message: "Notas internas muy largas" })
+      .refine((val) => !val || val.trim().length > 0, {
+        message: "Las notas internas no pueden contener solo espacios en blanco",
+      })
       .optional(),
     approvedAmount: z
       .number()
@@ -128,6 +134,9 @@ export const getCreditApplicationsForAdminQuerySchema = z
       .string()
       .min(1, { message: "Nombre de compañía no puede estar vacío" })
       .max(255, { message: "Nombre de compañía muy largo" })
+      .refine((val) => val.trim().length > 0, {
+        message: "El nombre de compañía no puede contener solo espacios en blanco",
+      })
       .optional(),
   })
   .strict();
