@@ -19,7 +19,9 @@ import {
   pymeRegister,
   pymeRegisterDocuments,
   pymeLoanRequestConfirm,
-  getIndustries
+  getIndustries,
+  getPymeById,
+  updatePyme
 } from '@/services/pyme.service'
 
 interface UsePymeRegisterProps {
@@ -107,5 +109,31 @@ export const useGetPymesByUser = () => {
     staleTime: 1000 * 60 * 5, // 5 min antes de recargar
     retry: 1, // reintenta 1 vez si falla
     refetchOnWindowFocus: false // no recarga al volver a la pestaña
+  })
+}
+export const useGetPymeById = (id: string) => {
+  return useQuery({
+    queryKey: ['pymeById', id],
+    queryFn: () => getPymeById(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+    refetchOnWindowFocus: false
+  })
+}
+
+interface UseUpdatePyme {
+  onSuccess?: (data: RegisterPymeSucessResponse) => void
+  onError?: (error: unknown) => void
+}
+export const useUpdatePyme = ({ onSuccess, onError }: UseUpdatePyme) => {
+  return useMutation<RegisterPymeSucessResponse, RegisterPymeErrorResponse, RegisterPymeFormData & { id: string }>({
+    mutationFn: async (data) => updatePyme(data),
+    onSuccess: (data) => {
+      if (onSuccess) onSuccess(data)
+    },
+    onError: (error) => {
+      if (onError) onError(error)
+    }
   })
 }

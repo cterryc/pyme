@@ -205,6 +205,16 @@ export class SeedService {
         value: 1000.0,
         description: "Redondeo de montos de préstamo",
       },
+      {
+        key: "MAX_EMPLOYEE_COUNT",
+        value: 250,
+        description: "Número máximo de empleados",
+      },
+      {
+        key: "MAX_ANNUAL_REVENUE",
+        value: 50000000.0,
+        description: "Ingreso anual máximo",
+      },
     ];
 
     for (const configData of systemConfigs) {

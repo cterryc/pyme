@@ -1,3 +1,24 @@
+export type PymeResponse = {
+  id: string
+  legalName: string
+  tradeName: string
+  phone: number
+  email: string
+  taxId: string
+  ownerId: string
+  industry: string
+  foundedDate: string
+  employeeCount: number
+  annualRevenue: number
+  address: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+  website: string | null
+  description: string
+}
+
 export type GetIndustriesResponse = {
   success: boolean
   payload: Array<{ id: string; name: string }>
@@ -5,26 +26,7 @@ export type GetIndustriesResponse = {
 
 export type RegisterPymeSucessResponse = {
   success: boolean
-  payload: {
-    id: string
-    legalName: string
-    tradeName: string
-    phone: number
-    email: string
-    taxId: string
-    ownerId: string
-    industry: string
-    foundedDate: string
-    employeeCount: number
-    annualRevenue: number
-    address: string
-    city: string
-    state: string
-    postalCode: string
-    country: string
-    website: null
-    description: string
-  }
+  payload: PymeResponse
 }
 // export type RegisterPymeErrorResponse = { success: boolean; payload: Array<{ path: string; message: string }> }
 export type RegisterPymeErrorResponse = { success: boolean; payload: { message: string } }

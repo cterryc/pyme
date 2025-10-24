@@ -5,29 +5,45 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { registerPymeSchema, type RegisterPymeFormData } from '@/schemas/pyme.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { usePymeRegister, useGetIndustries } from '@/hooks/usePyme'
-import { useNavigate } from 'react-router-dom'
+import { usePymeRegister, useGetIndustries, useGetPymeById, useUpdatePyme } from '@/hooks/usePyme'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import Confetti from 'react-confetti'
 
 export const RegisterPyme = () => {
+  const location = useLocation();
+  const id = location.state?.pymeId;
   const navigate = useNavigate()
   const maxStep = 4
   const [step, setStep] = useState(0)
+  const [isEditPyme, setIsEditPyme] = useState(false)
   const [pymeId, setPymeId] = useState('')
   const [industriesList, setIndustriesList] = useState<Array<{ id: string; name: string }>>()
 
   const { data: industries, isLoading: getIndustriesIsLoading, isError: getIndustriesError } = useGetIndustries()
-
-  useEffect(() => {
-    setIndustriesList(industries?.payload)
-  }, [industries])
+  const { data: pymeById, refetch } = useGetPymeById(id)
+  const { mutate: updatePymeById } = useUpdatePyme({
+    onSuccess: () => {
+      toast.success('¡MYPE actualizada exitosamente!', {
+        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
+        duration: 4000
+      })
+      localStorage.removeItem('registerPymeBackup')
+      navigate("/panel")
+      setIsEditPyme(false)
+    },
+    onError: () => {
+      toast.error('Error al actualizar la MYPE', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: 'Verifica los datos ingresados.',
+        duration: 4000
+      })
+    }
+  })
 
   const {
     mutate: pymeRegister,
-    isPending,
-    isError,
-    error
+    isPending
   } = usePymeRegister({
     onSuccess: (data) => {
       // console.log(data)
@@ -36,7 +52,6 @@ export const RegisterPyme = () => {
         description: 'Ahora debes adjuntar los documentos requeridos y firmarlos para completar el registro.',
         duration: 4000
       })
-      localStorage.removeItem('registerPymeBackup')
       localStorage.removeItem('registerPymeBackup')
       setPymeId(data.payload.id)
     },
@@ -57,7 +72,7 @@ export const RegisterPyme = () => {
         duration: 1500
       })
     }
-  }, [isPending, isError, error])
+  }, [isPending])
 
   const getStoredData = () => {
     const storedForm = localStorage.getItem('registerPymeBackup')
@@ -73,18 +88,33 @@ export const RegisterPyme = () => {
     // setValue,
     watch,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm<RegisterPymeFormData>({
     resolver: zodResolver(registerPymeSchema),
-    defaultValues: getStoredData(),
-    criteriaMode: 'all',
+    // criteriaMode: 'all',
     mode: 'onChange'
   })
 
+  useEffect(() => {
+    setIndustriesList(industries?.payload)
+    if (id && pymeById?.payload) {
+      refetch();
+      setIsEditPyme(true)
+      localStorage.removeItem('registerPymeBackup')
+      reset(pymeById.payload)
+    } else {
+      reset({}) 
+    }
+  }, [industries, id, pymeById, reset, refetch])
+
   const onSubmit = (data: RegisterPymeFormData) => {
-    localStorage.removeItem('registerPymeBackup')
-    pymeRegister(data)
-  }
+    if (isEditPyme) {
+      updatePymeById({ ...data, id });
+    } else {
+      pymeRegister(data);
+    }
+  };
 
   const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
@@ -103,10 +133,12 @@ export const RegisterPyme = () => {
     if (Object.keys(errors).length > 0) {
       toast.error('Hay errores en el formulario', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: 'Revisa los datos ingresados',
         duration: 2000
       })
     }
   }, [errors])
+
   useEffect(() => {
     const subscription = watch((value) => {
       localStorage.setItem('registerPymeBackup', JSON.stringify(value))
@@ -121,7 +153,9 @@ export const RegisterPyme = () => {
         <>
           {!getIndustriesError && (
             <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1 min-h-screen'>
-              <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Registra de PYME</h2>
+              <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>
+                {isEditPyme ? 'Edicion' : 'Registro'} de PYME
+              </h2>
               <p>Completa la información para crear el perfil de tu empresa.</p>
 
               <ProgressBar percent={Math.floor(100 / maxStep) * step} title='Progreso' barHeight={10} padding={30} />
@@ -450,6 +484,7 @@ export const RegisterPyme = () => {
                 <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
                   {step != 0 ? (
                     <button
+                      type='button'
                       className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
                       onClick={prevStep}
                     >
@@ -457,6 +492,7 @@ export const RegisterPyme = () => {
                     </button>
                   ) : (
                     <button
+                      type='button'
                       onClick={(e) => {
                         e.preventDefault()
                         navigate('/panel')
@@ -478,7 +514,7 @@ export const RegisterPyme = () => {
                     <input
                       type='submit'
                       className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                      value='Confirmar'
+                      value={isEditPyme ? 'Actualizar' : 'Confirmar'}
                     />
                   )}
                 </div>

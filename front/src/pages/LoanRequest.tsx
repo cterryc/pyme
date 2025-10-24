@@ -82,11 +82,11 @@ export const LoanRequest = () => {
   useEffect(() => {
     setEnableSend(
       loanOptions != undefined &&
-        selectedTerm > 0 &&
-        selectedAmount >= loanOptions?.offerDetails.minAmount &&
-        selectedAmount <= loanOptions?.offerDetails.maxAmount
+      selectedTerm > 0 &&
+      selectedAmount >= loanOptions?.offerDetails.minAmount &&
+      selectedAmount <= loanOptions?.offerDetails.maxAmount
     )
-  }, [selectedAmount, selectedTerm, loanOptions?.offerDetails.minAmount, loanOptions?.offerDetails.maxAmount])
+  }, [selectedAmount, selectedTerm, loanOptions])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -241,13 +241,13 @@ export const LoanRequest = () => {
                 <ImSpinner8 className='animate-spin' />
               </div>
             )}
+            <Link
+              to='/panel'
+              className='bg-[var(--primary)] col-span-2 p-3  rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150 w-full text-center'
+            >
+              Volver al inicio
+            </Link>
           </form>
-          <Link
-            to='/panel'
-            className='bg-[var(--primary)] col-span-2 p-3  rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150'
-          >
-            Volver al panel
-          </Link>
         </section>
       ) : (
         <div className='flex-1'>

@@ -1,3 +1,4 @@
+import { CreditApplicationStatus } from '../../constants/CreditStatus';
 import { Company } from '../../entities/Company.entity';
 import { responseCompanyDto } from './interface';
 import { responseAdminCompanyDto, PaginatedResponse } from './interface';
@@ -6,13 +7,46 @@ import { responseAdminCompanyDto, PaginatedResponse } from './interface';
  * Convierte una entidad Company de la DB a un DTO de respuesta seguro.
  */
 export function toCompanyDto(company: Company): responseCompanyDto {
+    
+    let statusCredit = CreditApplicationStatus.DRAFT;
+    
+    if (company.creditApplications && company.creditApplications.length > 0) {
+        
+        const notApplicableApplication = company.creditApplications.find(
+            app => app.status === CreditApplicationStatus.NOT_APPLICABLE
+        );
+        
+        if (notApplicableApplication) {
+            statusCredit = CreditApplicationStatus.NOT_APPLICABLE;
+        } else {
+           
+            const sortedApplications = company.creditApplications.sort(
+                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            statusCredit = sortedApplications[0].status;
+        }
+    }
+
     return {
         id: company.id,
         legalName: company.legalName,
+        tradeName: company.tradeName,
+        taxId: company.taxId,
+        email: company.email,
+        industryId: company.industry?.id,
         industryName: company.industry?.name,
-        statusCredit: company.creditApplications && company.creditApplications.length > 0
-            ? company.creditApplications[0].status
-            : 'No aplica',
+        foundedDate: company.foundedDate,
+        employeeCount: company.employeeCount,
+        annualRevenue: company.annualRevenue,
+        address: company.address,
+        city: company.city,
+        state: company.state,
+        postalCode: company.postalCode,
+        country: company.country,
+        phone: company.phone,
+        website: company.website,
+        description: company.description,
+        statusCredit,
         hasDocuments: company.documents && company.documents.length > 0
             ? true
             : false,
@@ -58,8 +92,23 @@ export function toAdminCompanyDto(company: Company): responseAdminCompanyDto {
         country: company.country,
         phone: company.phone,
         statusCredit: company.creditApplications && company.creditApplications.length > 0
-            ? company.creditApplications[0].status
-            : 'No aplica',
+            ? (() => {
+                
+                const notApplicableApplication = company.creditApplications.find(
+                    app => app.status === CreditApplicationStatus.NOT_APPLICABLE
+                );
+                
+                if (notApplicableApplication) {
+                    return CreditApplicationStatus.NOT_APPLICABLE;
+                } else {
+                  
+                    const sortedApplications = company.creditApplications.sort(
+                        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                    );
+                    return sortedApplications[0].status;
+                }
+              })()
+            : CreditApplicationStatus.DRAFT,
         hasDocuments: company.documents ? company.documents.length > 0 : false,
         createdAt: company.createdAt,
         deletedAt: company.deletedAt,
