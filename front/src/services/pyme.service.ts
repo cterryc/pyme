@@ -3,7 +3,7 @@ import {
   type RegisterPymeDocumentsSuccessResponse,
   type GetPymesByUserResponse,
   type LoanRequestResponse,
-  type GetIndustriesResponse
+  type GetIndustriesResponse,
 } from '@/interfaces/pyme.interface'
 import {
   type LoanRequestFormData,
@@ -123,10 +123,49 @@ export const getPymesByUser = async (): Promise<GetPymesByUserResponse> => {
 
     const result = await response.json()
     if (!response.ok) throw result
-    console.log(result)
+
     return result
   } catch (error) {
     console.error('[getPymesByUser]: Error fetching data:', error)
+    throw error
+  }
+}
+
+export const getPymeById = async (id: string) => {
+  try {
+    const token = localStorage.tokenPyme
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/companies/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    })
+
+    const result = await response.json()
+    if (!response.ok) throw result
+    return result
+  } catch (error) {
+    console.error('[getPymeById]: Error fetching data:', error)
+    throw error
+  }
+}
+
+export const updatePyme = async (data: RegisterPymeFormData & { id: string }) => {
+  try {
+    const token = localStorage.tokenPyme
+
+    const { id, ...body } = data
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/companies/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body)
+    })
+
+    const result = await response.json()
+    if (!response.ok) throw result
+
+    return result
+  } catch (error) {
+    console.error('[updateUserProfile]: Error fetching data:', error)
     throw error
   }
 }

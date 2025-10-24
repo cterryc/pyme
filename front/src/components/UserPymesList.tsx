@@ -19,6 +19,9 @@ export const UserPymesList = () => {
     refetch()
   }, [refetch])
 
+  const editPyme = (pymeId: string) => {
+    navigate(`/panel/registro-pyme`, { state: { pymeId } })
+  }
   return (
     <>
       <h2 className='text-2xl font-semibold mb-4 text-gray-700'>Pymes registradas</h2>
@@ -89,7 +92,10 @@ export const UserPymesList = () => {
                           </span>
                         </td>
                         <td className='p-3 flex gap-3'>
-                          <button className='bg-[#0095d5] text-white px-4 py-2 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer text-nowrap'>
+                          <button
+                            onClick={()=>editPyme(pyme.id)}
+                            className='bg-[#0095d5] text-white px-4 py-2 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer text-nowrap'
+                          >
                             Editar Pyme
                           </button>
                           <button
