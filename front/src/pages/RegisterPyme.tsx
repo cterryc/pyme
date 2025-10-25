@@ -5,48 +5,22 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { registerPymeSchema, type RegisterPymeFormData } from '@/schemas/pyme.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { usePymeRegister, useGetIndustries, useGetPymeById, useUpdatePyme } from '@/hooks/usePyme'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { usePymeRegister, useGetIndustries } from '@/hooks/usePyme'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import Confetti from 'react-confetti'
 
 export const RegisterPyme = () => {
-  const location = useLocation();
-  const id = location.state?.pymeId;
   const navigate = useNavigate()
   const maxStep = 4
   const [step, setStep] = useState(0)
-  const [isEditPyme, setIsEditPyme] = useState(false)
   const [pymeId, setPymeId] = useState('')
   const [industriesList, setIndustriesList] = useState<Array<{ id: string; name: string }>>()
 
   const { data: industries, isLoading: getIndustriesIsLoading, isError: getIndustriesError } = useGetIndustries()
-  const { data: pymeById, refetch } = useGetPymeById(id)
-  const { mutate: updatePymeById } = useUpdatePyme({
-    onSuccess: () => {
-      toast.success('¡MYPE actualizada exitosamente!', {
-        style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
-        duration: 4000
-      })
-      localStorage.removeItem('registerPymeBackup')
-      navigate("/panel")
-      setIsEditPyme(false)
-    },
-    onError: () => {
-      toast.error('Error al actualizar la MYPE', {
-        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: 'Verifica los datos ingresados.',
-        duration: 4000
-      })
-    }
-  })
 
-  const {
-    mutate: pymeRegister,
-    isPending
-  } = usePymeRegister({
+  const { mutate: pymeRegister } = usePymeRegister({
     onSuccess: (data) => {
-      // console.log(data)
       toast.success('¡MYPE registrada exitosamente!', {
         style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
         description: 'Ahora debes adjuntar los documentos requeridos y firmarlos para completar el registro.',
@@ -64,16 +38,6 @@ export const RegisterPyme = () => {
     }
   })
 
-  useEffect(() => {
-    if (isPending) {
-      toast.loading('Registrando tu MYPE...', {
-        style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
-        description: 'Estamos procesando la información de tu empresa.',
-        duration: 1500
-      })
-    }
-  }, [isPending])
-
   const getStoredData = () => {
     const storedForm = localStorage.getItem('registerPymeBackup')
     if (storedForm) {
@@ -89,31 +53,18 @@ export const RegisterPyme = () => {
     watch,
     handleSubmit,
     formState: { errors },
-    reset
   } = useForm<RegisterPymeFormData>({
     resolver: zodResolver(registerPymeSchema),
-    // criteriaMode: 'all',
+    defaultValues: getStoredData(),
     mode: 'onChange'
   })
 
   useEffect(() => {
     setIndustriesList(industries?.payload)
-    if (id && pymeById?.payload) {
-      refetch();
-      setIsEditPyme(true)
-      localStorage.removeItem('registerPymeBackup')
-      reset(pymeById.payload)
-    } else {
-      reset({}) 
-    }
-  }, [industries, id, pymeById, reset, refetch])
+  }, [industries])
 
   const onSubmit = (data: RegisterPymeFormData) => {
-    if (isEditPyme) {
-      updatePymeById({ ...data, id });
-    } else {
-      pymeRegister(data);
-    }
+    pymeRegister(data);
   };
 
   const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -154,7 +105,7 @@ export const RegisterPyme = () => {
           {!getIndustriesError && (
             <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1 min-h-screen'>
               <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>
-                {isEditPyme ? 'Edicion' : 'Registro'} de PYME
+                Registro de PYME
               </h2>
               <p>Completa la información para crear el perfil de tu empresa.</p>
 
@@ -514,7 +465,7 @@ export const RegisterPyme = () => {
                     <input
                       type='submit'
                       className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                      value={isEditPyme ? 'Actualizar' : 'Confirmar'}
+                      value="Confirmar"
                     />
                   )}
                 </div>

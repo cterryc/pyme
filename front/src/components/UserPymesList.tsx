@@ -19,9 +19,26 @@ export const UserPymesList = () => {
     refetch()
   }, [refetch])
 
-  const editPyme = (pymeId: string) => {
-    navigate(`/panel/registro-pyme`, { state: { pymeId } })
+  // const editPyme = (pymeId: string) => {
+  //   navigate(`/panel/registro-pyme`, { state: { pymeId } })
+  // }
+
+  const statusActions = (status: string, hasDocument: boolean) => {
+    if (!hasDocument) {
+      return 'Sin Documentos'
+    } else if (status === 'Enviado') {
+      return 'Credito Aplicado'
+    } else if (status === 'No confirmado') {
+      return 'Confirmar Credito'
+    } else if (status === 'No solicitado') {
+      return 'Solicitar Credito'
+    } else if (status === 'No aplica') {
+      return 'No aplica'
+    } else {
+      return ''
+    }
   }
+
   return (
     <>
       <h2 className='text-2xl font-semibold mb-4 text-gray-700'>Pymes registradas</h2>
@@ -53,12 +70,14 @@ export const UserPymesList = () => {
             ) : (
               <tbody>
                 {pymesByUser &&
-                  pymesByUser.payload.map((pyme: GetPymeResponse) => {
+                  pymesByUser.payload.map((pyme: GetPymeResponse, index) => {
+                    const isLast = index === pymesByUser.payload.length - 1
                     const isBlocked = BLOCKED_STATUSES.includes(pyme.statusCredit)
+                    console.log("pyme.statusCredit", pyme.statusCredit)
                     const canRequestCredit = pyme.hasDocuments && !isBlocked
-                    const buttonText = 'Solicitar credito'
+
                     return (
-                      <tr key={pyme.id} className='hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200'>
+                      <tr key={index} className='hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200'>
                         <td className='p-3'>{pyme.legalName}</td>
                         <td className='p-3'>{pyme.industryName}</td>
                         <td className='p-3'>
@@ -83,36 +102,54 @@ export const UserPymesList = () => {
                         </td>
                         <td className='p-3'>
                           <span
-                            className={` rounded-full px-6 py-2 text-gray-700
+                            className={`block w-40 min-w-40 rounded-full px-6 py-2 text-gray-700 text-center
                           ${pyme.statusCredit === 'Enviado' ? 'bg-[#0095d5]/80 text-white' : 'bg-gray-200 text-gray-500'}
-                          ${!pyme.hasDocuments &&  'hidden'}
+                          ${!pyme.hasDocuments && 'hidden'}
                         `}
                           >
-                            {pyme.statusCredit === 'No aplica' ? 'No Solicitado' : pyme.statusCredit}
+                            {pyme.statusCredit}
                           </span>
                         </td>
                         <td className='p-3 flex gap-3'>
-                          <button
+                          {/* <button
                             onClick={()=>editPyme(pyme.id)}
                             className='bg-[#0095d5] text-white px-4 py-2 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer text-nowrap'
                           >
                             Editar Pyme
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (canRequestCredit) navigate(`/panel/solicitar-credito/${pyme.id}`)
-                            }}
-                            className={`px-4 py-2 rounded-md font-semibold transition-colors text-nowrap
-                              ${
-                                canRequestCredit
-                                  ? 'bg-[#4dbaea] hover:bg-[#56cdf8] cursor-pointer text-white'
+                          </button> */}
+                          <div className="relative inline-block group">
+                            <button
+                              onClick={() => {
+                                if (canRequestCredit) navigate(`/panel/solicitar-credito/${pyme.id}`)
+                              }}
+                              className={`relative block w-40 min-w-40 px-4 py-2 rounded-md font-semibold transition-colors text-nowrap
+      ${canRequestCredit
+                                  ? 'bg-[#0095d5] hover:bg-[#28a9d6] cursor-pointer text-white'
                                   : 'bg-gray-200 cursor-default text-gray-600 select-none opacity-70'
-                              }
-                            `}
-                            disabled={isBlocked}
-                          >
-                            {buttonText}
-                          </button>
+                                }
+    `}
+                              disabled={isBlocked}
+                            >
+                              {statusActions(pyme.statusCredit, pyme.hasDocuments)}
+                            </button>
+                            {pyme.hasDocuments && pyme.statusCredit === 'No aplica' && (
+                              <div
+                                className={`absolute right-0 w-72 hidden group-hover:block bg-white border border-gray-200 rounded-xl p-4 text-gray-700 z-50 ${isLast ? 'bottom-12' : 'top-auto'
+                                  }`}
+                              >
+                                <div
+                                  className={`absolute right-12 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent ${isLast
+                                      ? '-bottom-2 border-t-8 border-t-white'
+                                      : '-top-2 border-b-8 border-b-white'
+                                    }`}
+                                />
+                                <p className="text-sm font-medium text-center">
+                                  Excede <span className="text-blue-600 font-semibold">50 millones</span> y{' '}
+                                  <span className="text-blue-600 font-semibold">250</span> empleados.
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     )
