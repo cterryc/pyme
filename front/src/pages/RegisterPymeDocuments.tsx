@@ -149,22 +149,26 @@ export const RegisterPymeDocuments = () => {
             </h3>
 
             <div className='flex flex-col  xl:flex-row gap-2 justify-around items-center border-2 border-[var(--primary)] border-dashed rounded-md py-3'>
-              <div className='flex flex-col sm:flex-row items-center gap-3'>
+              <div className='flex flex-col items-center gap-1'>
                 <p className='text-lg font-medium text-[var(--font-title-light)]'>Es el dueño de la pyme?</p>
-                <input
-                  type='checkbox'
-                  className='cursor-pointer w-5'
-                  {...register('isOwner')}
-                  onChange={(e) => {
-                    setIsOwner(e.target.checked)
-                  }}
-                />
+                <div className='flex gap-2'>
+                  <label htmlFor='isOwner' className='font-medium text-lg'>Si</label>
+                  <input
+                    id='isOwner'
+                    type='checkbox'
+                    className='cursor-pointer w-5'
+                    {...register('isOwner')}
+                    onChange={(e) => {
+                      setIsOwner(e.target.checked)
+                    }}
+                  />
+                </div>
               </div>
 
               {!isOwner && (
                 <div className='flex flex-col items-around gap-2 max-w-sm w-full'>
                   <p className='text-sm text-[var(--font-title-light)] font-medium text-center'>
-                    Poder Notarial con Facultades para Endeudamiento:
+                    Adjuntar documentos de Poder Notarial con Facultades para Endeudamiento:
                   </p>
                   {notarialPDF == null ? (
                     <label className='self-center'>
@@ -218,6 +222,7 @@ export const RegisterPymeDocuments = () => {
               )}
             </div>
             <div className='border-2 border-[var(--primary)] border-dashed my-3 sm:p-5 rounded-md'>
+              <h1 className='text-center text-[var(--font-title-light)] font-medium'>Adjuntar documentos legales necesarios para registrar la pyme</h1>
               <SignDocuments onSignDocument={handleSignedDocuments} />
             </div>
 
