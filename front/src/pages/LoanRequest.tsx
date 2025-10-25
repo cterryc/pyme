@@ -74,7 +74,8 @@ export const LoanRequest = () => {
   useEffect(() => {
     if (!pymeID) {
       navigate('/panel')
-    } else {
+    } 
+    else {
       loanRequest({ companyId: pymeID })
     }
   }, [pymeID, navigate, loanRequest])
