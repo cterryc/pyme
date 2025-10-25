@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { useUserAuthenticate } from '@/hooks/useUser'
 
 export const Landing = () => {
+  const navigate = useNavigate()
   const { hasUser } = useUserAuthenticate()
 
   const steps = [
@@ -38,12 +39,12 @@ export const Landing = () => {
             En Financia, entendemos las necesidades de las PYMES. Ofrecemos soluciones de financiamiento flexible y
             adaptadas a tu crecimiento.
           </p>
-          <Link
-            to={hasUser ? '/panel' : '/inicio-sesion'}
+          <button
+            onClick={()=>navigate(hasUser ? '/panel' : '/inicio-sesion')}
             className='bg-[#0095d5] text-white flex items-center w-fit mx-auto px-6 py-3 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer'
           >
             Solicita tu crédito
-          </Link>
+          </button>
         </div>
       </section>
       <section className='max-w-5xl m-auto my-16'>
