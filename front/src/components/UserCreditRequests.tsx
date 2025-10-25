@@ -6,7 +6,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 
 export const UserCreditRequests = () => {
   const { data: loansByUser, isLoading, isError, error, refetch } = useGetListCreditApplicationsByUser()
-  const tableHeaders = ['Nombre Pyme', 'Monto Solicitado', 'Fecha', 'Estado']
+  const tableHeaders = ['Nombre Pyme', 'Monto Solicitado', 'Fecha de envio', 'Estado']
 
   useEffect(() => {
     refetch()
@@ -24,7 +24,7 @@ export const UserCreditRequests = () => {
   }
   return (
     <>
-      <h2 className="text-2xl font-semibold mb-4 text-gray-700">Solicitudes de crédito registradas</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-gray-700">Solicitudes de crédito enviados</h2>
       {isError && <p className='text-red-400'>Error: {error.message}</p>}
       {!isLoading && !isError && (
         <div className="w-full overflow-x-auto rounded-lg border border-gray-200">
@@ -50,7 +50,11 @@ export const UserCreditRequests = () => {
               </tbody>
             ) : (
               <tbody>
-                {loansByUser && loansByUser.payload.map((credit: CreditAppplication, index) => {
+                {
+                  loansByUser && 
+                    loansByUser.payload
+                      .filter((cr) => cr.status === 'Enviado')
+                      .map((credit: CreditAppplication, index) => {
                   const amount = '$' + credit.requestAmonut
                   return (
                     <tr key={index} className="hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200">

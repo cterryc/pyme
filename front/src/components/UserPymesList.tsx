@@ -123,11 +123,11 @@ export const UserPymesList = () => {
                                 if (canRequestCredit) navigate(`/panel/solicitar-credito/${pyme.id}`)
                               }}
                               className={`relative block w-40 min-w-40 px-4 py-2 rounded-md font-semibold transition-colors text-nowrap
-      ${canRequestCredit
+                                ${canRequestCredit
                                   ? 'bg-[#0095d5] hover:bg-[#28a9d6] cursor-pointer text-white'
                                   : 'bg-gray-200 cursor-default text-gray-600 select-none opacity-70'
                                 }
-    `}
+                                `}
                               disabled={isBlocked}
                             >
                               {statusActions(pyme.statusCredit, pyme.hasDocuments)}
@@ -139,8 +139,8 @@ export const UserPymesList = () => {
                               >
                                 <div
                                   className={`absolute right-12 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent ${isLast
-                                      ? '-bottom-2 border-t-8 border-t-white'
-                                      : '-top-2 border-b-8 border-b-white'
+                                    ? '-bottom-2 border-t-8 border-t-white'
+                                    : '-top-2 border-b-8 border-b-white'
                                     }`}
                                 />
                                 <p className="text-sm font-medium text-center">
