@@ -18,5 +18,6 @@ export const BLOCKED_STATUSES = [
   'Rechazado', // REJECTED
   'Desembolsado', // DISBURSED
   'Cancelado', // CANCELLED
-  'Documentos requeridos'
+  'Documentos requeridos',
+  'No aplica'
 ]

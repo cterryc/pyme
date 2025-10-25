@@ -2,7 +2,14 @@ import { Router } from "express";
 import schemaValidator from "../../middlewares/schemaValidators.middlewares";
 import authenticate from "../../middlewares/authenticate.middleware";
 import LoanController from "./controller";
-import { createCreditApplicationSchema, loanRequestSchema } from "./validator";
+import { 
+  createCreditApplicationSchema, 
+  loanRequestSchema,
+  getCreditApplicationStatusParamsSchema,
+  listCreditApplicationsQuerySchema,
+  getCreditApplicationByIdParamsSchema,
+  deleteCreditApplicationParamsSchema
+} from "./validator";
 
 const loanRouter = Router();
 
@@ -27,6 +34,34 @@ loanRouter.get(
     "/user",
     authenticate,
     LoanController.listCreditApplicationsByUserId
+);
+
+loanRouter.get(
+    "/status/:id",
+    authenticate,
+    schemaValidator(null, getCreditApplicationStatusParamsSchema),
+    LoanController.getCreditApplicationStatus
+);
+
+loanRouter.get(
+    "/",
+    authenticate,
+    schemaValidator(null, listCreditApplicationsQuerySchema),
+    LoanController.listCreditApplications
+);
+
+loanRouter.get(
+    "/:id",
+    authenticate,
+    schemaValidator(null, getCreditApplicationByIdParamsSchema),
+    LoanController.getCreditApplicationById
+);
+
+loanRouter.delete(
+    "/:id",
+    authenticate,
+    schemaValidator(null, deleteCreditApplicationParamsSchema),
+    LoanController.deleteCreditApplication
 );
 
 export default loanRouter;

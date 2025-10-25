@@ -1,23 +1,84 @@
 import { z } from "zod";
 import { CreditApplicationStatus } from "../../constants/CreditStatus";
 
+// Validador para strings requeridos que no deben ser solo espacios
+const nonEmptyString = (minLength: number = 1, maxLength?: number) => {
+  let schema = z.string()
+    .min(minLength, { message: 'Campo requerido' })
+    .refine((val) => val.trim().length > 0, {
+      message: "El campo no puede contener solo espacios en blanco",
+    });
+  
+  if (maxLength) {
+    schema = schema.refine((val) => val.length <= maxLength, {
+      message: `El campo no puede exceder ${maxLength} caracteres`,
+    }) as any;
+  }
+  
+  return schema;
+};
+
+// Validador para strings opcionales que si se proporcionan no deben ser solo espacios
+const optionalNonEmptyString = (maxLength?: number) => {
+  let schema = z.string()
+    .transform((val) => {
+      // Convertir strings vacíos o solo con espacios a undefined
+      if (!val || val.trim() === '') return undefined;
+      return val.trim();
+    })
+    .optional();
+  
+  if (maxLength) {
+    schema = schema.refine((val) => {
+      if (!val) return true;
+      return val.length <= maxLength;
+    }, {
+      message: `El campo no puede exceder ${maxLength} caracteres`,
+    }) as any;
+  }
+  
+  return schema;
+};
+
 export const createCompanySchema = z.object({
-  legalName: z.string().min(1, { message: 'Nombre legal requerido' }).max(255),
-  tradeName: z.string().optional(),
+  legalName: nonEmptyString(1, 255),
+  tradeName: optionalNonEmptyString(255),
   industryId: z.string().uuid({ message: 'ID de industria inválido' }),
-  taxId: z.string().min(1, { message: 'Tax ID requerido' }).max(50), 
-  email: z.string().email({ message: 'Email inválido' }).optional(),
+  taxId: nonEmptyString(1, 50), 
+  email: z.preprocess(
+    (val) => {
+      if (typeof val === 'string' && val.trim() === '') return undefined;
+      return val;
+    },
+    z.string().email({ message: 'Email inválido' }).optional()
+  ),
   foundedDate: z.coerce.date().optional(),  
-  employeeCount: z.number().int().min(0),
-  annualRevenue: z.number().min(0),  
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  postalCode: z.string().optional(),
-  country: z.string().optional(),
-  phone: z.string().optional(),
-  website: z.string().url({ message: 'URL inválida' }).optional(),
-  description: z.string().optional(),
+  employeeCount: z.number()
+    .int({ message: "El número de empleados debe ser un entero" })
+    .min(0, { message: "El número de empleados no puede ser negativo" })
+    .max(1000000, { message: "El número de empleados excede el máximo permitido" })
+    .refine((val) => !isNaN(val) && isFinite(val), {
+      message: "El número de empleados debe ser un número válido",
+    }),
+  annualRevenue: z.number()
+    .min(0, { message: "Los ingresos anuales no pueden ser negativos" })
+    .refine((val) => !isNaN(val) && isFinite(val), {
+      message: "Los ingresos anuales deben ser un número válido",
+    }),
+  address: optionalNonEmptyString(500),
+  city: optionalNonEmptyString(100),
+  state: optionalNonEmptyString(100),
+  postalCode: optionalNonEmptyString(20),
+  country: optionalNonEmptyString(50),
+  phone: optionalNonEmptyString(20),
+  website: z.preprocess(
+    (val) => {
+      if (typeof val === 'string' && val.trim() === '') return undefined;
+      return val;
+    },
+    z.string().url({ message: 'URL inválida' }).optional()
+  ),
+  description: optionalNonEmptyString(1000),
 }).strict();
 
 export const getAllCompaniesQuerySchema = z.object({
@@ -30,7 +91,7 @@ export const getAllCompaniesQuerySchema = z.object({
   deleted: z.enum(['true', 'false', 'all']).optional().default('false'),
   
   // Búsqueda
-  search: z.string().optional(), // Busca en legalName y taxId
+  search: z.string().trim().min(1).optional(), // Busca en legalName y taxId
   
   // Filtros de fecha - createdAt
   createdAtFrom: z.coerce.date().optional(),

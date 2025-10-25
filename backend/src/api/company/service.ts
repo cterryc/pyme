@@ -20,7 +20,7 @@ import {
 } from "./dto";
 import { responseCompanyDto, PaginatedResponse } from "./interface";
 import { Industry } from "../../entities/Industry.entity";
-import { CreateCompanyInput, GetAllCompaniesQuery } from "./validator";
+import { CreateCompanyInput, GetAllCompaniesQuery, UpdateCompanyInput } from "./validator";
 import { User } from "../../entities/User.entity";
 import { SystemConfig } from "../../entities/System_config.entity";
 import { CreditApplication } from "../../entities/CreditApplication.entity";
@@ -224,7 +224,7 @@ export default class CompanyService {
 
   async updateCompany(
     companyId: string,
-    companyData: Partial<Company>,
+    companyData: UpdateCompanyInput,
     userId: string
   ): Promise<Company  | null> {
     const company = await this.companyRepo.findOne({
@@ -267,7 +267,30 @@ export default class CompanyService {
         }
       }
     }
-    this.companyRepo.merge(company, companyData);
+
+    if (companyData.industryId !== undefined) {
+      if (companyData.industryId === null) {
+        company.industry = undefined;
+      } else {
+        const industry = await this.industryRepo.findOne({
+          where: { id: companyData.industryId },
+        });
+
+        if (!industry) {
+          throw new HttpError(
+            HttpStatus.BAD_REQUEST,
+            "La industria especificada con ese ID no existe."
+          );
+        }
+
+        company.industry = industry;
+      }
+      const { industryId: _industryId, ...restData } = companyData;
+      this.companyRepo.merge(company, restData);
+    } else {
+      this.companyRepo.merge(company, companyData);
+    }
+    
     return this.companyRepo.save(company);
   }
 

@@ -247,9 +247,327 @@ export default class LoanService {
     return responseLoanByUserListDto(applications);
   }
 
-  async getCreditApplicationStatus(applicationId: string): Promise<string> {
-    // Lógica para obtener el estado de la solicitud de crédito
-    return "PENDING";
+  async getCreditApplicationStatus(applicationId: string): Promise<{ status: string; applicationNumber: string; submittedAt?: Date }> {
+    const application = await this.loanRepo.findOne({
+      where: { id: applicationId },
+      relations: ["company"],
+    });
+
+    if (!application) {
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La solicitud de crédito no existe."
+      );
+    }
+
+    return {
+      status: application.status,
+      applicationNumber: application.applicationNumber,
+      submittedAt: application.submittedAt,
+    };
+  }
+
+  async listCreditApplications(
+    page: number | string = 1,
+    limit: number | string = 10,
+    status?: string
+  ): Promise<{
+    applications: responseLoanByUser[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const pageNum = typeof page === 'string' ? parseInt(page, 10) : page;
+    const limitNum = typeof limit === 'string' ? parseInt(limit, 10) : limit;
+    const skip = (pageNum - 1) * limitNum;
+    
+    const whereCondition: any = {};
+    if (status) {
+      whereCondition.status = status;
+    }
+
+    const [applications, total] = await this.loanRepo.findAndCount({
+      where: whereCondition,
+      relations: ["company"],
+      order: { createdAt: "DESC" },
+      skip,
+      take: limitNum,
+    });
+
+    const totalPages = Math.ceil(total / limitNum);
+
+    return {
+      applications: responseLoanByUserListDto(applications),
+      total,
+      page: pageNum,
+      totalPages,
+    };
+  }
+
+  async getCreditApplicationById(applicationId: string): Promise<responseLoanRequest> {
+    const application = await this.loanRepo.findOne({
+      where: { id: applicationId },
+      relations: ["company"],
+    });
+
+    if (!application) {
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La solicitud de crédito no existe."
+      );
+    }
+
+    if (!application.company) {
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La compañía asociada no existe."
+      );
+    }
+
+    return LoanResponseDto.fromExisting(application, application.company);
+  }
+
+  async deleteCreditApplication(applicationId: string, userId: string): Promise<{ message: string }> {
+    const application = await this.loanRepo.findOne({
+      where: { id: applicationId },
+      relations: ["company"],
+    });
+
+    if (!application) {
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La solicitud de crédito no existe."
+      );
+    }
+
+    // Verificar que el usuario sea el propietario de la compañía
+    if (application.company.ownerId !== userId) {
+      throw new HttpError(
+        HttpStatus.FORBIDDEN,
+        "No tienes permisos para eliminar esta solicitud."
+      );
+    }
+
+    // Solo permitir eliminar solicitudes en estado APPLYING o SUBMITTED
+    const allowedStatuses = [
+      CreditApplicationStatus.APPLYING,
+      CreditApplicationStatus.SUBMITTED,
+    ];
+
+    if (!allowedStatuses.includes(application.status as CreditApplicationStatus)) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "No se puede eliminar una solicitud que ya está en proceso de revisión."
+      );
+    }
+
+    await this.loanRepo.remove(application);
+
+    return { message: "Solicitud de crédito eliminada exitosamente." };
+  }
+
+  // --- MÉTODOS ADMINISTRATIVOS ---
+
+  async updateCreditApplicationStatus(
+    applicationId: string,
+    newStatus: CreditApplicationStatus,
+    adminUserId: string,
+    rejectionReason?: string,
+    internalNotes?: string,
+    approvedAmount?: number,
+    riskScore?: number
+  ): Promise<{ message: string; application: responseLoanRequest }> {
+    const application = await this.loanRepo.findOne({
+      where: { id: applicationId },
+      relations: ["company"],
+    });
+
+    if (!application) {
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La solicitud de crédito no existe."
+      );
+    }
+
+    // Validar transición de estado
+    const validTransitions = this.getValidStatusTransitions(application.status);
+    if (!validTransitions.includes(newStatus)) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        `No se puede cambiar de ${application.status} a ${newStatus}. Transiciones válidas: ${validTransitions.join(", ")}`
+      );
+    }
+
+    // Validaciones específicas por estado
+    if (newStatus === CreditApplicationStatus.REJECTED && !rejectionReason) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "Se requiere una razón de rechazo para rechazar la solicitud."
+      );
+    }
+
+    if (newStatus === CreditApplicationStatus.APPROVED && !approvedAmount) {
+      throw new HttpError(
+        HttpStatus.BAD_REQUEST,
+        "Se requiere especificar el monto aprobado para aprobar la solicitud."
+      );
+    }
+
+    // Actualizar campos según el nuevo estado
+    const now = new Date();
+    application.status = newStatus;
+    application.reviewedById = adminUserId;
+    application.reviewedAt = now;
+
+    if (rejectionReason) {
+      application.rejectionReason = rejectionReason;
+    }
+
+    if (internalNotes) {
+      application.internalNotes = internalNotes;
+    }
+
+    if (approvedAmount) {
+      application.approvedAmount = approvedAmount;
+    }
+
+    if (riskScore !== undefined) {
+      application.riskScore = riskScore;
+    }
+
+    if (newStatus === CreditApplicationStatus.APPROVED) {
+      application.approvedAt = now;
+    }
+
+    if (newStatus === CreditApplicationStatus.DISBURSED) {
+      application.disbursedAt = now;
+    }
+
+    // Actualizar historial de estados
+    const statusHistoryEntry = {
+      status: newStatus,
+      timestamp: now,
+      changedBy: adminUserId,
+      reason: rejectionReason || internalNotes || `Estado actualizado por administrador`,
+    };
+
+    application.statusHistory = [
+      ...(application.statusHistory || []),
+      statusHistoryEntry,
+    ];
+
+    await this.loanRepo.save(application);
+
+    // Notificar al usuario sobre el cambio de estado
+    if (application.company.ownerId) {
+      broadcastLoanStatusUpdate(application.company.ownerId, {
+        id: application.id,
+        newStatus: application.status,
+        updatedAt: application.updatedAt,
+      });
+    }
+
+    return {
+      message: `Estado actualizado a ${newStatus}`,
+      application: LoanResponseDto.fromExisting(application, application.company),
+    };
+  }
+
+  async getCreditApplicationsForAdmin(
+    page: number | string = 1,
+    limit: number | string = 10,
+    status?: CreditApplicationStatus | string,
+    companyName?: string
+  ): Promise<{
+    applications: any[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const pageNum = typeof page === 'string' ? parseInt(page, 10) : page;
+    const limitNum = typeof limit === 'string' ? parseInt(limit, 10) : limit;
+    const skip = (pageNum - 1) * limitNum;
+    
+    const whereCondition: any = {};
+    if (status) {
+      whereCondition.status = status;
+    }
+
+    const queryBuilder = this.loanRepo
+      .createQueryBuilder("application")
+      .leftJoinAndSelect("application.company", "company")
+      .leftJoinAndSelect("application.reviewedBy", "reviewedBy")
+      .where(whereCondition);
+
+    if (companyName) {
+      queryBuilder.andWhere("company.legalName ILIKE :companyName", {
+        companyName: `%${companyName}%`,
+      });
+    }
+
+    const [applications, total] = await queryBuilder
+      .orderBy("application.createdAt", "DESC")
+      .skip(skip)
+      .take(limitNum)
+      .getManyAndCount();
+
+    const totalPages = Math.ceil(total / limitNum);
+
+    return {
+      applications: applications.map(app => ({
+        id: app.id,
+        applicationNumber: app.applicationNumber,
+        companyName: app.company?.legalName,
+        selectedAmount: app.selectedAmount,
+        approvedAmount: app.approvedAmount,
+        status: app.status,
+        submittedAt: app.submittedAt,
+        reviewedAt: app.reviewedAt,
+        approvedAt: app.approvedAt,
+        rejectionReason: app.rejectionReason,
+        internalNotes: app.internalNotes,
+        riskScore: app.riskScore,
+        reviewedBy: app.reviewedBy ? {
+          id: app.reviewedBy.id,
+          name: `${app.reviewedBy.firstName || ''} ${app.reviewedBy.lastName || ''}`.trim() || 'Usuario',
+          email: app.reviewedBy.email,
+        } : null,
+      })),
+      total,
+      page: pageNum,
+      totalPages,
+    };
+  }
+
+  private getValidStatusTransitions(currentStatus: CreditApplicationStatus): CreditApplicationStatus[] {
+    const transitions: Record<CreditApplicationStatus, CreditApplicationStatus[]> = {
+      [CreditApplicationStatus.DRAFT]: [CreditApplicationStatus.APPLYING],
+      [CreditApplicationStatus.APPLYING]: [CreditApplicationStatus.SUBMITTED, CreditApplicationStatus.CANCELLED],
+      [CreditApplicationStatus.SUBMITTED]: [
+        CreditApplicationStatus.UNDER_REVIEW,
+        CreditApplicationStatus.DOCUMENTS_REQUIRED,
+        CreditApplicationStatus.APPROVED,
+        CreditApplicationStatus.REJECTED,
+        CreditApplicationStatus.CANCELLED,
+      ],
+      [CreditApplicationStatus.UNDER_REVIEW]: [
+        CreditApplicationStatus.APPROVED,
+        CreditApplicationStatus.REJECTED,
+        CreditApplicationStatus.DOCUMENTS_REQUIRED,
+      ],
+      [CreditApplicationStatus.DOCUMENTS_REQUIRED]: [
+        CreditApplicationStatus.UNDER_REVIEW,
+        CreditApplicationStatus.APPROVED,
+        CreditApplicationStatus.REJECTED,
+      ],
+      [CreditApplicationStatus.APPROVED]: [CreditApplicationStatus.DISBURSED],
+      [CreditApplicationStatus.REJECTED]: [],
+      [CreditApplicationStatus.DISBURSED]: [],
+      [CreditApplicationStatus.CANCELLED]: [],
+      [CreditApplicationStatus.NOT_APPLICABLE]: [],
+    };
+
+    return transitions[currentStatus] || [];
   }
 
   async calculateLoanOptions(company: Company): Promise<LoanCalculationResult> {

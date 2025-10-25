@@ -47,12 +47,12 @@ export const Header = () => {
           {isAvatarMenuOpen && (
             <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1'>
               <li className='hover:text-[var(--primary)]'>
-                <Link to='/panel' className='flex gap-4 items-center '>
+                <button onClick={()=>navigate('/panel')} className='flex gap-4 items-center cursor-pointer'>
                   <HiOutlineUserCircle className='text-xl' /> Mi cuenta
-                </Link>
+                </button>
               </li>
               <li className='hover:text-[var(--primary)]'>
-                <button onClick={deleteToken} className='flex gap-4 items-center text-left'>
+                <button onClick={deleteToken} className='flex gap-4 items-center text-left cursor-pointer'>
                   <HiOutlineLogout className='text-xl' /> Cerrar sesión
                 </button>
               </li>

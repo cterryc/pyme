@@ -122,7 +122,7 @@ export const UserProfile = () => {
     localStorage.removeItem('tokenPyme')
     queryClient.clear()
     setTimeout(() => {
-      navigate('/Login')
+      navigate('/inicio-sesion')
     }, 500)
   }
 

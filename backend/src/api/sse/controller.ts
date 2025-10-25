@@ -8,17 +8,19 @@ interface SSEClient {
 
 let clients: SSEClient[] = [];
 
+// Limpieza y heartbeat cada 25s
 setInterval(() => {
   clients = clients.filter((c) => !c.res.writableEnded);
   clients.forEach((c) => c.res.write(`: keep-alive\n\n`));
 }, 25000);
 
-
+// ✅ Handler para GET /api/events
 export function subscribeLoanStatus(req: Request, res: Response) {
   const userId = res.locals.user?.id || req.query.userId?.toString() || "anon";
 
   console.log(`[SSE] 🔗 Nueva conexión solicitada por usuario: ${userId}`);
 
+  // --- 🔥 Configuración correcta del stream SSE ---
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
@@ -28,6 +30,7 @@ export function subscribeLoanStatus(req: Request, res: Response) {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("X-Accel-Buffering", "no"); 
   res.flushHeaders();
+
 
   res.write(`: connected ${new Date().toISOString()}\n\n`);
 
@@ -40,6 +43,7 @@ export function subscribeLoanStatus(req: Request, res: Response) {
   });
 }
 
+// ✅ Handler para preflight CORS (OPTIONS)
 export function handleSSEPreflight(req: Request, res: Response) {
   console.log("[SSE] 📋 Recibida solicitud OPTIONS preflight");
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
@@ -49,12 +53,14 @@ export function handleSSEPreflight(req: Request, res: Response) {
   res.status(204).end();
 }
 
+// ✅ Estructura de evento
 export interface LoanStatusEvent {
   id: string;
   newStatus: string;
   updatedAt: Date;
 }
 
+// ✅ Enviar evento a un usuario
 export function broadcastLoanStatusUpdate(userId: string, data: LoanStatusEvent) {
   const msg = `data: ${JSON.stringify(data)}\n\n`;
   const targets = clients.filter((c) => c.userId === userId);
