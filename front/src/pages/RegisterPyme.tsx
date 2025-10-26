@@ -63,7 +63,19 @@ export const RegisterPyme = () => {
     setIndustriesList(industries?.payload)
   }, [industries])
 
-  const onSubmit = (data: RegisterPymeFormData) => {
+  const onSubmit = (dataForm: RegisterPymeFormData) => {
+    const { countryCode, ...data } = dataForm
+    console.log(countryCode)
+    let fixedWebsite
+    try {
+      if (data.website != undefined) {
+        fixedWebsite = new URL(data.website.includes('://') ? data.website : `https://${data.website}`)
+      }
+      data.website = fixedWebsite.origin
+    } catch {
+      data.website = ''
+    }
+
     pymeRegister(data)
   }
 
@@ -321,6 +333,20 @@ export const RegisterPyme = () => {
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                       <div className='flex flex-col gap-1'>
                         <p className='text-sm'>Teléfono empresarial</p>
+                        <div className='border border-[#D1D5DB] rounded-md'>
+                          <select className='h-full px-2 text-xl' {...registerPyme('countryCode')}>
+                            <option value='0'>🇺🇾</option>
+                            <option value='1'>🇦🇷</option>
+                            <option value='2'>🇵🇪</option>
+                            <option value='3'>🇵🇾</option>
+                          </select>
+                          <input type='text' className='p-2' {...registerPyme('phone')} />
+                        </div>
+                        {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
+                        {errors.countryCode && <p className='text-red-500 text-center'>{errors.countryCode.message}</p>}
+                      </div>
+                      {/* <div className='flex flex-col gap-1'>
+                        <p className='text-sm'>Teléfono empresarial</p>
                         <input
                           type='text'
                           {...registerPyme('phone')}
@@ -329,7 +355,7 @@ export const RegisterPyme = () => {
                           style={{ borderColor: errors.phone ? 'red' : '' }}
                         />
                         {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
-                      </div>
+                      </div> */}
 
                       <div className='flex flex-col gap-1 col-span-2'>
                         <p className='text-sm'>Website (opcional)</p>
