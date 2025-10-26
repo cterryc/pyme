@@ -67,8 +67,14 @@ export const registerPymeSchema = z
     email: z.string().email('Debes ingresar un email válido'),
     industryId: z.string().min(3, 'Debes ingresar una industria'),
     foundedDate: z.date('Fecha incompleta'),
-    employeeCount: z.number().min(0, 'Debes ingresar la cantidad de empleados'),
-    annualRevenue: z.number().min(0, 'Debes ingresar los ingresos anuales'),
+    employeeCount: z.coerce
+      .number('Debes ingresar un numero')
+      .min(1, 'Debes ingresar la cantidad de empleados')
+      .refine((val) => val <= 500, 'Maximo 500 empleados'),
+    annualRevenue: z.coerce
+      .number('Debes ingresar los ingresos anuales')
+      .min(1000, 'Debes ingresar una cantidad superior a $1000')
+      .refine((val) => val <= 25000000, 'Debes ingresar una cantidad menor a $25.000.000'),
     address: textField(3, 'La dirección es requerida', 'Debes ingresar una dirección con al menos 3 caracteres'),
     city: textField(3, 'La ciudad es requerida', 'Debes ingresar una ciudad con al menos 3 caracteres'),
     state: textField(3, 'La provincia es requerida', 'Debes ingresar una provincia con al menos 3 caracteres'),
