@@ -7,7 +7,8 @@ const nonEmptyString = (minLength: number = 1, maxLength?: number) => {
     .min(minLength, { message: 'Campo requerido' })
     .refine((val) => val.trim().length > 0, {
       message: "El campo no puede contener solo espacios en blanco",
-    });
+    })
+    .transform((val) => val.trim()); // Trim después de validar
   
   if (maxLength) {
     schema = schema.refine((val) => val.length <= maxLength, {
@@ -21,12 +22,20 @@ const nonEmptyString = (minLength: number = 1, maxLength?: number) => {
 // Validador para strings opcionales que si se proporcionan no deben ser solo espacios
 const optionalNonEmptyString = (maxLength?: number) => {
   let schema = z.string()
+    .optional()
+    .refine((val) => {
+      // Si el campo no se envía o es undefined, está bien
+      if (val === undefined || val === null) return true;
+      // Si se envía, NO debe ser solo espacios en blanco
+      return val.trim().length > 0;
+    }, {
+      message: "El campo no puede contener solo espacios en blanco",
+    })
     .transform((val) => {
-      // Convertir strings vacíos o solo con espacios a undefined
+      // Convertir strings vacíos a undefined, trim los demás
       if (!val || val.trim() === '') return undefined;
       return val.trim();
-    })
-    .optional();
+    });
   
   if (maxLength) {
     schema = schema.refine((val) => {
@@ -45,13 +54,25 @@ export const createCompanySchema = z.object({
   tradeName: optionalNonEmptyString(255),
   industryId: z.string().uuid({ message: 'ID de industria inválido' }),
   taxId: nonEmptyString(1, 50), 
-  email: z.preprocess(
-    (val) => {
-      if (typeof val === 'string' && val.trim() === '') return undefined;
-      return val;
-    },
-    z.string().email({ message: 'Email inválido' }).optional()
-  ),
+  email: z.string()
+    .optional()
+    .refine((val) => {
+      if (val === undefined || val === null) return true;
+      return val.trim().length > 0;
+    }, {
+      message: "El email no puede contener solo espacios en blanco",
+    })
+    .refine((val) => {
+      if (!val || val.trim() === '') return true;
+      // Validar formato de email solo si hay contenido
+      return z.string().email().safeParse(val.trim()).success;
+    }, {
+      message: "Email inválido",
+    })
+    .transform((val) => {
+      if (!val || val.trim() === '') return undefined;
+      return val.trim();
+    }),
   foundedDate: z.coerce.date().optional(),  
   employeeCount: z.number()
     .int({ message: "El número de empleados debe ser un entero" })
@@ -71,13 +92,25 @@ export const createCompanySchema = z.object({
   postalCode: optionalNonEmptyString(20),
   country: optionalNonEmptyString(50),
   phone: optionalNonEmptyString(20),
-  website: z.preprocess(
-    (val) => {
-      if (typeof val === 'string' && val.trim() === '') return undefined;
-      return val;
-    },
-    z.string().url({ message: 'URL inválida' }).optional()
-  ),
+  website: z.string()
+    .optional()
+    .refine((val) => {
+      if (val === undefined || val === null) return true;
+      return val.trim().length > 0;
+    }, {
+      message: "La URL no puede contener solo espacios en blanco",
+    })
+    .refine((val) => {
+      if (!val || val.trim() === '') return true;
+      // Validar formato de URL solo si hay contenido
+      return z.string().url().safeParse(val.trim()).success;
+    }, {
+      message: "URL inválida",
+    })
+    .transform((val) => {
+      if (!val || val.trim() === '') return undefined;
+      return val.trim();
+    }),
   description: optionalNonEmptyString(1000),
 }).strict();
 

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { IoWarningOutline } from "react-icons/io5";
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { useAuthRegister } from '@/hooks/useAuth'
@@ -125,6 +126,9 @@ export const Register = () => {
                 className='absolute right-3 top-3.5 text-gray-400 cursor-pointer w-5 h-5'
               /> */}
             </div>
+            <p className="rounded-md p-1 mt-2 text-yellow-600 flex gap-1.5 items-center">
+              <IoWarningOutline className='h-7 w-7' /> No se permiten correos temporales o desechables.
+            </p>
             <button
               className='bg-[#0095d5] text-white p-3 rounded-md mt-6 hover:bg-[#28a9d6] transition-colors 
             cursor-pointer'
