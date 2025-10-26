@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -105,7 +105,7 @@ export const Login = () => {
                 className='absolute right-3 top-3.5 text-gray-400 cursor-pointer w-5 h-5'
               />
             </div>
-            <Link to='/ResetPassword' className='text-[#0095d5] text-right mt-4 cursor-pointer hover:underline'>
+            <Link to='/reset-password' className='text-[#0095d5] text-right mt-4 cursor-pointer hover:underline'>
               Olvidaste tu contraseña?
             </Link>
             <button
