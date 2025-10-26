@@ -52,7 +52,7 @@ export const RegisterPyme = () => {
     // setValue,
     watch,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<RegisterPymeFormData>({
     resolver: zodResolver(registerPymeSchema),
     defaultValues: getStoredData(),
@@ -64,8 +64,8 @@ export const RegisterPyme = () => {
   }, [industries])
 
   const onSubmit = (data: RegisterPymeFormData) => {
-    pymeRegister(data);
-  };
+    pymeRegister(data)
+  }
 
   const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
@@ -104,9 +104,7 @@ export const RegisterPyme = () => {
         <>
           {!getIndustriesError && (
             <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1 min-h-screen'>
-              <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>
-                Registro de PYME
-              </h2>
+              <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Registro de PYME</h2>
               <p>Completa la información para crear el perfil de tu empresa.</p>
 
               <ProgressBar percent={Math.floor(100 / maxStep) * step} title='Progreso' barHeight={10} padding={30} />
@@ -465,7 +463,7 @@ export const RegisterPyme = () => {
                     <input
                       type='submit'
                       className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                      value="Confirmar"
+                      value='Confirmar'
                     />
                   )}
                 </div>

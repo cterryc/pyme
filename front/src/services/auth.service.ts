@@ -51,3 +51,23 @@ export const resetPassword = async (data: { email: string }) => {
     throw error
   }
 }
+
+export const sendResetPassword = async (data: { token: string; password: string; newPassword: string }) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+
+    const result = await response.json()
+    if (!response.ok) throw result
+
+    console.log(result)
+
+    return result
+  } catch (error) {
+    console.error('[resetPassword]: Error fetching data:', error)
+    throw error
+  }
+}
