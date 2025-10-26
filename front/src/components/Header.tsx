@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi'
+import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout, HiMenuAlt1 } from 'react-icons/hi'
 import { useUserAuthenticate } from '@/hooks/useUser'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -47,8 +47,13 @@ export const Header = () => {
           {isAvatarMenuOpen && (
             <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1'>
               <li className='hover:text-[var(--primary)]'>
-                <button onClick={()=>navigate('/panel')} className='flex gap-4 items-center cursor-pointer'>
-                  <HiOutlineUserCircle className='text-xl' /> Mi cuenta
+                <button onClick={() => navigate('/panel/perfil')} className='flex gap-4 items-center cursor-pointer'>
+                  <HiOutlineUserCircle className='text-xl' /> Mi Perfil
+                </button>
+              </li>
+              <li className='hover:text-[var(--primary)]'>
+                <button onClick={() => navigate('/panel')} className='flex gap-4 items-center cursor-pointer'>
+                  <HiMenuAlt1 className='text-xl' /> Panel
                 </button>
               </li>
               <li className='hover:text-[var(--primary)]'>
