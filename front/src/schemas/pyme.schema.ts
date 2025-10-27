@@ -12,10 +12,7 @@ const textField = (minChars: number, requiredMessage?: string, minMessage?: stri
       (val) => val.replace(/\s/g, '').length >= minChars,
       minMessage || `Debe tener al menos ${minChars} caracteres`
     )
-    .refine(
-      (val) => /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ.,-\s]+$/.test(val),
-      'Solo se permiten letras, tildes, puntos, comas, guiones y espacios'
-    )
+    .refine((val) => /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9.,-\s]+$/.test(val), 'No se permiten caracteres especiales')
 }
 
 const validateUrl = (url: string) => {
