@@ -34,8 +34,7 @@ export const UserDashboard = () => {
           className='lg:hidden fixed inset-0 bg-black z-[40]'
           style={{
             opacity: 0.5
-          }
-          }
+          }}
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -64,62 +63,62 @@ export const UserDashboard = () => {
           </div>
 
           {/* Navigation Links */}
-          <div className='flex flex-col gap-1'>
-          <NavLink
-            to='/panel'
-            end
-            onClick={handleLinkClick}
-            className={({ isActive }) =>
-              `group flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
-                isActive
-                  ? 'bg-[#23a9d6] text-white shadow-md'
-                  : 'text-gray-400 hover:bg-[#28a9d622] hover:text-[#23a9d6]'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <FaBuilding className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
-                Pymes
-              </>
-            )}
-          </NavLink>
-          <NavLink
-            to='/panel/solicitudes'
-            onClick={handleLinkClick}
-            className={({ isActive }) =>
-              `group flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
-                isActive
-                  ? 'bg-[#23a9d6] text-white shadow-md'
-                  : 'text-gray-400 hover:bg-[#28a9d622] hover:text-[#23a9d6]'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <HiMiniDocumentCheck className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
-                Solicitudes
-              </>
-            )}
-          </NavLink>
-          <NavLink
-            to='/panel/perfil'
-            onClick={handleLinkClick}
-            className={({ isActive }) =>
-              `group flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
-                isActive
-                  ? 'bg-[#23a9d6] text-white shadow-md'
-                  : 'text-gray-400 hover:bg-[#28a9d622] hover:text-[#23a9d6]'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <FaUser className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
-                Perfil
-              </>
-            )}
-          </NavLink>
+          <div className='flex flex-col gap-1 flex-1 relative'>
+            <NavLink
+              to='/panel'
+              end
+              onClick={handleLinkClick}
+              className={({ isActive }) =>
+                `group flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
+                  isActive
+                    ? 'bg-[#23a9d6] text-white shadow-md'
+                    : 'text-gray-400 hover:bg-[#28a9d622] hover:text-[#23a9d6]'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <FaBuilding className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
+                  Pymes
+                </>
+              )}
+            </NavLink>
+            <NavLink
+              to='/panel/solicitudes'
+              onClick={handleLinkClick}
+              className={({ isActive }) =>
+                `group flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
+                  isActive
+                    ? 'bg-[#23a9d6] text-white shadow-md'
+                    : 'text-gray-400 hover:bg-[#28a9d622] hover:text-[#23a9d6]'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <HiMiniDocumentCheck className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
+                  Solicitudes
+                </>
+              )}
+            </NavLink>
+            <NavLink
+              to='/panel/perfil'
+              onClick={handleLinkClick}
+              className={({ isActive }) =>
+                `group absolute bottom-1 flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
+                  isActive
+                    ? 'bg-[#23a9d6] text-white shadow-md'
+                    : 'text-gray-400 hover:bg-[#28a9d622] hover:text-[#23a9d6]'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <FaUser className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
+                  Perfil
+                </>
+              )}
+            </NavLink>
           </div>
         </aside>
         <div className='flex-[6] min-w-0 p-7 overflow-x-auto w-full lg:w-auto'>

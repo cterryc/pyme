@@ -333,14 +333,14 @@ export const RegisterPyme = () => {
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                       <div className='flex flex-col gap-1'>
                         <p className='text-sm'>Teléfono empresarial</p>
-                        <div className='border border-[#D1D5DB] rounded-md'>
+                        <div className='border border-[#D1D5DB] rounded-md flex'>
                           <select className='h-full px-2 text-xl' {...registerPyme('countryCode')}>
                             <option value='0'>🇺🇾</option>
                             <option value='1'>🇦🇷</option>
                             <option value='2'>🇵🇪</option>
                             <option value='3'>🇵🇾</option>
                           </select>
-                          <input type='text' className='p-2' {...registerPyme('phone')} />
+                          <input type='text' className='p-2 flex-1' {...registerPyme('phone')} />
                         </div>
                         {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
                         {errors.countryCode && <p className='text-red-500 text-center'>{errors.countryCode.message}</p>}
