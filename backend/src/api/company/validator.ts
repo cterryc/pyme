@@ -54,25 +54,18 @@ export const createCompanySchema = z.object({
   tradeName: optionalNonEmptyString(255),
   industryId: z.string().uuid({ message: 'ID de industria inválido' }),
   taxId: nonEmptyString(1, 50), 
-  email: z.string()
-    .optional()
-    .refine((val) => {
-      if (val === undefined || val === null) return true;
-      return val.trim().length > 0;
-    }, {
+  email: z.string({ required_error: 'El email es requerido' })
+    .min(1, { message: 'El email es requerido' })
+    .refine((val) => val.trim().length > 0, {
       message: "El email no puede contener solo espacios en blanco",
     })
     .refine((val) => {
-      if (!val || val.trim() === '') return true;
-      // Validar formato de email solo si hay contenido
+      // Validar formato de email
       return z.string().email().safeParse(val.trim()).success;
     }, {
       message: "Email inválido",
     })
-    .transform((val) => {
-      if (!val || val.trim() === '') return undefined;
-      return val.trim();
-    }),
+    .transform((val) => val.trim()),
   foundedDate: z.coerce.date().optional(),  
   employeeCount: z.number()
     .int({ message: "El número de empleados debe ser un entero" })
@@ -92,25 +85,21 @@ export const createCompanySchema = z.object({
   postalCode: optionalNonEmptyString(20),
   country: optionalNonEmptyString(50),
   phone: optionalNonEmptyString(20),
-  website: z.string()
-    .optional()
-    .refine((val) => {
-      if (val === undefined || val === null) return true;
+  website: z.union([
+    z.string().refine((val) => {
+      // Si se proporciona, NO debe ser solo espacios
       return val.trim().length > 0;
     }, {
       message: "La URL no puede contener solo espacios en blanco",
-    })
-    .refine((val) => {
-      if (!val || val.trim() === '') return true;
-      // Validar formato de URL solo si hay contenido
+    }).refine((val) => {
+      // Validar formato de URL
       return z.string().url().safeParse(val.trim()).success;
     }, {
       message: "URL inválida",
-    })
-    .transform((val) => {
-      if (!val || val.trim() === '') return undefined;
-      return val.trim();
-    }),
+    }).transform((val) => val.trim()),
+    z.literal('').transform(() => undefined),
+    z.undefined()
+  ]).optional(),
   description: optionalNonEmptyString(1000),
 }).strict();
 
