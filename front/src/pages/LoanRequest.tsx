@@ -177,12 +177,20 @@ export const LoanRequest = () => {
                   onChange={(e) => {
                     const value = Number(e.target.value)
                     const maxAmount = Number(loanOptions?.offerDetails.maxAmount)
+                    const minAmount = Number(loanOptions?.offerDetails.minAmount)
                     
                     if (value > maxAmount) {
                       setSelectedAmount(maxAmount)
                       toast.info('Monto ajustado', {
                         style: { borderColor: '#3b82f6', backgroundColor: '#eff6ff', borderWidth: '2px' },
                         description: `El monto ingresado supera el máximo permitido. Se ha ajustado a ${formatToDolar(maxAmount)}.`,
+                        duration: 3000
+                      })
+                    } else if (value < minAmount && value > 0) {
+                      setSelectedAmount(minAmount)
+                      toast.info('Monto ajustado', {
+                        style: { borderColor: '#3b82f6', backgroundColor: '#eff6ff', borderWidth: '2px' },
+                        description: `El monto ingresado es menor al mínimo permitido. Se ha ajustado a ${formatToDolar(minAmount)}.`,
                         duration: 3000
                       })
                     } else {
