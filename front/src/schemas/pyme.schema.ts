@@ -45,7 +45,7 @@ const getPhoneRegexForCountry = (countryCode: number) => {
 
 const getCountryFormatMessage = (countryCode: number) => {
   const countryNames = {
-    0: 'Para Uruguay es 9 XXX XXX',
+    0: 'Para Uruguay es 9X XXX XXX',
     1: 'Para Argentina es 9 XXX XXX XXX',
     2: 'Para Perú es 9 XX XX XX XX',
     3: 'Para Paraguay es 9 XX XXX XXX'
