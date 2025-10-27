@@ -69,7 +69,7 @@ export const useDashboard = (): DashboardContextType => {
   const [clients, setClients] = useState<Array<Client>>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(2)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
   const [totalPages, setTotalPages] = useState(0)
   const [totalClients, setTotalClients] = useState(0)
   const [industryList, setIndustryList] = useState<Array<{ id: string; name: string }>>([])
