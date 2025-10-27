@@ -57,6 +57,7 @@ interface DashboardContextType {
   industryFilter: string
   totalClients: number
   totalPages: number
+  errors: string[]
 }
 
 export const useDashboard = (): DashboardContextType => {
@@ -72,6 +73,8 @@ export const useDashboard = (): DashboardContextType => {
   const [totalPages, setTotalPages] = useState(0)
   const [totalClients, setTotalClients] = useState(0)
   const [industryList, setIndustryList] = useState<Array<{ id: string; name: string }>>([])
+  const [errors, setErrors] = useState<string[]>([])
+
   //Buscar al toke perri
   useEffect(() => {
     const fetchClients = async (page = 1, search = '', industry = '', status = '') => {
@@ -101,10 +104,14 @@ export const useDashboard = (): DashboardContextType => {
           '  |' + ' es : ',
           data.payload
         )
-        setClients(data.payload.data)
-        setCurrentPage(data.payload.pagination.page)
-        setTotalClients(data.payload.pagination.total)
-        setTotalPages(data.payload.pagination.totalPages)
+        if (data.success) {
+          setClients(data.payload.data)
+          setCurrentPage(data.payload.pagination.page)
+          setTotalClients(data.payload.pagination.total)
+          setTotalPages(data.payload.pagination.totalPages)
+        } else {
+          setErrors((prev) => [...prev, 'No tienes permisos para realizar esta accion'])
+        }
       } catch (error) {
         console.error('useDashboard[fetchClients]', error)
       } finally {
@@ -149,6 +156,7 @@ export const useDashboard = (): DashboardContextType => {
   }
 
   return {
+    errors,
     searchTerm,
     setSearchTerm,
     estadoFilter,
