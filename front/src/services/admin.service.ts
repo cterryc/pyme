@@ -11,7 +11,13 @@ import {
   type CreateRiskTierConfigData,
   type UpdateRiskTierConfigData,
   type CreateIndustryData,
-  type UpdateIndustryData
+  type UpdateIndustryData,
+  type PaginatedCreditApplicationsResponse,
+  type GetCreditApplicationsParams,
+  type DetailedCreditApplicationResponse,
+  type UpdateCreditApplicationStatusData,
+  type UpdateCreditApplicationStatusResponse,
+  type DashboardStatsResponse
 } from '@/interfaces/admin.interface'
 
 // Helper function to get auth token
@@ -42,7 +48,19 @@ const makeRequest = async <T>(
   const result = await response.json()
   
   if (!response.ok) {
-    throw new Error(result.message || `Error: ${response.status}`)
+    // Intentar extraer mensaje de error más detallado
+    let errorMessage = `Error: ${response.status}`
+    
+    if (result.payload && Array.isArray(result.payload)) {
+      // Errores de validación de Zod
+      errorMessage = result.payload.map((err: { message: string }) => err.message).join(', ')
+    } else if (result.message) {
+      errorMessage = result.message
+    } else if (typeof result.payload === 'string') {
+      errorMessage = result.payload
+    }
+    
+    throw new Error(errorMessage)
   }
   
   return result
@@ -206,6 +224,61 @@ export const deleteIndustry = async (id: string): Promise<DeleteResponse> => {
     })
   } catch (error) {
     console.error('[deleteIndustry]: Error deleting data:', error)
+    throw error
+  }
+}
+
+// Credit Applications API functions
+export const getCreditApplicationsForAdmin = async (
+  params: GetCreditApplicationsParams = {}
+): Promise<PaginatedCreditApplicationsResponse> => {
+  try {
+    const queryParams = new URLSearchParams()
+    
+    if (params.page) queryParams.append('page', params.page.toString())
+    if (params.limit) queryParams.append('limit', params.limit.toString())
+    if (params.status) queryParams.append('status', params.status)
+    if (params.companyName) queryParams.append('companyName', params.companyName)
+    
+    const queryString = queryParams.toString()
+    const endpoint = queryString ? `/credit-applications?${queryString}` : '/credit-applications'
+    
+    return await makeRequest<PaginatedCreditApplicationsResponse>(endpoint)
+  } catch (error) {
+    console.error('[getCreditApplicationsForAdmin]: Error fetching data:', error)
+    throw error
+  }
+}
+
+export const getCreditApplicationByIdForAdmin = async (id: string): Promise<DetailedCreditApplicationResponse> => {
+  try {
+    return await makeRequest<DetailedCreditApplicationResponse>(`/credit-applications/${id}`)
+  } catch (error) {
+    console.error('[getCreditApplicationByIdForAdmin]: Error fetching data:', error)
+    throw error
+  }
+}
+
+export const updateCreditApplicationStatus = async (
+  id: string, 
+  data: UpdateCreditApplicationStatusData
+): Promise<UpdateCreditApplicationStatusResponse> => {
+  try {
+    return await makeRequest<UpdateCreditApplicationStatusResponse>(`/credit-applications/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  } catch (error) {
+    console.error('[updateCreditApplicationStatus]: Error updating status:', error)
+    throw error
+  }
+}
+
+export const getDashboardStats = async (): Promise<DashboardStatsResponse> => {
+  try {
+    return await makeRequest<DashboardStatsResponse>('/dashboard/stats')
+  } catch (error) {
+    console.error('[getDashboardStats]: Error fetching dashboard stats:', error)
     throw error
   }
 }
