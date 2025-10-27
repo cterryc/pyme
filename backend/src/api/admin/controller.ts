@@ -279,4 +279,31 @@ export default class AdminController {
       return next(error);
     }
   };
+
+  static getCreditApplicationByIdForAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { id } = req.params;
+      const result = await this.loanService.getCreditApplicationByIdForAdmin(id);
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+
+  static getDashboardStats = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.loanService.getDashboardStats();
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
 }

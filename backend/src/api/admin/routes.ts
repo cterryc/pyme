@@ -14,7 +14,6 @@ import {
  updateIndustrySchema,
  } from "./validator";
 import { 
-  updateCreditApplicationStatusParamsSchema,
   updateCreditApplicationStatusBodySchema,
   getCreditApplicationsForAdminQuerySchema 
 } from "../loan/validator";
@@ -108,13 +107,23 @@ adminRouter.delete(
 
 // CREDIT APPLICATIONS MANAGEMENT
 adminRouter.get(
+  "/dashboard/stats",
+  AdminController.getDashboardStats
+);
+adminRouter.get(
   "/credit-applications", 
   schemaValidator(null, getCreditApplicationsForAdminQuerySchema),
   AdminController.getCreditApplicationsForAdmin
 );
+adminRouter.get(
+  "/credit-applications/:id",
+  validateUuid,
+  AdminController.getCreditApplicationByIdForAdmin
+);
 adminRouter.patch(
   "/credit-applications/:id/status",
-  schemaValidator(updateCreditApplicationStatusBodySchema, updateCreditApplicationStatusParamsSchema),
+  validateUuid,
+  schemaValidator(updateCreditApplicationStatusBodySchema, null),
   AdminController.updateCreditApplicationStatus
 );
 

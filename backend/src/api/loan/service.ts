@@ -527,6 +527,10 @@ export default class LoanService {
         rejectionReason: app.rejectionReason,
         internalNotes: app.internalNotes,
         riskScore: app.riskScore,
+        company: app.company ? {
+          annualRevenue: app.company.annualRevenue,
+          employeeCount: app.company.employeeCount,
+        } : null,
         reviewedBy: app.reviewedBy ? {
           id: app.reviewedBy.id,
           name: `${app.reviewedBy.firstName || ''} ${app.reviewedBy.lastName || ''}`.trim() || 'Usuario',
@@ -537,6 +541,107 @@ export default class LoanService {
       page: pageNum,
       totalPages,
     };
+  }
+
+  async getCreditApplicationByIdForAdmin(applicationId: string): Promise<any> {
+    const application = await this.loanRepo.findOne({
+      where: { id: applicationId },
+      relations: ["company", "company.industry", "company.owner", "reviewedBy", "documents"],
+    });
+
+    if (!application) {
+      throw new HttpError(
+        HttpStatus.NOT_FOUND,
+        "La solicitud de crédito no existe."
+      );
+    }
+
+    return {
+      id: application.id,
+      applicationNumber: application.applicationNumber,
+      status: application.status,
+      selectedAmount: application.selectedAmount,
+      selectedTermMonths: application.selectedTermMonths,
+      approvedAmount: application.approvedAmount,
+      rejectionReason: application.rejectionReason,
+      internalNotes: application.internalNotes,
+      riskScore: application.riskScore,
+      submittedAt: application.submittedAt,
+      reviewedAt: application.reviewedAt,
+      approvedAt: application.approvedAt,
+      disbursedAt: application.disbursedAt,
+      createdAt: application.createdAt,
+      updatedAt: application.updatedAt,
+      offerDetails: application.offerDetails,
+      statusHistory: application.statusHistory || [],
+      company: application.company ? {
+        id: application.company.id,
+        legalName: application.company.legalName,
+        cuit: application.company.taxId,
+        annualRevenue: application.company.annualRevenue,
+        employeeCount: application.company.employeeCount,
+        foundedDate: application.company.foundedDate,
+        industry: application.company.industry ? {
+          id: application.company.industry.id,
+          name: application.company.industry.name,
+        } : null,
+        owner: application.company.owner ? {
+          id: application.company.owner.id,
+          firstName: application.company.owner.firstName,
+          lastName: application.company.owner.lastName,
+          email: application.company.owner.email,
+        } : null,
+      } : null,
+      reviewedBy: application.reviewedBy ? {
+        id: application.reviewedBy.id,
+        name: `${application.reviewedBy.firstName || ''} ${application.reviewedBy.lastName || ''}`.trim() || 'Usuario',
+        email: application.reviewedBy.email,
+      } : null,
+      documents: application.documents ? application.documents.map(doc => ({
+        id: doc.id,
+        name: doc.fileName,
+        fileUrl: doc.fileUrl,
+        uploadedAt: doc.createdAt,
+      })) : [],
+    };
+  }
+
+  async getDashboardStats(): Promise<{
+    total: number;
+    approved: number;
+    pending: number;
+    rejected: number;
+    recentApplications: any[];
+  }> {
+    // Obtener todas las solicitudes
+    const allApplications = await this.loanRepo.find({
+      relations: ["company", "reviewedBy"],
+      order: { createdAt: "DESC" },
+    });
+
+    // Calcular estadísticas
+    const stats = {
+      total: allApplications.length,
+      approved: allApplications.filter(app => app.status === CreditApplicationStatus.APPROVED).length,
+      pending: allApplications.filter(app => 
+        app.status === CreditApplicationStatus.SUBMITTED || 
+        app.status === CreditApplicationStatus.UNDER_REVIEW ||
+        app.status === CreditApplicationStatus.DOCUMENTS_REQUIRED
+      ).length,
+      rejected: allApplications.filter(app => app.status === CreditApplicationStatus.REJECTED).length,
+      recentApplications: allApplications.slice(0, 5).map(app => ({
+        id: app.id,
+        applicationNumber: app.applicationNumber,
+        companyName: app.company?.legalName,
+        selectedAmount: app.selectedAmount,
+        approvedAmount: app.approvedAmount,
+        status: app.status,
+        submittedAt: app.submittedAt,
+        createdAt: app.createdAt,
+      })),
+    };
+
+    return stats;
   }
 
   private getValidStatusTransitions(currentStatus: CreditApplicationStatus): CreditApplicationStatus[] {
