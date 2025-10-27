@@ -28,7 +28,7 @@ export const Header = () => {
   }
 
   return (
-    <header className='flex justify-between p-3 md:px-10 items-center border-b-1 border-gray-200'>
+    <header className='flex justify-between p-3 md:px-10 items-center border-b-1 border-gray-200 relative z-[45] bg-white'>
       <Link to='/' className='flex items-center gap-6'>
         <img src='/assets/logo.png' className='h-[25px]' alt='' />
         <h1 className='font-medium text-2xl text-[var(--font-title-light)]'>Financia</h1>
@@ -45,7 +45,7 @@ export const Header = () => {
             <HiOutlineChevronDown className='text-xl' />
           </button>
           {isAvatarMenuOpen && (
-            <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1'>
+            <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1 z-[70] shadow-lg'>
               <li className='hover:text-[var(--primary)]'>
                 <button onClick={() => navigate('/panel')} className='flex gap-4 items-center cursor-pointer'>
                   <HiMenuAlt1 className='text-xl' /> Panel
