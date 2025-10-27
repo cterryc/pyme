@@ -92,15 +92,15 @@ export const RegisterPyme = () => {
     }
   }
 
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      toast.error('Hay errores en el formulario', {
-        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: 'Revisa los datos ingresados',
-        duration: 2000
-      })
-    }
-  }, [errors])
+  // useEffect(() => {
+  //   if (Object.keys(errors).length > 0) {
+  //     toast.error('Hay errores en el formulario', {
+  //       style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+  //       description: 'Revisa los datos ingresados',
+  //       duration: 2000
+  //     })
+  //   }
+  // }, [errors])
 
   useEffect(() => {
     const subscription = watch((value) => {
@@ -124,228 +124,230 @@ export const RegisterPyme = () => {
               {/* {Object.keys(errors).length > 0 && <p className='text-red-500 text-xl'>Hay errores en el formulario</p>} */}
 
               <form className='flex flex-col text-left px-10 md:px-20 mt-5' onSubmit={handleSubmit(onSubmit)}>
-                {step == 0 && (
-                  <div>
-                    <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] py-2 mb-5'>
-                      Información básica
-                    </h3>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Nombre legal</p>
+                {/* {step == 0 && ( */}
+                <div>
+                  <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] py-2 mb-5'>
+                    Información básica
+                  </h3>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Nombre legal</p>
 
-                        <input
-                          type='text'
-                          {...registerPyme('legalName')}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Nombre legal de la empresa'
-                          style={{ borderColor: errors.legalName ? 'red' : '' }}
-                        />
-                        {errors.legalName && <p className='text-red-500 text-center'>{errors.legalName.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Nombre comercial</p>
+                      <input
+                        type='text'
+                        {...registerPyme('legalName')}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Nombre legal de la empresa'
+                        style={{ borderColor: errors.legalName ? 'red' : '' }}
+                      />
+                      {errors.legalName && <p className='text-red-500 text-center'>{errors.legalName.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Nombre comercial</p>
 
-                        <input
-                          {...registerPyme('tradeName')}
-                          type='text'
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Nombre comercial de la empresa'
-                          style={{ borderColor: errors.tradeName ? 'red' : '' }}
-                        />
-                        {errors.tradeName && <p className='text-red-500 text-center'>{errors.tradeName.message}</p>}
-                      </div>
+                      <input
+                        {...registerPyme('tradeName')}
+                        type='text'
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Nombre comercial de la empresa'
+                        style={{ borderColor: errors.tradeName ? 'red' : '' }}
+                      />
+                      {errors.tradeName && <p className='text-red-500 text-center'>{errors.tradeName.message}</p>}
+                    </div>
 
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>CUIT</p>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>CUIT</p>
 
-                        <input
-                          type='text'
-                          {...registerPyme('taxId')}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='XX-XXXXXXXX-X'
-                          style={{ borderColor: errors.taxId ? 'red' : '' }}
-                        />
-                        {errors.taxId && <p className='text-red-500 text-center'>{errors.taxId.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Correo electrónico</p>
+                      <input
+                        type='text'
+                        {...registerPyme('taxId')}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='XX-XXXXXXXX-X'
+                        style={{ borderColor: errors.taxId ? 'red' : '' }}
+                      />
+                      {errors.taxId && <p className='text-red-500 text-center'>{errors.taxId.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Correo electrónico</p>
 
-                        <input
-                          type='text'
-                          {...registerPyme('email')}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='contacto@empresa.com'
-                          style={{ borderColor: errors.email ? 'red' : '' }}
-                        />
-                        {errors.email && <p className='text-red-500 text-center'>{errors.email.message}</p>}
-                      </div>
+                      <input
+                        type='text'
+                        {...registerPyme('email')}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='contacto@empresa.com'
+                        style={{ borderColor: errors.email ? 'red' : '' }}
+                      />
+                      {errors.email && <p className='text-red-500 text-center'>{errors.email.message}</p>}
                     </div>
                   </div>
-                )}
-                {step == 1 && (
-                  <div>
-                    <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
-                      Detalles de la empresa
-                    </h3>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Industria</p>
-                        <select
-                          style={{ borderColor: errors.industryId ? 'red' : '' }}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          {...registerPyme('industryId')}
-                        >
-                          {industriesList &&
-                            industriesList.map((ind) => (
-                              <option key={ind.id} value={ind.id}>
-                                {ind.name}
-                              </option>
-                            ))}
-                        </select>
-                        {errors.industryId && <p className='text-red-500 text-center'>{errors.industryId.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Fecha de fundación</p>
+                </div>
+                {/* )} */}
+                {/* {step == 1 && ( */}
+                <div>
+                  <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
+                    Detalles de la empresa
+                  </h3>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Industria</p>
+                      <select
+                        style={{ borderColor: errors.industryId ? 'red' : '' }}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        {...registerPyme('industryId')}
+                      >
+                        {industriesList &&
+                          industriesList.map((ind) => (
+                            <option key={ind.id} value={ind.id}>
+                              {ind.name}
+                            </option>
+                          ))}
+                      </select>
+                      {errors.industryId && <p className='text-red-500 text-center'>{errors.industryId.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Fecha de fundación</p>
 
-                        <input
-                          type='date'
-                          {...registerPyme('foundedDate', { valueAsDate: true })}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Nombre comercial de la empresa'
-                          style={{ borderColor: errors.foundedDate ? 'red' : '' }}
-                        />
-                        {errors.foundedDate && <p className='text-red-500 text-center'>{errors.foundedDate.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Cantidad empleados</p>
+                      <input
+                        type='date'
+                        {...registerPyme('foundedDate', { valueAsDate: true })}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Nombre comercial de la empresa'
+                        style={{ borderColor: errors.foundedDate ? 'red' : '' }}
+                        min='2000-01-01'
+                        max={`${new Date().toISOString().substr(0, 10)}`}
+                      />
+                      {errors.foundedDate && <p className='text-red-500 text-center'>{errors.foundedDate.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Cantidad empleados</p>
 
+                      <input
+                        type='number'
+                        {...registerPyme('employeeCount', { valueAsNumber: true })}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='100'
+                        style={{ borderColor: errors.employeeCount ? 'red' : '' }}
+                      />
+                      {errors.employeeCount && (
+                        <p className='text-red-500 text-center'>{errors.employeeCount.message}</p>
+                      )}
+                    </div>
+                    <div className='flex flex-col gap-1 '>
+                      <p className='text-sm'>Ingresos anuales</p>
+
+                      <div
+                        style={{ borderColor: errors.annualRevenue ? 'red' : '' }}
+                        className='flex items-center border gap-2 border-[#D1D5DB] overflow-hidden rounded-md focus-within:border-black '
+                      >
+                        <span className='text-[var(--font-title-light)] bg-[#D1D5DB] p-2'>$</span>
                         <input
                           type='number'
-                          {...registerPyme('employeeCount', { valueAsNumber: true })}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='100'
-                          style={{ borderColor: errors.employeeCount ? 'red' : '' }}
+                          {...registerPyme('annualRevenue', { valueAsNumber: true })}
+                          className='w-full outline-none py-2'
+                          placeholder='1000000'
+                          min={0}
                         />
-                        {errors.employeeCount && (
-                          <p className='text-red-500 text-center'>{errors.employeeCount.message}</p>
-                        )}
+                        <span className='text-[#414141FF] bg-[#D1D5DB] p-2'>USD</span>
                       </div>
-                      <div className='flex flex-col gap-1 '>
-                        <p className='text-sm'>Ingresos anuales</p>
 
-                        <div
-                          style={{ borderColor: errors.annualRevenue ? 'red' : '' }}
-                          className='flex items-center border gap-2 border-[#D1D5DB] overflow-hidden rounded-md focus-within:border-black '
-                        >
-                          <span className='text-[var(--font-title-light)] bg-[#D1D5DB] p-2'>$</span>
-                          <input
-                            type='number'
-                            {...registerPyme('annualRevenue', { valueAsNumber: true })}
-                            className='w-full outline-none py-2'
-                            placeholder='1000000'
-                            min={0}
-                          />
-                          <span className='text-[#414141FF] bg-[#D1D5DB] p-2'>USD</span>
-                        </div>
-
-                        {errors.annualRevenue && (
-                          <p className='text-red-500 text-center'>{errors.annualRevenue.message}</p>
-                        )}
-                      </div>
+                      {errors.annualRevenue && (
+                        <p className='text-red-500 text-center'>{errors.annualRevenue.message}</p>
+                      )}
                     </div>
                   </div>
-                )}
-                {step == 2 && (
-                  <div>
-                    <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
-                      Dirección
-                    </h3>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Dirección</p>
+                </div>
+                {/* )} */}
+                {/* {step == 2 && ( */}
+                <div>
+                  <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
+                    Dirección
+                  </h3>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Dirección</p>
 
-                        <input
-                          {...registerPyme('address')}
-                          type='text'
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Av.Corrientes 1234'
-                          style={{ borderColor: errors.address ? 'red' : '' }}
-                        />
-                        {errors.address && <p className='text-red-500 text-center'>{errors.address.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Ciudad</p>
+                      <input
+                        {...registerPyme('address')}
+                        type='text'
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Av.Corrientes 1234'
+                        style={{ borderColor: errors.address ? 'red' : '' }}
+                      />
+                      {errors.address && <p className='text-red-500 text-center'>{errors.address.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Ciudad</p>
 
-                        <input
-                          type='text'
-                          {...registerPyme('city')}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Ciudad Autónoma de Buenos Aires'
-                          style={{ borderColor: errors.city ? 'red' : '' }}
-                        />
-                        {errors.city && <p className='text-red-500 text-center'>{errors.city.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Estado/Provincia</p>
+                      <input
+                        type='text'
+                        {...registerPyme('city')}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Ciudad Autónoma de Buenos Aires'
+                        style={{ borderColor: errors.city ? 'red' : '' }}
+                      />
+                      {errors.city && <p className='text-red-500 text-center'>{errors.city.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Estado/Provincia</p>
 
-                        <input
-                          type='text'
-                          {...registerPyme('state')}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Caba'
-                          style={{ borderColor: errors.state ? 'red' : '' }}
-                        />
-                        {errors.state && <p className='text-red-500 text-center'>{errors.state.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Código postal</p>
+                      <input
+                        type='text'
+                        {...registerPyme('state')}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Caba'
+                        style={{ borderColor: errors.state ? 'red' : '' }}
+                      />
+                      {errors.state && <p className='text-red-500 text-center'>{errors.state.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Código postal</p>
 
-                        <input
-                          type='text'
-                          {...registerPyme('postalCode')}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='C1043AAS'
-                          style={{ borderColor: errors.postalCode ? 'red' : '' }}
-                        />
-                        {errors.postalCode && <p className='text-red-500 text-center'>{errors.postalCode.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>País</p>
+                      <input
+                        type='text'
+                        {...registerPyme('postalCode')}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='C1043AAS'
+                        style={{ borderColor: errors.postalCode ? 'red' : '' }}
+                      />
+                      {errors.postalCode && <p className='text-red-500 text-center'>{errors.postalCode.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>País</p>
 
-                        <input
-                          type='text'
-                          {...registerPyme('country')}
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Argentina'
-                          style={{ borderColor: errors.country ? 'red' : '' }}
-                        />
-                        {errors.country && <p className='text-red-500 text-center'>{errors.country.message}</p>}
-                      </div>
+                      <input
+                        type='text'
+                        {...registerPyme('country')}
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Argentina'
+                        style={{ borderColor: errors.country ? 'red' : '' }}
+                      />
+                      {errors.country && <p className='text-red-500 text-center'>{errors.country.message}</p>}
                     </div>
                   </div>
-                )}
-                {step == 3 && (
-                  <div>
-                    <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
-                      Contacto y descripción
-                    </h3>
+                </div>
+                {/* // )} */}
+                {/* {step == 3 && ( */}
+                <div>
+                  <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
+                    Contacto y descripción
+                  </h3>
 
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                      <div className='flex flex-col gap-1'>
-                        <p className='text-sm'>Teléfono empresarial</p>
-                        <div className='border border-[#D1D5DB] rounded-md'>
-                          <select className='h-full px-2 text-xl' {...registerPyme('countryCode')}>
-                            <option value='0'>🇺🇾</option>
-                            <option value='1'>🇦🇷</option>
-                            <option value='2'>🇵🇪</option>
-                            <option value='3'>🇵🇾</option>
-                          </select>
-                          <input type='text' className='p-2' {...registerPyme('phone')} />
-                        </div>
-                        {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
-                        {errors.countryCode && <p className='text-red-500 text-center'>{errors.countryCode.message}</p>}
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                    <div className='flex flex-col gap-1'>
+                      <p className='text-sm'>Teléfono empresarial</p>
+                      <div className='border border-[#D1D5DB] rounded-md flex'>
+                        <select className='h-full px-2 text-xl' {...registerPyme('countryCode')}>
+                          <option value='0'>🇺🇾</option>
+                          <option value='1'>🇦🇷</option>
+                          <option value='2'>🇵🇪</option>
+                          <option value='3'>🇵🇾</option>
+                        </select>
+                        <input type='text' className='p-2 flex-1' {...registerPyme('phone')} />
                       </div>
-                      {/* <div className='flex flex-col gap-1'>
+                      {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
+                      {errors.countryCode && <p className='text-red-500 text-center'>{errors.countryCode.message}</p>}
+                    </div>
+                    {/* <div className='flex flex-col gap-1'>
                         <p className='text-sm'>Teléfono empresarial</p>
                         <input
                           type='text'
@@ -357,104 +359,104 @@ export const RegisterPyme = () => {
                         {errors.phone && <p className='text-red-500 text-center'>{errors.phone.message}</p>}
                       </div> */}
 
-                      <div className='flex flex-col gap-1 col-span-2'>
-                        <p className='text-sm'>Website (opcional)</p>
-                        <input
-                          type='text'
-                          {
-                            ...registerPyme('website', { required: false }) /*, { required: false }*/
-                          }
-                          className='border p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='https://www.empresa.com'
-                          style={{ borderColor: errors.website ? 'red' : '' }}
-                        />
-                        {errors.website && <p className='text-red-500 text-center'>{errors.website.message}</p>}
-                      </div>
-                      <div className='flex flex-col gap-1 col-span-2'>
-                        <p className='text-sm'>Descripción</p>
-                        <textarea
-                          rows={5}
-                          {...registerPyme('description')}
-                          className='border min-h-30 max-h-60 p-2 border-[#D1D5DB] rounded-md'
-                          placeholder='Describe brevemente tu empresa...'
-                          style={{ borderColor: errors.description ? 'red' : '' }}
-                        />
-                        {errors.description && <p className='text-red-500 text-center'>{errors.description.message}</p>}
-                      </div>
+                    <div className='flex flex-col gap-1 col-span-2'>
+                      <p className='text-sm'>Website (opcional)</p>
+                      <input
+                        type='text'
+                        {
+                          ...registerPyme('website', { required: false }) /*, { required: false }*/
+                        }
+                        className='border p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='https://www.empresa.com'
+                        style={{ borderColor: errors.website ? 'red' : '' }}
+                      />
+                      {errors.website && <p className='text-red-500 text-center'>{errors.website.message}</p>}
+                    </div>
+                    <div className='flex flex-col gap-1 col-span-2'>
+                      <p className='text-sm'>Descripción</p>
+                      <textarea
+                        rows={5}
+                        {...registerPyme('description')}
+                        className='border min-h-30 max-h-60 p-2 border-[#D1D5DB] rounded-md'
+                        placeholder='Describe brevemente tu empresa...'
+                        style={{ borderColor: errors.description ? 'red' : '' }}
+                      />
+                      {errors.description && <p className='text-red-500 text-center'>{errors.description.message}</p>}
                     </div>
                   </div>
-                )}
-                {step == 4 && (
-                  <div className='flex flex-col gap-5'>
-                    <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
-                      Confirma tus datos
-                    </h3>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Nombre legal :</span> {getStoredData().legalName}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Nombre comercial : </span>
-                      {getStoredData().tradeName}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>CUIT : </span>
-                      {getStoredData().taxId}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Correo electrónico : </span>
-                      {getStoredData().email}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Industria : </span>
-                      {/* {getStoredData().industry} */}
-                      {getStoredData().industryId}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Fecha fundacion : </span>
-                      {new Date(getStoredData().foundedDate).toLocaleDateString('es-ES')}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Cantidad de empleados : </span>
-                      {getStoredData().employeeCount}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Ingresos anuales : </span>
-                      {getStoredData().annualRevenue}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Dirección : </span>
-                      {getStoredData().address}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Ciudad : </span>
-                      {getStoredData().city}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Estado/Provincia : </span>
-                      {getStoredData().state}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Código postal : </span>
-                      {getStoredData().postalCode}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>País : </span>
-                      {getStoredData().country}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Telefono empresarial : </span>
-                      {getStoredData().phone}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Website : </span>
-                      {getStoredData().website}
-                    </p>
-                    <p className='border-b-1 border-[#ddd]'>
-                      <span className='font-bold'>Descripción : </span>
-                      {getStoredData().description}
-                    </p>
-                  </div>
-                )}
+                </div>
+                {/* )} */}
+                {/* {step == 4 && ( */}
+                {/* <div className='flex flex-col gap-5'>
+                  <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] mt-15 py-2 mb-5'>
+                    Confirma tus datos
+                  </h3>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Nombre legal :</span> {getStoredData().legalName}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Nombre comercial : </span>
+                    {getStoredData().tradeName}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>CUIT : </span>
+                    {getStoredData().taxId}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Correo electrónico : </span>
+                    {getStoredData().email}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Industria : </span>
+                    {/* {getStoredData().industry} *}
+                    {getStoredData().industryId}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Fecha fundacion : </span>
+                    {new Date(getStoredData().foundedDate).toLocaleDateString('es-ES')}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Cantidad de empleados : </span>
+                    {getStoredData().employeeCount}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Ingresos anuales : </span>
+                    {getStoredData().annualRevenue}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Dirección : </span>
+                    {getStoredData().address}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Ciudad : </span>
+                    {getStoredData().city}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Estado/Provincia : </span>
+                    {getStoredData().state}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Código postal : </span>
+                    {getStoredData().postalCode}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>País : </span>
+                    {getStoredData().country}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Telefono empresarial : </span>
+                    {getStoredData().phone}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Website : </span>
+                    {getStoredData().website}
+                  </p>
+                  <p className='border-b-1 border-[#ddd]'>
+                    <span className='font-bold'>Descripción : </span>
+                    {getStoredData().description}
+                  </p>
+                </div>
+                )} */}
 
                 <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
                   {step != 0 ? (
@@ -477,21 +479,21 @@ export const RegisterPyme = () => {
                       Salir
                     </button>
                   )}
-                  {step != maxStep && (
+                  {/* {step != maxStep && (
                     <button
                       className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
                       onClick={nextStep}
                     >
                       Siguiente
                     </button>
-                  )}
-                  {step == maxStep && (
-                    <input
-                      type='submit'
-                      className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                      value='Confirmar'
-                    />
-                  )}
+                  )} */}
+                  {/* {step == maxStep && ( */}
+                  <input
+                    type='submit'
+                    className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
+                    value='Confirmar'
+                  />
+                  {/* )} */}
                 </div>
               </form>
             </section>
