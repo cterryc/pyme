@@ -213,6 +213,8 @@ export const RegisterPyme = () => {
                         className='border p-2 border-[#D1D5DB] rounded-md'
                         placeholder='Nombre comercial de la empresa'
                         style={{ borderColor: errors.foundedDate ? 'red' : '' }}
+                        min='2000-01-01'
+                        max={`${new Date().toISOString().substr(0, 10)}`}
                       />
                       {errors.foundedDate && <p className='text-red-500 text-center'>{errors.foundedDate.message}</p>}
                     </div>
