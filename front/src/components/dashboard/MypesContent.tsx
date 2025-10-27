@@ -133,7 +133,7 @@ export const MypesContent = () => {
                 }}
                 className='appearance-none bg-white border border-gray-300 rounded-md py-2 px-4 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
               >
-                <option value=''>_</option>
+                <option value=''>Filtrar por industria</option>
                 {industryList.map((pair) => (
                   <option key={pair.id} value={pair.id}>
                     {pair.name}
@@ -149,9 +149,9 @@ export const MypesContent = () => {
             {/* { FILTER DROW DOWN TUNEADO} */}
             {/* { FILTER DROW DOWN TUNEADO} */}
 
-            <button className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors'>
+            {/* <button className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors'>
               Nuevo Cliente
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@ export const MypesContent = () => {
             </div>
           </div>
 
-          <div className='bg-green-50 p-4 rounded-lg'>
+          {/*<div className='bg-green-50 p-4 rounded-lg'>
             <div className='flex items-center'>
               <div className='flex-shrink-0'>
                 <div className='w-6 h-6 bg-green-500 rounded-full flex items-center justify-center'>
@@ -183,7 +183,7 @@ export const MypesContent = () => {
               <div className='ml-3'>
                 <p className='text-sm font-medium text-green-800'>Activos</p>
                 <p className='text-lg font-bold text-green-900'>
-                  {/* {clients.filter((client) => client.estado === 'Activo').length} */}
+                  {// {clients.filter((client) => client.estado === 'Activo').length} }
                   0000
                 </p>
               </div>
@@ -201,32 +201,32 @@ export const MypesContent = () => {
                 <p className='text-sm font-medium text-gray-800'>Inactivos</p>
                 <p className='text-lg font-bold text-gray-900'>
                   000
-                  {/* {clients.filter((client) => client.estado === 'Inactivo').length} */}
+                  {//{clients.filter((client) => client.estado === 'Inactivo').length}}
                 </p>
               </div>
             </div>
-          </div>
+          </div>*/}
         </div>
       </div>
 
       {/* Tabla de datos */}
       <div className='px-8 py-6'>
-        {!isLoading ? (
-          <div>
-            <DataTable
-              columns={tableColumns}
-              data={filteredData}
-              onRowClick={(row) => console.log('Clicked client:', row)}
-              isLoading={isLoading}
-            />
-          </div>
-        ) : (
+        {/* {!isLoading ? ( 
+        <div>*/}
+        <DataTable
+          columns={tableColumns}
+          data={filteredData}
+          onRowClick={(row) => console.log('Clicked client:', row)}
+          isLoading={isLoading}
+        />
+        {/*</div>
+         ) : (
           //   <div className='flex flex-col min-h-[20vh] justify-center '>
           <Loading dark={true} />
           //   </div>
-        )}
+        )} */}
 
-        <Paginator totalPages={totalPages} onPagChange={setCurrentPage} />
+        <Paginator totalPages={totalPages} disable={isLoading} onPagChange={setCurrentPage} />
 
         {!isLoading && filteredData && filteredData.length === 0 && (
           <div className='text-center py-12'>
