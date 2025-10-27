@@ -40,14 +40,16 @@ export const UserDashboard = () => {
       )}
 
       <section className='flex flex-1 relative'>
-        <aside className={`
+        <aside
+          className={`
           fixed lg:static inset-y-0 left-0 z-[50]
           flex flex-col w-64 lg:flex-1 py-5 px-3 
           bg-white lg:border-r-2 border-gray-200
           transform transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           shadow-xl lg:shadow-none
-        `}>
+        `}
+        >
           {/* Sidebar Header - Solo visible en móvil */}
           <div className='lg:hidden flex items-center justify-between mb-6 pb-4 border-b border-gray-200'>
             <div className='flex items-center gap-2'>
@@ -78,7 +80,9 @@ export const UserDashboard = () => {
             >
               {({ isActive }) => (
                 <>
-                  <FaBuilding className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
+                  <FaBuilding
+                    className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`}
+                  />
                   Pymes
                 </>
               )}
@@ -96,7 +100,9 @@ export const UserDashboard = () => {
             >
               {({ isActive }) => (
                 <>
-                  <HiMiniDocumentCheck className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
+                  <HiMiniDocumentCheck
+                    className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`}
+                  />
                   Solicitudes
                 </>
               )}
@@ -105,7 +111,7 @@ export const UserDashboard = () => {
               to='/panel/perfil'
               onClick={handleLinkClick}
               className={({ isActive }) =>
-                `group absolute bottom-1 flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
+                `group absolute w-full bottom-1 flex items-center gap-2 text-xl p-2 rounded-lg cursor-pointer transition-all ${
                   isActive
                     ? 'bg-[#23a9d6] text-white shadow-md'
                     : 'text-gray-400 hover:bg-[#28a9d622] hover:text-[#23a9d6]'
@@ -114,7 +120,9 @@ export const UserDashboard = () => {
             >
               {({ isActive }) => (
                 <>
-                  <FaUser className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`} />
+                  <FaUser
+                    className={`h-6 w-6 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#23a9d6]'}`}
+                  />
                   Perfil
                 </>
               )}
