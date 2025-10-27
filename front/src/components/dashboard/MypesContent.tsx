@@ -1,11 +1,13 @@
 import { SearchBar } from '../SearchBar'
-import { FilterDropdown } from '../FilterDropdown'
+// import { FilterDropdown } from '../FilterDropdown'
 import { DataTable } from '../DataTable'
 import { Select } from '../Select'
 // import { useDashboard } from '../../context/DashboardContext'
 import { useDashboard } from '../../hooks/Admin/useDashboard'
 import { Loading } from '../Loading'
 import { Paginator } from '../Paginator'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 export const MypesContent = () => {
   const {
@@ -21,42 +23,43 @@ export const MypesContent = () => {
     totalClients,
     totalPages,
     industryList,
-    setCurrentPage
+    setCurrentPage,
+    errors
   } = useDashboard()
 
-  // Configuración de columnas para la tabla de clientes
-  //   const tableColumns = [
-  //     { key: 'nombre', label: 'NOMBRE', width: '20%' },
-  //     { key: 'email', label: 'EMAIL', width: '25%' },
-  //     { key: 'telefono', label: 'TELÉFONO', width: '15%' },
-  //     { key: 'empresa', label: 'EMPRESA', width: '20%' },
-  //     { key: 'fechaRegistro', label: 'FECHA REGISTRO', width: '15%' },
-  //     { key: 'estado', label: 'ESTADO', width: '5%' },
-  //     {
-  //       key: 'acciones',
-  //       label: 'ACCIONES',
-  //       width: '10%',
-  //       render: (_value: any, row: any) => (
-  //         <Select
-  //           options={[
-  //             { value: 'ver', label: 'Ver', icon: '👁️' },
-  //             { value: 'editar', label: 'Editar', icon: '✏️' }
-  //           ]}
-  //           placeholder='Opciones'
-  //           variant='button'
-  //           size='sm'
-  //           onSelect={(option) => {
-  //             console.log(`Acción seleccionada: ${option.value} para cliente:`, row)
-  //             if (option.value === 'ver') {
-  //               console.log('Ver cliente:', row.nombre)
-  //             } else if (option.value === 'editar') {
-  //               console.log('Editar cliente:', row.nombre)
-  //             }
-  //           }}
-  //         />
-  //       )
-  //     }
-  //   ]
+  //Configuración de columnas para la tabla de clientes
+  // const tableColumns = [
+  //   { key: 'nombre', label: 'NOMBRE', width: '20%' },
+  //   { key: 'email', label: 'EMAIL', width: '25%' },
+  //   { key: 'telefono', label: 'TELÉFONO', width: '15%' },
+  //   { key: 'empresa', label: 'EMPRESA', width: '20%' },
+  //   { key: 'fechaRegistro', label: 'FECHA REGISTRO', width: '15%' },
+  //   { key: 'estado', label: 'ESTADO', width: '5%' },
+  //   {
+  //     key: 'acciones',
+  //     label: 'ACCIONES',
+  //     width: '10%',
+  //     render: (_value: any, row: any) => (
+  //       <Select
+  //         options={[
+  //           { value: 'ver', label: 'Ver', icon: '👁️' },
+  //           { value: 'editar', label: 'Editar', icon: '✏️' }
+  //         ]}
+  //         placeholder='Opciones'
+  //         variant='button'
+  //         size='sm'
+  //         onSelect={(option) => {
+  //           console.log(`Acción seleccionada: ${option.value} para cliente:`, row)
+  //           if (option.value === 'ver') {
+  //             console.log('Ver cliente:', row.nombre)
+  //           } else if (option.value === 'editar') {
+  //             console.log('Editar cliente:', row.nombre)
+  //           }
+  //         }}
+  //       />
+  //     )
+  //   }
+  // ]
 
   const tableColumns = [
     { key: 'legalName', label: 'NOMBRE LEGAL', width: '20%' },
@@ -92,6 +95,16 @@ export const MypesContent = () => {
   ]
 
   const filteredData = getFilteredClients()
+
+  useEffect(() => {
+    errors.forEach((errorMessage) =>
+      toast.error('Error', {
+        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+        description: errorMessage,
+        duration: 4000
+      })
+    )
+  }, [errors])
 
   return (
     <div className='flex-1 bg-white'>
@@ -215,7 +228,7 @@ export const MypesContent = () => {
 
         <Paginator totalPages={totalPages} onPagChange={setCurrentPage} />
 
-        {!isLoading && filteredData.length === 0 && (
+        {!isLoading && filteredData && filteredData.length === 0 && (
           <div className='text-center py-12'>
             <div className='text-gray-400 text-5xl mb-4'>👥</div>
             <h3 className='text-lg font-medium text-gray-900 mb-2'>No se encontraron clientes</h3>
