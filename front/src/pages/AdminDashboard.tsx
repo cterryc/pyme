@@ -13,11 +13,11 @@ const AdminDashboardRoutes = () => {
       {/* Submodule selection for a specific module (optional, can be removed if not needed) */}
       <Route path='/modules/:moduleId' element={<SubmoduleSelectionPage />} />
       {/* All submodule routes now use the same LeftAdminDashboard with collapsible sidebar */}
-      <Route path='/operations/dashboard' element={<LeftAdminDashboard />} />
-      <Route path='/operations/solicitudes' element={<LeftAdminDashboard />} />
-      <Route path='/clients/mypes' element={<LeftAdminDashboard />} />
-      <Route path='/products/productos' element={<LeftAdminDashboard />} />
-      <Route path='/settings/configuracion' element={<LeftAdminDashboard />} />
+      <Route path="/operations/dashboard" element={<LeftAdminDashboard />} />
+      <Route path="/operations/solicitudes" element={<LeftAdminDashboard />} />
+      <Route path="/clients/mypes" element={<LeftAdminDashboard />} />
+  {/* Products/Planes removed from admin menu */}
+      <Route path="/settings/configuracion" element={<LeftAdminDashboard />} />
 
       {/* Redirect unknown routes to main page */}
       <Route path='*' element={<Navigate to='/admin' replace />} />
