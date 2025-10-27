@@ -9,7 +9,7 @@ export const UserDashboard = () => {
     <section className='flex flex-col min-h-screen'>
       <Header />
       <section className='flex flex-1'>
-        <aside className='flex flex-col gap-1 flex-1 py-5 px-3 border-r-2 border-gray-200'>
+        <aside className='flex flex-col gap-1 flex-1 py-5 px-3 border-r-2 border-gray-200 relative'>
           <NavLink
             to='/panel'
             className='group flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]'
@@ -24,13 +24,13 @@ export const UserDashboard = () => {
             <HiMiniDocumentCheck className='h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]' />
             Solicitudes
           </NavLink>
-          {/* <NavLink
+          <NavLink
             to='/panel/perfil'
-            className='group flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]'
+            className='group absolute bottom-1 flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]'
           >
             <FaUser className='h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]' />
             Perfil
-          </NavLink> */}
+          </NavLink>
         </aside>
         <div className='flex-[6] min-w-0 p-7 overflow-x-auto'>
           <Outlet />
