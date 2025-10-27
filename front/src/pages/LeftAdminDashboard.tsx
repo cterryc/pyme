@@ -10,13 +10,14 @@ import {
 } from '@/components/dashboard'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { FiChevronDown, FiChevronRight } from 'react-icons/fi'
+import { FiChevronDown, FiChevronRight, FiMenu, FiX } from 'react-icons/fi'
 
 export const LeftAdminDashboard = () => {
     const { getActiveModules, activeSection, setActiveSection, getSubmoduleByRoute } = useDashboard()
     const navigate = useNavigate()
     const location = useLocation()
     const [expandedModules, setExpandedModules] = useState<string[]>([])
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     const activeModules = getActiveModules()
 
@@ -45,6 +46,7 @@ export const LeftAdminDashboard = () => {
     const handleSubmoduleClick = (route: string, submoduleId: string) => {
         navigate(route)
         setActiveSection(submoduleId)
+        setIsSidebarOpen(false) // Close sidebar on mobile after selection
     }
 
     const renderContent = () => {
@@ -77,11 +79,33 @@ export const LeftAdminDashboard = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col">
-            <Header avatar='/assets/defaultAvatar.jpg' />
+            <Header />
 
-            <div className="flex flex-1">
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="lg:hidden fixed top-20 left-4 z-50 bg-blue-600 text-white p-3 rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
+                aria-label="Toggle menu"
+            >
+                {isSidebarOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+            </button>
+
+            {/* Overlay for mobile */}
+            {isSidebarOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            <div className="flex flex-1 relative">
                 {/* Collapsible Sidebar */}
-                <div className="w-64 bg-blue-600 text-white min-h-screen flex flex-col">
+                <div className={`
+                    fixed lg:static inset-y-0 left-0 z-40
+                    w-64 bg-blue-600 text-white flex flex-col
+                    transform transition-transform duration-300 ease-in-out
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                `}>
                     <div className="flex-1 overflow-y-auto">
                         {/* Header */}
                         <div className="p-6 border-b border-blue-500">
@@ -145,7 +169,10 @@ export const LeftAdminDashboard = () => {
                     {/* Bottom Actions */}
                     <div className="p-6 border-t border-blue-500">
                         <button 
-                            onClick={() => navigate('/admin')}
+                            onClick={() => {
+                                navigate('/admin')
+                                setIsSidebarOpen(false)
+                            }}
                             className="w-full bg-blue-500 hover:bg-blue-400 text-white py-3 px-4 rounded-lg font-medium mb-3"
                         >
                             Volver a Módulos
@@ -154,7 +181,9 @@ export const LeftAdminDashboard = () => {
                 </div>
 
                 {/* Main Content */}
-                {renderContent()}
+                <div className="flex-1 w-full lg:ml-0">
+                    {renderContent()}
+                </div>
             </div>
 
             <Footer />
