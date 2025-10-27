@@ -1,31 +1,33 @@
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
 import { Header } from '@/components/Header'
-import { TbTrashX } from 'react-icons/tb'
-import { SignDocuments } from '@/components/SignDocuments'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { SignSingleDocument } from '@/components/SignSingleDocument'
-import type { SignedPDF } from '@/interfaces/sign.interface'
-import { usePymeRegisterDocuments } from '@/hooks/usePyme'
-import { registerPymeDocumentsSchema, type RegisterPymeDocumentsFormData } from '@/schemas/pyme.schema'
-import { type DocumentResponse } from '@/interfaces/pyme.interface'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
+import { IoMdTrash, IoMdAddCircle } from 'react-icons/io'
+import { BsQuestionCircle } from 'react-icons/bs'
 import { Footer } from '@/components/Footer'
-import { IoIosAddCircle } from 'react-icons/io'
+import { DocumentList } from '@/components/DocumentsList'
+import { Modal } from '@/components/Modals/Modal'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { usePymeRegisterDocuments } from '@/hooks/usePyme'
+import { useNavigate, useParams } from 'react-router-dom'
+import type { DocumentResponse } from '@/interfaces/pyme.interface'
+
+const TrashIcon = IoMdTrash
+const AddIcon = IoMdAddCircle
+const QuestionIcon = BsQuestionCircle
+
+interface DocumentField {
+  id: string
+  file: File | null
+}
 
 export const RegisterPymeDocuments = () => {
-  const [isOwner, setIsOwner] = useState(false)
-  const [notarialPDF, setNotarialPDF] = useState<File | null>(null)
-  const [signedPDFs, setSignedPDFs] = useState<Array<SignedPDF>>([])
-  const [notarialSignedPDF, setNotarialSignedPDF] = useState<SignedPDF | null>(null)
-  const [response, setResponse] = useState<Array<DocumentResponse>>([])
-
+  const MAX_DOCUMENTS = 5
+  const navigate = useNavigate()
   const { id: pymeID } = useParams<{ id: string }>()
 
-  // const idPYmeDePruebas = "2ef62129-672b-4c7a-9b89-e7f5e71c3ba8"
+  const [openModal, setOpenModal] = useState(false)
 
-  const navigate = useNavigate()
+  const [documents, setDocuments] = useState<DocumentField[]>([{ id: `doc_${Date.now()}`, file: null }])
+  const [uploadDocuments, setUploadDocuments] = useState<DocumentResponse[]>([])
 
   const {
     mutate: pymeRegisterDocuments,
@@ -39,9 +41,8 @@ export const RegisterPymeDocuments = () => {
         description: 'Tu MYPE está completamente registrada. Ya puedes solicitar un crédito.',
         duration: 4000
       })
-
-      setResponse(data.payload.documents)
       // console.log(data.payload.documents)
+      setUploadDocuments(data.payload.documents)
     },
     onError: (data) => {
       toast.error('Error al subir los documentos', {
@@ -55,238 +56,189 @@ export const RegisterPymeDocuments = () => {
     }
   })
 
-  const {
-    register,
-    setValue,
-    handleSubmit
-    // formState: { errors }
-  } = useForm<RegisterPymeDocumentsFormData>({
-    resolver: zodResolver(registerPymeDocumentsSchema)
-  })
-  useEffect(() => {
-    const signedPDFToSend: Array<{ docName: string; data: ArrayBuffer; sign: ArrayBuffer }> = []
-    signedPDFs.forEach((signedPDF) => {
-      // const data:{ data: ArrayBuffer; sign: ArrayBuffer } = {}
-      const value = { docName: signedPDF.docName ?? 'document', data: signedPDF.pdfBytes, sign: signedPDF.imageBytes }
-      signedPDFToSend.push(value)
-    })
-    setValue('documents', signedPDFToSend)
-  }, [notarialSignedPDF, signedPDFs, setValue])
+  const addDocInput = () => {
+    if (documents.length >= MAX_DOCUMENTS) return
 
-  const handleSignedDocuments = (newSignedPDFs: Array<SignedPDF>) => {
-    const currentSignedPDFs = [...signedPDFs]
-    newSignedPDFs.forEach((newPDF) => {
-      if (!currentSignedPDFs.find((pdf) => pdf.docName == newPDF.docName)) {
-        currentSignedPDFs.push(newPDF)
-      }
-    })
-    setSignedPDFs(currentSignedPDFs)
-    // console.log('LOS PDFS FIRMADOS ACTUALMENTE SON : ', currentSignedPDFs)
+    const newDocInput: DocumentField = {
+      id: `doc_${Date.now()}`,
+      file: null
+    }
+
+    setDocuments((prev) => [...prev, newDocInput])
+  }
+  const removeDocInput = (docId: string) => {
+    if (documents.length <= 1) return
+    setDocuments((prev) => prev.filter((doc) => doc.id != docId))
   }
 
-  const onSubmit = (data: RegisterPymeDocumentsFormData) => {
-    if (isPending) {
-      toast.loading('Subiendo archivos...', {
+  const handleFileChange = (docId: string, file: File) => {
+    const isDuplicated = documents.some((d) => d.file?.name == file.name)
+    if (isDuplicated) {
+      toast.info(`Documento repetido`, {
         style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
-        description: 'Estamos procesando y verificando tus documentos.',
-        duration: 1500
-      })
-    }
-    if (!data.isOwner && notarialSignedPDF == null) {
-      toast.error('Documento faltante', {
-        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: 'Debes adjuntar y firmar el poder notarial si no eres el dueño de la MYPE.',
-        duration: 4000
+        duration: 2500
       })
       return
     }
+    setDocuments((prev) => prev.map((doc) => (doc.id == docId ? { id: docId, file: file } : doc)))
+  }
 
-    if (data.documents.length == 0) {
-      toast.error('Sin documentos', {
-        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: 'Debes adjuntar al menos un documento firmado para continuar.',
-        duration: 4000
-      })
-      return
-    }
-
-    if (!pymeID) {
-      toast.error('Error de identificación', {
-        style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
-        description: 'No se pudo identificar tu MYPE. Intenta nuevamente.',
-        duration: 4000
-      })
-      return
-    }
-
-    //Form data para enviar;
+  const handleSubmit = () => {
+    console.log('submit')
 
     const formData = new FormData()
-
-    data.documents.forEach((doc) => {
-      const pdfBlob = new Blob([doc.data], { type: 'application/pdf' })
-      const signBlob = new Blob([doc.sign], { type: 'image/png' })
-
-      formData.append('files', pdfBlob, doc.docName.split('.')[0])
-      formData.append('files', signBlob, doc.docName.split('.')[0])
+    documents.forEach((doc) => {
+      if (doc.file) {
+        formData.append('files', doc.file)
+      }
     })
-    formData.set('companyId', pymeID)
+
+    if (formData.getAll('files').length < 1) {
+      toast.info(`Debes adjuntar al menos un documento`, {
+        style: { borderColor: '#0095d5', backgroundColor: '#e6f4fb', borderWidth: '2px' },
+        duration: 2500
+      })
+      return
+    }
+    formData.set('companyId', pymeID ?? '')
     formData.set('type', 'Tax Return')
+
+    // console.log('Enviar', formData.getAll('files'), formData.get('type'), formData.get('companyId'))
 
     pymeRegisterDocuments(formData)
   }
 
-  return (
-    <div className='flex flex-col min-h-screen'>
-      <Header />
-      {response.length == 0 ? (
+  if (uploadDocuments.length == 0) {
+    return (
+      <div className='flex flex-col min-h-screen'>
+        <Header />
+
         <section className='w-full max-w-7xl py-5 my-10 m-auto text-center flex-1 p-2'>
           <h2 className='text-3xl my-3 text-[var(--font-title-light)] font-medium'>Adjunta documentos de la PYME</h2>
           <p>Completa con la documentación necesaria para poder solicitar un crédito</p>
-          <form className='flex flex-col text-left px-10 md:px-20 mt-5' onSubmit={handleSubmit(onSubmit)}>
-            <h3 className='border-b-1 border-[#D1D5DB] text-xl font-medium text-[var(--font-title-light)] py-2 mb-5'>
-              Documentación
-            </h3>
 
-            <div className='flex flex-col  xl:flex-row gap-2 justify-around items-center border-2 border-[var(--primary)] border-dashed rounded-md py-3'>
-              <div className='flex flex-col items-center gap-1'>
-                <p className='text-lg font-medium text-[var(--font-title-light)]'>Es el dueño de la pyme?</p>
-                <div className='flex gap-2'>
-                  <label htmlFor='isOwner' className='font-medium text-lg'>Si</label>
-                  <input
-                    id='isOwner'
-                    type='checkbox'
-                    className='cursor-pointer w-5'
-                    {...register('isOwner')}
-                    onChange={(e) => {
-                      setIsOwner(e.target.checked)
-                    }}
-                  />
-                </div>
-              </div>
+          <form
+            className='max-w-2xl mx-auto rounded-md flex flex-col items-center p-10 gap-10'
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSubmit()
+            }}
+          >
+            <p
+              onClick={() => {
+                setOpenModal(true)
+              }}
+              className='flex gap-3 p-4 border border-dashed rounded-md items-center text-xl text-[var(--primary)] font-medium text-center cursor-pointer hover:text-[#1879a9] duration-150'
+            >
+              ¿Que documentos debo adjuntar?
+              <QuestionIcon />
+            </p>
 
-              {!isOwner && (
-                <div className='flex flex-col items-around gap-2 max-w-sm w-full'>
-                  <p className='text-sm text-[var(--font-title-light)] font-medium text-center'>
-                    Adjuntar documentos de Poder Notarial con Facultades para Endeudamiento:
-                  </p>
-                  {notarialPDF == null ? (
-                    <label className='self-center'>
-                      <IoIosAddCircle className='text-3xl text-[var(--primary)] hover:text-[#1074a6] duration-150 cursor-pointer' />
+            <ul className='flex flex-col gap-5 w-full max-w-md'>
+              {documents.map((docField, indx) => {
+                return (
+                  <li className='flex gap-3 items-center relative' key={indx}>
+                    {docField.file != null ? (
+                      <div className='border-b-1 border-[#999] p-1 w-full text-ellipsis overflow-hidden'>
+                        Documento adjunto: {docField.file.name}
+                      </div>
+                    ) : (
                       <input
-                        accept='.pdf'
-                        disabled={notarialPDF != null}
                         type='file'
-                        className='border p-2 border-[#D1D5DB] rounded-md w-full hidden'
+                        className='border border-[#999] p-1 rounded-md w-full cursor-pointer hover:bg-[#ddd]'
+                        accept='.pdf'
+                        placeholder='Sube tu documento'
                         onChange={(e) => {
-                          const pdfFile = e.target.files?.[0]
-                          if (pdfFile && pdfFile.type == 'application/pdf') {
-                            setNotarialPDF(pdfFile)
-                          } else {
-                            setNotarialPDF(null)
+                          const file = e.target.files?.[0] || null
+                          if (file) {
+                            handleFileChange(docField.id, file)
                           }
                         }}
                       />
-                    </label>
-                  ) : (
-                    <div className='flex items-center gap-1 justify-around'>
-                      <p className='overflow-hidden text-center text-ellipsis text-[var(--font-title-light)] font-medium'>
-                        {notarialPDF.name.split('.pdf')[0]}
-                      </p>
-                      <button
-                        className='text-red-500 text-3xl cursor-pointer hover:text-[#8c060c]'
-                        onClick={(e) => {
-                          e.preventDefault()
-                          setNotarialPDF(null)
-                          setNotarialSignedPDF(null)
-                        }}
-                      >
-                        <TbTrashX />
-                      </button>
-                      {notarialSignedPDF != null ? (
-                        <a
-                          target='blank_'
-                          href={notarialSignedPDF.urlPreview}
-                          className='bg-[#12b92f] p-1 px-2 text-white text-center rounded-md hover:bg-[#18912d] duration-150 cursor-pointer'
-                        >
-                          Revisar
-                        </a>
-                      ) : (
-                        <button className='bg-[var(--primary)] p-1 px-2 text-white text-center rounded-md hover:bg-[#0972a6] duration-150 cursor-pointer'>
-                          Firmar
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className='border-2 border-[var(--primary)] border-dashed my-3 sm:p-5 rounded-md'>
-              <h1 className='text-center text-[var(--font-title-light)] font-medium'>Adjuntar documentos legales necesarios para registrar la pyme</h1>
-              <SignDocuments onSignDocument={handleSignedDocuments} />
-            </div>
+                    )}
+                    <TrashIcon
+                      onClick={() => {
+                        removeDocInput(docField.id)
+                      }}
+                      className='text-red-600 absolute text-3xl left-full cursor-pointer hover:text-red-800 duration-150'
+                    />
+                  </li>
+                )
+              })}
 
-            <div className='flex text-center justify-between px-10 md:px-20 mt-20'>
+              <li
+                className='bg-lime-600 flex justify-center px-10 self-center p-1 rounded-md cursor-pointer hover:bg-lime-700 duration-150'
+                onClick={(e) => {
+                  e.preventDefault()
+                  addDocInput()
+                }}
+              >
+                <AddIcon className='text-3xl text-lime-500'></AddIcon>
+              </li>
+            </ul>
+            <div className='flex justify-around w-full my-15'>
               <button
-                className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
                 onClick={(e) => {
                   e.preventDefault()
                   navigate('/panel')
                 }}
+                className='bg-red-500 text-white p-2 px-4 rounded-md hover:bg-red-600 duration-150 cursor-pointer'
               >
                 Cancelar
               </button>
-
               <input
                 type='submit'
-                className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
-                value='Subir'
+                value='Enviar'
+                className='bg-[var(--primary)] text-white p-2 px-4 rounded-md hover:bg-[#1477a9] duration-150 cursor-pointer'
+                disabled={isPending}
               />
             </div>
           </form>
-          {notarialPDF != null && notarialSignedPDF == null && (
-            <SignSingleDocument
-              pdfFile={notarialPDF}
-              onSuccess={(signedPDF) => {
-                const newSignedPDFFiles = [...signedPDFs]
-                newSignedPDFFiles.push(signedPDF)
-                setNotarialSignedPDF(signedPDF)
-                setSignedPDFs(newSignedPDFFiles)
-              }}
-            />
-          )}
         </section>
-      ) : (
-        <section className='w-full max-w-7xl py-5 my-10 m-auto flex flex-col items-center gap-10 text-center flex-1'>
-          <h3 className='font-medium text-2xl text-[var(--font-title-light)]'>Documentos subidos:</h3>
-          <ul className='flex flex-col gap-5 content-center border-2 border-[var(--primary)] border-dashed rounded-md p-10'>
-            {response.map((doc, i) => {
+        <Modal
+          enable={openModal}
+          onClose={() => {
+            setOpenModal(false)
+          }}
+        >
+          <DocumentList />
+        </Modal>
+        <Footer />
+      </div>
+    )
+  } else {
+    return (
+      <div className='flex flex-col min-h-screen'>
+        <Header />
+        <section className='flex-1 flex flex-col gap-20 items-center pt-20'>
+          <h3 className='text-2xl text-[var(--font-title-light)] font-medium'>Documentos subidos</h3>
+          <ul className='p-5 max-w-md w-full flex flex-col gap-4'>
+            {uploadDocuments.map((doc, i) => {
               return (
-                <li
-                  key={i}
-                  className='flex border-t-1 border-b-1 border-[#ccc] justify-around min-w-sm py-3 items-center'
-                >
-                  <p className='font-bold'>{doc.fileName}</p>
+                <li className='flex justify-between items-center border-b-1 border-[#bbb] p-2 px-3 ' key={i}>
+                  <span className='font-medium overflow-hidden text-ellipsis'>{doc.fileName}</span>
                   <a
                     href={doc.fileUrl}
-                    target='blank_'
-                    className='bg-green-500 p-1 px-5 text-white rounded-md hover:bg-green-700 duration-150'
+                    target='_blank'
+                    className='bg-lime-600 text-white p-2 rounded cursor-pointer hover:bg-lime-700 duration-150'
                   >
-                    Ver
+                    Revisar
                   </a>
                 </li>
               )
             })}
           </ul>
-          <Link
-            to='/panel'
-            className='bg-[var(--primary)] p-2 px-5 rounded-md text-white curor-pointer hover:bg-[#1074a6] duration-150'
+          <button
+            className='bg-[var(--primary)] px-4 p-2 text-white rounded-md cursor-pointer hover:bg-[#1471a0] duration-150 '
+            onClick={() => {
+              navigate('/panel')
+            }}
           >
             Volver al panel
-          </Link>
+          </button>
         </section>
-      )}
-      <Footer />
-    </div>
-  )
+        <Footer />
+      </div>
+    )
+  }
 }

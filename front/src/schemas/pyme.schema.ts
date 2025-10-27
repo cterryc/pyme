@@ -70,11 +70,11 @@ export const registerPymeSchema = z
     employeeCount: z.coerce
       .number('Debes ingresar un numero')
       .min(1, 'Debes ingresar la cantidad de empleados')
-      .refine((val) => val <= 500, 'Maximo 500 empleados'),
+      .refine((val) => val <= 250, 'Maximo 250 empleados'),
     annualRevenue: z.coerce
       .number('Debes ingresar los ingresos anuales')
       .min(1000, 'Debes ingresar una cantidad superior a $1000')
-      .refine((val) => val <= 25000000, 'Debes ingresar una cantidad menor a $25.000.000'),
+      .refine((val) => val <= 50000000, 'Debes ingresar una cantidad menor a $50.000.000'),
     address: textField(3, 'La dirección es requerida', 'Debes ingresar una dirección con al menos 3 caracteres'),
     city: textField(3, 'La ciudad es requerida', 'Debes ingresar una ciudad con al menos 3 caracteres'),
     state: textField(3, 'La provincia es requerida', 'Debes ingresar una provincia con al menos 3 caracteres'),
@@ -119,13 +119,18 @@ export const registerPymeSchema = z
 
 export const registerPymeDocumentsSchema = z.object({
   isOwner: z.boolean(),
-  documents: z.array(
-    z.object({
-      docName: z.string(),
-      data: z.instanceof(ArrayBuffer),
-      sign: z.instanceof(ArrayBuffer)
-    })
-  )
+  // documents: z.array(
+  //   z.object(
+  //     {
+  //       docName: z.string(),
+  //       data: z.instanceof(ArrayBuffer),
+  //       sign: z.instanceof(ArrayBuffer)
+  //     },
+  //     'fiumba'
+  //   )
+  // )
+  notarialPDF: z.file(),
+  documents: z.any().refine((val) => val instanceof FileList, 'Debe ser una lista de archivos')
 })
 
 export type RegisterPymeFormData = z.infer<typeof registerPymeSchema>

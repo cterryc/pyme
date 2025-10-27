@@ -24,13 +24,13 @@ export const UserDashboard = () => {
             <HiMiniDocumentCheck className='h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]' />
             Solicitudes
           </NavLink>
-          <NavLink
+          {/* <NavLink
             to='/panel/perfil'
             className='group flex items-center gap-2 text-xl p-2 rounded-lg hover:bg-[#28a9d622] cursor-pointer text-gray-400 hover:text-[#23a9d6]'
           >
             <FaUser className='h-6 w-6 text-gray-400 group-hover:text-[#23a9d6]' />
             Perfil
-          </NavLink>
+          </NavLink> */}
         </aside>
         <div className='flex-[6] min-w-0 p-7 overflow-x-auto'>
           <Outlet />
