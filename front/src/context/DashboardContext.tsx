@@ -269,22 +269,12 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     },
     {
       id: 'products',
-      name: 'Planes',
-      description: 'Catálogo de productos financieros',
+      name: 'Products (hidden)',
+      description: 'Deprecated products module (removed from admin menu)',
       logo: FiPackage,
-      active: true,
+      active: false,
       permissionId: 'perm_products_' + Math.random().toString(36).substr(2, 9),
-      submodules: [
-        {
-          id: 'productos',
-          name: 'Lista de planes',
-          description: 'Lista de planes financieros disponibles',
-          logo: FiPackage,
-          active: true,
-          permissionId: 'perm_productos_' + Math.random().toString(36).substr(2, 9),
-          route: '/admin/products/productos'
-        }
-      ]
+      submodules: []
     },
     {
       id: 'settings',

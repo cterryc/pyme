@@ -16,7 +16,7 @@ const AdminDashboardRoutes = () => {
       <Route path="/operations/dashboard" element={<LeftAdminDashboard />} />
       <Route path="/operations/solicitudes" element={<LeftAdminDashboard />} />
       <Route path="/clients/mypes" element={<LeftAdminDashboard />} />
-      <Route path="/products/productos" element={<LeftAdminDashboard />} />
+  {/* Products/Planes removed from admin menu */}
       <Route path="/settings/configuracion" element={<LeftAdminDashboard />} />
 
       {/* Redirect unknown routes to main page */}
