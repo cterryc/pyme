@@ -55,25 +55,24 @@ export const mainRouter = createBrowserRouter([
             element: <UserProfile />
           }
         ]
+      },
+      {
+        path: '/panel/registro-documentos/:id',
+        element: <RegisterPymeDocuments />
+      },
+      {
+        path: '/panel/registro-pyme',
+        element: <RegisterPyme />
+      },
+      {
+        path: '/panel/solicitar-credito/:id',
+        element: <LoanRequest />
+      },
+      {
+        path: '/panel/solicitar-credito/hecho',
+        element: <LoanRequestSuccess />
       }
     ]
-  },
-
-  {
-    path: '/panel/registro-documentos/:id',
-    element: <RegisterPymeDocuments />
-  },
-  {
-    path: '/panel/registro-pyme',
-    element: <RegisterPyme />
-  },
-  {
-    path: '/panel/solicitar-credito/:id',
-    element: <LoanRequest />
-  },
-  {
-    path: '/panel/solicitar-credito/hecho',
-    element: <LoanRequestSuccess />
   },
 
   {
