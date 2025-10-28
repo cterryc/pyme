@@ -5,6 +5,7 @@ import {
   OneToMany,
   JoinColumn,
   Index,
+  OneToOne,
 } from "typeorm";
 import { BaseEntity } from "./BaseEntity";
 import { Document } from "./Document.entity";
@@ -12,6 +13,7 @@ import { CreditApplicationStatus} from "../constants/CreditStatus";
 import { User } from "./User.entity";
 import { Company } from "./Company.entity";
 import { RiskTier } from "../constants/RiskTier";
+import { Signature } from "./Signature.entity";
 
 @Entity("credit_applications")
 export class CreditApplication extends BaseEntity {
@@ -135,4 +137,18 @@ export class CreditApplication extends BaseEntity {
 
   @OneToMany(() => Document, (document) => document.creditApplication)
   documents?: Document[];
+
+  @Column({ name: "request_id", nullable: true })
+  requestId?: string;
+
+  // Nueva relación con Signature
+  @OneToOne(() => Signature, (signature) => signature.creditApplication, {
+    cascade: true,
+    onDelete: "SET NULL",
+  })
+  @JoinColumn({ name: "signature_id" })
+  signature?: Signature;
+
+  @Column({ name: "signature_id", nullable: true })
+  signatureId?: string;
 }
