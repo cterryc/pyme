@@ -120,6 +120,11 @@ adminRouter.get(
   validateUuid,
   AdminController.getCreditApplicationByIdForAdmin
 );
+adminRouter.get(
+  "/credit-applications/:id/allowed-transitions",
+  validateUuid,
+  AdminController.getAllowedStatusTransitions
+);
 adminRouter.patch(
   "/credit-applications/:id/status",
   validateUuid,

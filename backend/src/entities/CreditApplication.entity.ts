@@ -93,6 +93,9 @@ export class CreditApplication extends BaseEntity {
   @Column({ type: "text", nullable: true })
   internalNotes?: string;
 
+  @Column({ type: "text", nullable: true, comment: "Notas visibles para el usuario" })
+  userNotes?: string;
+
   @Column({ type: "int", nullable: true, comment: "Risk score 0-100" })
   riskScore?: number;
 

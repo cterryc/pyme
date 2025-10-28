@@ -374,6 +374,7 @@ export default class LoanService {
     adminUserId: string,
     rejectionReason?: string,
     internalNotes?: string,
+    userNotes?: string,
     approvedAmount?: number,
     riskScore?: number
   ): Promise<{ message: string; application: responseLoanRequest }> {
@@ -427,6 +428,10 @@ export default class LoanService {
       application.internalNotes = internalNotes;
     }
 
+    if (userNotes) {
+      application.userNotes = userNotes;
+    }
+
     if (approvedAmount) {
       application.approvedAmount = approvedAmount;
     }
@@ -448,7 +453,7 @@ export default class LoanService {
       status: newStatus,
       timestamp: now,
       changedBy: adminUserId,
-      reason: rejectionReason || internalNotes || `Estado actualizado por administrador`,
+      reason: rejectionReason || userNotes || internalNotes || `Estado actualizado por administrador`,
     };
 
     application.statusHistory = [
@@ -565,6 +570,7 @@ export default class LoanService {
       approvedAmount: application.approvedAmount,
       rejectionReason: application.rejectionReason,
       internalNotes: application.internalNotes,
+      userNotes: application.userNotes,
       riskScore: application.riskScore,
       submittedAt: application.submittedAt,
       reviewedAt: application.reviewedAt,

@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { 
   getCreditApplicationByIdForAdmin, 
-  updateCreditApplicationStatus 
+  updateCreditApplicationStatus,
+  getAllowedStatusTransitions 
 } from '@/services/admin.service'
 import type { 
   CreditApplicationStatus, 
@@ -23,7 +24,8 @@ export const CreditApplicationDetailModal = ({
   const [newStatus, setNewStatus] = useState<CreditApplicationStatus | ''>('')
   const [rejectionReason, setRejectionReason] = useState('')
   const [internalNotes, setInternalNotes] = useState('')
-  const [approvedAmount, setApprovedAmount] = useState('')
+  const [userNotes, setUserNotes] = useState('')
+  const [allowedTransitions, setAllowedTransitions] = useState<string[]>([])
 
   // Query para obtener los detalles de la solicitud
   const { data, isLoading, error } = useQuery({
@@ -31,6 +33,21 @@ export const CreditApplicationDetailModal = ({
     queryFn: () => getCreditApplicationByIdForAdmin(applicationId),
     staleTime: 10000,
   })
+
+  // Query para obtener las transiciones permitidas
+  const { data: transitionsData } = useQuery({
+    queryKey: ['allowedTransitions', applicationId],
+    queryFn: () => getAllowedStatusTransitions(applicationId),
+    enabled: !!applicationId,
+    staleTime: 10000,
+  })
+
+  // Actualizar las transiciones permitidas cuando se obtengan los datos
+  useEffect(() => {
+    if (transitionsData?.payload?.allowedTransitions) {
+      setAllowedTransitions(transitionsData.payload.allowedTransitions)
+    }
+  }, [transitionsData])
 
   // Mutation para actualizar el estado
   const updateStatusMutation = useMutation({
@@ -48,7 +65,7 @@ export const CreditApplicationDetailModal = ({
       setNewStatus('')
       setRejectionReason('')
       setInternalNotes('')
-      setApprovedAmount('')
+      setUserNotes('')
       
       // Toast de éxito
       toast.success('Estado actualizado exitosamente', {
@@ -79,10 +96,10 @@ export const CreditApplicationDetailModal = ({
       return
     }
 
-    // Validación para monto aprobado
-    if (newStatus === 'Aprobado' && !approvedAmount) {
+    // Validación para notas de usuario (ahora obligatorio)
+    if (!userNotes.trim()) {
       toast.warning('Campo requerido', {
-        description: 'Debes especificar el monto aprobado',
+        description: 'Debes agregar notas para el usuario',
         duration: 3000,
       })
       return
@@ -99,11 +116,11 @@ export const CreditApplicationDetailModal = ({
 
     const updateData: UpdateCreditApplicationStatusData = {
       newStatus: newStatus as CreditApplicationStatus,
+      userNotes: userNotes,
     }
 
     if (rejectionReason) updateData.rejectionReason = rejectionReason
     if (internalNotes) updateData.internalNotes = internalNotes
-    if (approvedAmount) updateData.approvedAmount = parseFloat(approvedAmount)
 
     // Toast de carga
     toast.loading('Actualizando estado...', {
@@ -362,9 +379,15 @@ export const CreditApplicationDetailModal = ({
                   <p className="font-medium text-red-600">{application.rejectionReason}</p>
                 </div>
               )}
+              {application.userNotes && (
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600">Notas para el Usuario</p>
+                  <p className="font-medium text-blue-600">{application.userNotes}</p>
+                </div>
+              )}
               {application.internalNotes && (
                 <div className="col-span-2">
-                  <p className="text-sm text-gray-600">Notas Internas</p>
+                  <p className="text-sm text-gray-600">Notas Internas (Solo Admin)</p>
                   <p className="font-medium">{application.internalNotes}</p>
                 </div>
               )}
@@ -480,32 +503,18 @@ export const CreditApplicationDetailModal = ({
                     required
                   >
                     <option value="">Seleccionar estado...</option>
-                    <option value="En revisión">En revisión</option>
-                    <option value="Documentos requeridos">Documentos requeridos</option>
-                    <option value="Aprobado">Aprobado</option>
-                    <option value="Rechazado">Rechazado</option>
-                    <option value="Desembolsado">Desembolsado</option>
-                    <option value="Cancelado">Cancelado</option>
+                    {allowedTransitions.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
                   </select>
+                  {allowedTransitions.length === 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      No hay transiciones de estado disponibles desde el estado actual
+                    </p>
+                  )}
                 </div>
-
-                {newStatus === 'Aprobado' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Monto Aprobado *
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={approvedAmount}
-                      onChange={(e) => setApprovedAmount(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Ej: 500000"
-                      required={newStatus === 'Aprobado'}
-                    />
-                  </div>
-                )}
 
                 {newStatus === 'Rechazado' && (
                   <div>
@@ -525,6 +534,23 @@ export const CreditApplicationDetailModal = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Notas para el Usuario *
+                  </label>
+                  <textarea
+                    value={userNotes}
+                    onChange={(e) => setUserNotes(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                    placeholder="Notas que verá el usuario sobre esta solicitud..."
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Estas notas serán visibles para el usuario de la empresa
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Notas Internas
                   </label>
                   <textarea
@@ -532,8 +558,11 @@ export const CreditApplicationDetailModal = ({
                     onChange={(e) => setInternalNotes(e.target.value)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
-                    placeholder="Agregar notas internas (opcional)..."
+                    placeholder="Notas internas solo para administradores (opcional)..."
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Estas notas son privadas y solo visibles para administradores
+                  </p>
                 </div>
               </div>
 

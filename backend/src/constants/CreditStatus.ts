@@ -11,6 +11,51 @@ export enum CreditApplicationStatus {
     NOT_APPLICABLE = "No aplica"
 }
 
+// Transiciones de estado permitidas para el admin
+export const ALLOWED_STATUS_TRANSITIONS: Record<CreditApplicationStatus, CreditApplicationStatus[]> = {
+    [CreditApplicationStatus.DRAFT]: [
+        CreditApplicationStatus.APPLYING,
+        CreditApplicationStatus.CANCELLED,
+        CreditApplicationStatus.NOT_APPLICABLE
+    ],
+    [CreditApplicationStatus.APPLYING]: [
+        CreditApplicationStatus.SUBMITTED,
+        CreditApplicationStatus.CANCELLED,
+        CreditApplicationStatus.NOT_APPLICABLE
+    ],
+    [CreditApplicationStatus.SUBMITTED]: [
+        CreditApplicationStatus.UNDER_REVIEW,
+        CreditApplicationStatus.CANCELLED,
+        CreditApplicationStatus.REJECTED
+    ],
+    [CreditApplicationStatus.UNDER_REVIEW]: [
+        CreditApplicationStatus.DOCUMENTS_REQUIRED,
+        CreditApplicationStatus.APPROVED,
+        CreditApplicationStatus.REJECTED
+    ],
+    [CreditApplicationStatus.DOCUMENTS_REQUIRED]: [
+        CreditApplicationStatus.UNDER_REVIEW,
+        CreditApplicationStatus.APPROVED,
+        CreditApplicationStatus.REJECTED
+    ],
+    [CreditApplicationStatus.APPROVED]: [
+        CreditApplicationStatus.DISBURSED,
+        CreditApplicationStatus.CANCELLED
+    ],
+    [CreditApplicationStatus.REJECTED]: [
+        // No se puede cambiar desde rechazado
+    ],
+    [CreditApplicationStatus.DISBURSED]: [
+        // Estado final, no se puede cambiar
+    ],
+    [CreditApplicationStatus.CANCELLED]: [
+        // Estado final, no se puede cambiar
+    ],
+    [CreditApplicationStatus.NOT_APPLICABLE]: [
+        // Estado final, no se puede cambiar
+    ]
+};
+
 export enum DocumentType {
     ID_DOCUMENT = "ID Document",
     PROOF_OF_ADDRESS = "Proof of Address",
