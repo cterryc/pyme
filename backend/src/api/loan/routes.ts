@@ -65,9 +65,9 @@ loanRouter.delete(
 loanRouter.post(
     "/firma",
     // schemaValidator(createCreditApplicationSchema, null),
-    (req, res) => {
-        console.log(req.body)
-        res.status(200).json({message: "Gracias"})
+    (req:any, res:any) => {
+        console.log(req.body);
+        res.status(200).json({message: "Gracias"});
     }
 );
 
