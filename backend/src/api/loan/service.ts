@@ -551,7 +551,7 @@ export default class LoanService {
   async getCreditApplicationByIdForAdmin(applicationId: string): Promise<any> {
     const application = await this.loanRepo.findOne({
       where: { id: applicationId },
-      relations: ["company", "company.industry", "company.owner", "reviewedBy", "documents"],
+      relations: ["company", "company.industry", "company.owner", "company.documents", "reviewedBy", "documents"],
     });
 
     if (!application) {
@@ -560,6 +560,17 @@ export default class LoanService {
         "La solicitud de crédito no existe."
       );
     }
+
+    // Combinar documentos de la solicitud y de la compañía
+    const allDocuments = [
+      ...(application.documents || []),
+      ...(application.company?.documents || [])
+    ];
+
+    // Eliminar duplicados por ID
+    const uniqueDocuments = Array.from(
+      new Map(allDocuments.map(doc => [doc.id, doc])).values()
+    );
 
     return {
       id: application.id,
@@ -603,12 +614,14 @@ export default class LoanService {
         name: `${application.reviewedBy.firstName || ''} ${application.reviewedBy.lastName || ''}`.trim() || 'Usuario',
         email: application.reviewedBy.email,
       } : null,
-      documents: application.documents ? application.documents.map(doc => ({
+      documents: uniqueDocuments.map(doc => ({
         id: doc.id,
         name: doc.fileName,
         fileUrl: doc.fileUrl,
         uploadedAt: doc.createdAt,
-      })) : [],
+        type: doc.type,
+        status: doc.status,
+      })),
     };
   }
 

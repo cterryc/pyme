@@ -10,6 +10,7 @@ import type {
   CreditApplicationStatus, 
   UpdateCreditApplicationStatusData 
 } from '@/interfaces/admin.interface'
+import { DocumentViewerModal } from './DocumentViewerModal'
 
 interface CreditApplicationDetailModalProps {
   applicationId: string
@@ -26,6 +27,7 @@ export const CreditApplicationDetailModal = ({
   const [internalNotes, setInternalNotes] = useState('')
   const [userNotes, setUserNotes] = useState('')
   const [allowedTransitions, setAllowedTransitions] = useState<string[]>([])
+  const [selectedDocument, setSelectedDocument] = useState<{ fileUrl: string; fileName: string } | null>(null)
 
   // Query para obtener los detalles de la solicitud
   const { data, isLoading, error } = useQuery({
@@ -460,26 +462,82 @@ export const CreditApplicationDetailModal = ({
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-gray-900">Documentos Adjuntos</h3>
             <div className="bg-gray-50 p-4 rounded-lg">
-              {application.documents.length === 0 ? (
+              {!application.documents || application.documents.length === 0 ? (
                 <p className="text-gray-500 text-sm">No hay documentos adjuntos</p>
               ) : (
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {application.documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between p-2 bg-white rounded">
-                      <div>
-                        <p className="font-medium text-sm">{doc.name}</p>
-                        <p className="text-xs text-gray-500">
-                          Subido: {formatDate(doc.uploadedAt)}
-                        </p>
+                    <div 
+                      key={doc.id} 
+                      className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-900 truncate">
+                            {doc.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-gray-500">
+                              {formatDate(doc.uploadedAt)}
+                            </p>
+                            {doc.type && (
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                {doc.type}
+                              </span>
+                            )}
+                            {doc.status && (
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                doc.status === 'Approved' ? 'bg-green-100 text-green-700' :
+                                doc.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                                doc.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {doc.status}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <a
-                        href={doc.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      <button
+                        onClick={() => setSelectedDocument({ fileUrl: doc.fileUrl, fileName: doc.name })}
+                        className="flex-shrink-0 ml-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
                       >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
                         Ver
-                      </a>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -587,6 +645,15 @@ export const CreditApplicationDetailModal = ({
           </div>
         </div>
       </div>
+
+      {/* Modal de visualización de documentos */}
+      {selectedDocument && (
+        <DocumentViewerModal
+          fileUrl={selectedDocument.fileUrl}
+          fileName={selectedDocument.fileName}
+          onClose={() => setSelectedDocument(null)}
+        />
+      )}
     </div>
   )
 }

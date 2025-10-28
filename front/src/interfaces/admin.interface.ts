@@ -225,6 +225,8 @@ export interface DetailedCreditApplication {
     name: string;
     fileUrl: string;
     uploadedAt: string;
+    type?: string;
+    status?: string;
   }[];
 }
 
