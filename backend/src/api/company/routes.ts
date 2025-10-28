@@ -9,48 +9,40 @@ import { UserRole } from "../../constants/Roles";
 
 const companyRouter = Router();
 
+companyRouter.use(authenticate);
+
 companyRouter.get(
   "/all",
-  authenticate,
   authorizeRoles([UserRole.ADMIN]),
   CompanyController.getAllCompanies
 );
 
 companyRouter.get(
   "/industries",
-  authenticate,
   CompanyController.getIndustries
 );
 
 // Protected routes
 companyRouter.post(
   "/",
-  authenticate,
   schemaValidator(createCompanySchema, null),
   CompanyController.createCompany
 );
 
 companyRouter.get(
     "/",
-    authenticate,
     CompanyController.listCompaniesByUserId
 );
-
 
 companyRouter.get(
   "/:id",
   validateUuid,
-  authenticate,
   CompanyController.getCompanyById
 );
-
-
-
 
 companyRouter.patch(
   "/:id",
   validateUuid,
-  authenticate,
   schemaValidator(updateCompanySchema, null),
   CompanyController.updateCompany
 );
@@ -58,7 +50,6 @@ companyRouter.patch(
 companyRouter.delete(
   "/:id",
   validateUuid,
-  authenticate,
   CompanyController.deleteCompanyByUser
 );
 

@@ -10,14 +10,15 @@ import {
   getCreditApplicationByIdParamsSchema,
   deleteCreditApplicationParamsSchema
 } from "./validator";
+import { validateUuid } from "../../middlewares/validateParamId.middleware";
 
 const loanRouter = Router();
 
+loanRouter.use(authenticate);
 
 // Protected routes
 loanRouter.post(
   "/",
-  authenticate,
   schemaValidator(loanRequestSchema, null),
   LoanController.loanRequest
 );
@@ -25,41 +26,38 @@ loanRouter.post(
 
 loanRouter.post(
     "/confirm",
-    authenticate,
     schemaValidator(createCreditApplicationSchema, null),
     LoanController.createCreditApplication
 );
 
 loanRouter.get(
     "/user",
-    authenticate,
     LoanController.listCreditApplicationsByUserId
 );
 
 loanRouter.get(
     "/status/:id",
-    authenticate,
+    validateUuid,
     schemaValidator(null, getCreditApplicationStatusParamsSchema),
     LoanController.getCreditApplicationStatus
 );
 
 loanRouter.get(
     "/",
-    authenticate,
     schemaValidator(null, listCreditApplicationsQuerySchema),
     LoanController.listCreditApplications
 );
 
 loanRouter.get(
     "/:id",
-    authenticate,
+    validateUuid,
     schemaValidator(null, getCreditApplicationByIdParamsSchema),
     LoanController.getCreditApplicationById
 );
 
 loanRouter.delete(
     "/:id",
-    authenticate,
+    validateUuid,
     schemaValidator(null, deleteCreditApplicationParamsSchema),
     LoanController.deleteCreditApplication
 );

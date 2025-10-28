@@ -7,7 +7,7 @@ import { Company } from "../../entities/Company.entity";
 import { RiskTierConfig } from "../../entities/Risk_tier_config.entity";
 import { SystemConfig } from "../../entities/System_config.entity";
 import { Industry } from "../../entities/Industry.entity";
-import { CreditApplicationStatus } from "../../constants/CreditStatus";
+import { CreditApplicationStatus, ALLOWED_STATUS_TRANSITIONS } from "../../constants/CreditStatus";
 import { RiskTier } from "../../constants/RiskTier";
 import { Document } from "../../entities/Document.entity";
 import {
@@ -695,34 +695,8 @@ export default class LoanService {
   }
 
   private getValidStatusTransitions(currentStatus: CreditApplicationStatus): CreditApplicationStatus[] {
-    const transitions: Record<CreditApplicationStatus, CreditApplicationStatus[]> = {
-      [CreditApplicationStatus.DRAFT]: [CreditApplicationStatus.APPLYING],
-      [CreditApplicationStatus.APPLYING]: [CreditApplicationStatus.SUBMITTED, CreditApplicationStatus.CANCELLED],
-      [CreditApplicationStatus.SUBMITTED]: [
-        CreditApplicationStatus.UNDER_REVIEW,
-        CreditApplicationStatus.DOCUMENTS_REQUIRED,
-        CreditApplicationStatus.APPROVED,
-        CreditApplicationStatus.REJECTED,
-        CreditApplicationStatus.CANCELLED,
-      ],
-      [CreditApplicationStatus.UNDER_REVIEW]: [
-        CreditApplicationStatus.APPROVED,
-        CreditApplicationStatus.REJECTED,
-        CreditApplicationStatus.DOCUMENTS_REQUIRED,
-      ],
-      [CreditApplicationStatus.DOCUMENTS_REQUIRED]: [
-        CreditApplicationStatus.UNDER_REVIEW,
-        CreditApplicationStatus.APPROVED,
-        CreditApplicationStatus.REJECTED,
-      ],
-      [CreditApplicationStatus.APPROVED]: [CreditApplicationStatus.DISBURSED],
-      [CreditApplicationStatus.REJECTED]: [],
-      [CreditApplicationStatus.DISBURSED]: [],
-      [CreditApplicationStatus.CANCELLED]: [],
-      [CreditApplicationStatus.NOT_APPLICABLE]: [],
-    };
-
-    return transitions[currentStatus] || [];
+    // Usar las transiciones definidas centralmente en CreditStatus.ts
+    return ALLOWED_STATUS_TRANSITIONS[currentStatus] || [];
   }
 
   async calculateLoanOptions(company: Company): Promise<LoanCalculationResult> {

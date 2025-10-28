@@ -22,6 +22,7 @@ export interface responseLoanByUser {
     nameCompany?: string;
     requestAmonut?: number;
     subbmitedAt?: Date;
+    notes?: string;
     status?: string;
 }
 

@@ -421,31 +421,4 @@ export default class CompanyService {
     return createPaginatedResponse(companiesDto, total, page, limit);
   }
 
-  // async getAllCompanies(): Promise<Company[]> {
-  //     return this.companyRepo.find({ relations: ["user", "creditApplications", "documents"] });
-  // }
-
-  // async getCompaniesByUserId(userId: number): Promise<Company[]> {
-  //     return this.companyRepo.find({
-  //         where: { user: { id: userId } },
-  //         relations: ["user", "creditApplications", "documents"],
-  //     });
-  // }
-
-  // async removeDocumentFromCompany(companyId: number, documentId: number): Promise<Company | null> {
-  //     const company = await this.companyRepo.findOne({
-  //         where: { id: companyId },
-  //         relations: ["documents"],
-  //     });
-  //     if (!company) {
-  //         return null;
-  //     }
-  //     const document = company.documents.find(doc => doc.id === documentId);
-  //     if (!document) {
-  //         return null;
-  //     }
-  //     company.documents = company.documents.filter(doc => doc.id !== documentId);
-  //     await this.companyRepo.save(company);
-  //     return company;
-  // }
 }
