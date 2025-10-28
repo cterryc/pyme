@@ -50,6 +50,12 @@ const config: Config = {
 
   // Breo APi Key
   BREVO_API_KEY: process.env.BREVO_API_KEY || "",
+
+  // Backend URL
+  BACKEND_URL: process.env.BACKEND_URL || "",
+
+  // Backend Firma
+  BACKEND_FIRMA: process.env.BACKEND_FIRMA || ""
 };
 
 export default config;

@@ -64,4 +64,13 @@ loanRouter.delete(
     LoanController.deleteCreditApplication
 );
 
+loanRouter.post(
+    "/firma",
+    // schemaValidator(createCreditApplicationSchema, null),
+    (req, res) => {
+        console.log(req.body)
+        res.status(200).json({message: "Gracias"})
+    }
+);
+
 export default loanRouter;
