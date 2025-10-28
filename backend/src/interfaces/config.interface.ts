@@ -30,6 +30,10 @@ export interface Config {
 
   // Frontend
   FRONTEND_URL: string;
+  // Backend url
+  BACKEND_URL: string
+  // Backend firma
+  BACKEND_FIRMA: string
 
   // File Upload
   MAX_FILE_SIZE: number;
