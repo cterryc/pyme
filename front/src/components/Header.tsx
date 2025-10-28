@@ -4,10 +4,12 @@ import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout, HiMenuAlt1 
 import { useUserAuthenticate } from '@/hooks/useUser'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useDisconnectSSE } from '@/hooks/useSSENotifications'
 
 export const Header = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const disconnectSSE = useDisconnectSSE()
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false)
 
   const imageDefault = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
@@ -20,6 +22,10 @@ export const Header = () => {
       description: 'Hasta pronto. Esperamos verte de nuevo.',
       duration: 2000
     })
+    
+    // Desconectar SSE antes de cerrar sesión
+    disconnectSSE()
+    
     localStorage.removeItem('tokenPyme')
     queryClient.clear()
     setTimeout(() => {

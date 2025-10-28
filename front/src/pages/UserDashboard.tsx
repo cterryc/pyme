@@ -5,9 +5,13 @@ import { FiMenu, FiX } from 'react-icons/fi'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { useState } from 'react'
+import { useSSENotifications } from '@/hooks/useSSENotifications'
 
 export const UserDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  // Conectar a SSE para recibir notificaciones en tiempo real
+  useSSENotifications()
 
   const handleLinkClick = () => {
     setIsSidebarOpen(false)
