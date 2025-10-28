@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
   ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
   synchronize: true, // Auto-sync in dev only
   logging: false,
-  entities: ["src/entities/**/*.ts"],
+  entities: ["src/entities/**/*.ts","src/entities/**/*.js"],
   migrations: ["src/migrations/**/*.ts"],
   subscribers: ["src/subscribers/**/*.ts"],
   //   dropSchema: true,
