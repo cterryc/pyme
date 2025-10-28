@@ -93,6 +93,13 @@ export const updateCreditApplicationStatusBodySchema = z
         message: "Las notas internas no pueden contener solo espacios en blanco",
       })
       .optional(),
+    userNotes: z
+      .string({ required_error: "Las notas para el usuario son obligatorias" })
+      .min(1, { message: "Las notas para el usuario son obligatorias" })
+      .max(2000, { message: "Notas para el usuario muy largas" })
+      .refine((val) => val.trim().length > 0, {
+        message: "Las notas para el usuario no pueden contener solo espacios en blanco",
+      }),
     approvedAmount: z
       .number()
       .positive({ message: "Monto aprobado debe ser mayor a 0" })

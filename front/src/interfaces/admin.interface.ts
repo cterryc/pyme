@@ -187,6 +187,7 @@ export interface DetailedCreditApplication {
   approvedAmount: number | null;
   rejectionReason: string | null;
   internalNotes: string | null;
+  userNotes: string | null;
   riskScore: number | null;
   submittedAt: string | null;
   reviewedAt: string | null;
@@ -224,6 +225,8 @@ export interface DetailedCreditApplication {
     name: string;
     fileUrl: string;
     uploadedAt: string;
+    type?: string;
+    status?: string;
   }[];
 }
 
@@ -236,6 +239,7 @@ export interface UpdateCreditApplicationStatusData {
   newStatus: CreditApplicationStatus;
   rejectionReason?: string;
   internalNotes?: string;
+  userNotes?: string;
   approvedAmount?: number;
   riskScore?: number;
 }

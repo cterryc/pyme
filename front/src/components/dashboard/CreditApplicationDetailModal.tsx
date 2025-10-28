@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { 
   getCreditApplicationByIdForAdmin, 
-  updateCreditApplicationStatus 
+  updateCreditApplicationStatus,
+  getAllowedStatusTransitions 
 } from '@/services/admin.service'
 import type { 
   CreditApplicationStatus, 
   UpdateCreditApplicationStatusData 
 } from '@/interfaces/admin.interface'
+import { DocumentViewerModal } from './DocumentViewerModal'
 
 interface CreditApplicationDetailModalProps {
   applicationId: string
@@ -23,7 +25,9 @@ export const CreditApplicationDetailModal = ({
   const [newStatus, setNewStatus] = useState<CreditApplicationStatus | ''>('')
   const [rejectionReason, setRejectionReason] = useState('')
   const [internalNotes, setInternalNotes] = useState('')
-  const [approvedAmount, setApprovedAmount] = useState('')
+  const [userNotes, setUserNotes] = useState('')
+  const [allowedTransitions, setAllowedTransitions] = useState<string[]>([])
+  const [selectedDocument, setSelectedDocument] = useState<{ fileUrl: string; fileName: string } | null>(null)
 
   // Query para obtener los detalles de la solicitud
   const { data, isLoading, error } = useQuery({
@@ -31,6 +35,21 @@ export const CreditApplicationDetailModal = ({
     queryFn: () => getCreditApplicationByIdForAdmin(applicationId),
     staleTime: 10000,
   })
+
+  // Query para obtener las transiciones permitidas
+  const { data: transitionsData } = useQuery({
+    queryKey: ['allowedTransitions', applicationId],
+    queryFn: () => getAllowedStatusTransitions(applicationId),
+    enabled: !!applicationId,
+    staleTime: 10000,
+  })
+
+  // Actualizar las transiciones permitidas cuando se obtengan los datos
+  useEffect(() => {
+    if (transitionsData?.payload?.allowedTransitions) {
+      setAllowedTransitions(transitionsData.payload.allowedTransitions)
+    }
+  }, [transitionsData])
 
   // Mutation para actualizar el estado
   const updateStatusMutation = useMutation({
@@ -48,7 +67,7 @@ export const CreditApplicationDetailModal = ({
       setNewStatus('')
       setRejectionReason('')
       setInternalNotes('')
-      setApprovedAmount('')
+      setUserNotes('')
       
       // Toast de éxito
       toast.success('Estado actualizado exitosamente', {
@@ -79,10 +98,10 @@ export const CreditApplicationDetailModal = ({
       return
     }
 
-    // Validación para monto aprobado
-    if (newStatus === 'Aprobado' && !approvedAmount) {
+    // Validación para notas de usuario (ahora obligatorio)
+    if (!userNotes.trim()) {
       toast.warning('Campo requerido', {
-        description: 'Debes especificar el monto aprobado',
+        description: 'Debes agregar notas para el usuario',
         duration: 3000,
       })
       return
@@ -99,11 +118,11 @@ export const CreditApplicationDetailModal = ({
 
     const updateData: UpdateCreditApplicationStatusData = {
       newStatus: newStatus as CreditApplicationStatus,
+      userNotes: userNotes,
     }
 
     if (rejectionReason) updateData.rejectionReason = rejectionReason
     if (internalNotes) updateData.internalNotes = internalNotes
-    if (approvedAmount) updateData.approvedAmount = parseFloat(approvedAmount)
 
     // Toast de carga
     toast.loading('Actualizando estado...', {
@@ -362,9 +381,15 @@ export const CreditApplicationDetailModal = ({
                   <p className="font-medium text-red-600">{application.rejectionReason}</p>
                 </div>
               )}
+              {application.userNotes && (
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600">Notas para el Usuario</p>
+                  <p className="font-medium text-blue-600">{application.userNotes}</p>
+                </div>
+              )}
               {application.internalNotes && (
                 <div className="col-span-2">
-                  <p className="text-sm text-gray-600">Notas Internas</p>
+                  <p className="text-sm text-gray-600">Notas Internas (Solo Admin)</p>
                   <p className="font-medium">{application.internalNotes}</p>
                 </div>
               )}
@@ -437,26 +462,82 @@ export const CreditApplicationDetailModal = ({
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-gray-900">Documentos Adjuntos</h3>
             <div className="bg-gray-50 p-4 rounded-lg">
-              {application.documents.length === 0 ? (
+              {!application.documents || application.documents.length === 0 ? (
                 <p className="text-gray-500 text-sm">No hay documentos adjuntos</p>
               ) : (
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {application.documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between p-2 bg-white rounded">
-                      <div>
-                        <p className="font-medium text-sm">{doc.name}</p>
-                        <p className="text-xs text-gray-500">
-                          Subido: {formatDate(doc.uploadedAt)}
-                        </p>
+                    <div 
+                      key={doc.id} 
+                      className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-900 truncate">
+                            {doc.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-gray-500">
+                              {formatDate(doc.uploadedAt)}
+                            </p>
+                            {doc.type && (
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                {doc.type}
+                              </span>
+                            )}
+                            {doc.status && (
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                doc.status === 'Approved' ? 'bg-green-100 text-green-700' :
+                                doc.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                                doc.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {doc.status}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <a
-                        href={doc.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      <button
+                        onClick={() => setSelectedDocument({ fileUrl: doc.fileUrl, fileName: doc.name })}
+                        className="flex-shrink-0 ml-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
                       >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
                         Ver
-                      </a>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -480,32 +561,18 @@ export const CreditApplicationDetailModal = ({
                     required
                   >
                     <option value="">Seleccionar estado...</option>
-                    <option value="En revisión">En revisión</option>
-                    <option value="Documentos requeridos">Documentos requeridos</option>
-                    <option value="Aprobado">Aprobado</option>
-                    <option value="Rechazado">Rechazado</option>
-                    <option value="Desembolsado">Desembolsado</option>
-                    <option value="Cancelado">Cancelado</option>
+                    {allowedTransitions.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
                   </select>
+                  {allowedTransitions.length === 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      No hay transiciones de estado disponibles desde el estado actual
+                    </p>
+                  )}
                 </div>
-
-                {newStatus === 'Aprobado' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Monto Aprobado *
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={approvedAmount}
-                      onChange={(e) => setApprovedAmount(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Ej: 500000"
-                      required={newStatus === 'Aprobado'}
-                    />
-                  </div>
-                )}
 
                 {newStatus === 'Rechazado' && (
                   <div>
@@ -525,6 +592,23 @@ export const CreditApplicationDetailModal = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Notas para el Usuario *
+                  </label>
+                  <textarea
+                    value={userNotes}
+                    onChange={(e) => setUserNotes(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                    placeholder="Notas que verá el usuario sobre esta solicitud..."
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Estas notas serán visibles para el usuario de la empresa
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Notas Internas
                   </label>
                   <textarea
@@ -532,8 +616,11 @@ export const CreditApplicationDetailModal = ({
                     onChange={(e) => setInternalNotes(e.target.value)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
-                    placeholder="Agregar notas internas (opcional)..."
+                    placeholder="Notas internas solo para administradores (opcional)..."
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Estas notas son privadas y solo visibles para administradores
+                  </p>
                 </div>
               </div>
 
@@ -558,6 +645,15 @@ export const CreditApplicationDetailModal = ({
           </div>
         </div>
       </div>
+
+      {/* Modal de visualización de documentos */}
+      {selectedDocument && (
+        <DocumentViewerModal
+          fileUrl={selectedDocument.fileUrl}
+          fileName={selectedDocument.fileName}
+          onClose={() => setSelectedDocument(null)}
+        />
+      )}
     </div>
   )
 }

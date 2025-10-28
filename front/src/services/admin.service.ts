@@ -285,3 +285,12 @@ export const getDashboardStats = async (): Promise<DashboardStatsResponse> => {
     throw error
   }
 }
+
+export const getAllowedStatusTransitions = async (id: string): Promise<{ success: boolean; payload: { currentStatus: string; allowedTransitions: string[] } }> => {
+  try {
+    return await makeRequest<{ success: boolean; payload: { currentStatus: string; allowedTransitions: string[] } }>(`/credit-applications/${id}/allowed-transitions`)
+  } catch (error) {
+    console.error('[getAllowedStatusTransitions]: Error fetching allowed transitions:', error)
+    throw error
+  }
+}
