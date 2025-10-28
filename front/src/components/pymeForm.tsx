@@ -23,9 +23,8 @@ export const PymeForm = ({
     mode: 'onChange'
   })
 
-  console.log(defaultValues)
   const onSubmit = (data: RegisterPymeFormData) => {
-    console.log(data)
+    console.log('ACTUALIZAR PYME CON : ', data)
   }
 
   return (
