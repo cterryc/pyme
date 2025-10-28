@@ -25,6 +25,7 @@ import {
 import { generateUniqueCode } from "../../utils/generateCode.utils";
 import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
 import { broadcastLoanStatusUpdate } from "../sse/controller";
+import config from "../../config/enviroment.config";
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -407,12 +408,12 @@ export default class LoanService {
       );
     }
 
-    if (newStatus === CreditApplicationStatus.APPROVED && !approvedAmount) {
-      throw new HttpError(
-        HttpStatus.BAD_REQUEST,
-        "Se requiere especificar el monto aprobado para aprobar la solicitud."
-      );
-    }
+    // if (newStatus === CreditApplicationStatus.APPROVED && !approvedAmount) {
+    //   throw new HttpError(
+    //     HttpStatus.BAD_REQUEST,
+    //     "Se requiere especificar el monto aprobado para aprobar la solicitud."
+    //   );
+    // }
 
     // Actualizar campos según el nuevo estado
     const now = new Date();
@@ -460,6 +461,36 @@ export default class LoanService {
       ...(application.statusHistory || []),
       statusHistoryEntry,
     ];
+
+    if (newStatus === CreditApplicationStatus.APPROVED) {
+      const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer sw6AK-UfwtvQW9ep3i-IPYsWPSuiJG7y7TgaR3IWSlo'
+        },
+        body: JSON.stringify({
+          "doc_hash": 'c83e66953f8b303697d4712ce0590e3eeaa2bbc7a0daa05001a01d764e908339',//"DOCUMENT_HASH"
+          "doc_id": application.id,//id solicitud
+          "doc_url": "https://puaqabdbobgomkjepvjc.supabase.co/storage/v1/object/public/contrato-pdf/contrato/Contrato_Prestamo_Pyme.pdf",
+          "callback": `${config.BACKEND_URL}/api/loanRequest/firma`,
+          "return_url": `${config.FRONTEND_URL}/panel`,
+          "description": "Contrato para pyme",
+          "external_ref" : application.id
+        }) // Convert the data object to a JSON string
+      };
+      const response = await fetch(config.BACKEND_FIRMA, options)
+      const data = await response.json()
+      console.log("data ==>",data)
+      if (!data.success) {
+        throw new HttpError(
+          HttpStatus.BAD_REQUEST,
+          data.payload.error
+        );
+      }
+      // const urlFirma = 'https://firma-digital-alpha.vercel.app/panel/firmar-documento?signId=IDFIRMA'
+      application.requestId = data.payload.requestId
+    }
 
     await this.loanRepo.save(application);
 
