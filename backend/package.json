@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src -e ts,tsx --exec node -r ts-node/register/transpile-only src/index.ts",
+    "build_render": "npm install && npm run build",
     "build": "tsc",
     "start": "node dist/index.js",
     "typeorm": "typeorm-ts-node-commonjs",
