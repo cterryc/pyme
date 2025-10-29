@@ -4,25 +4,22 @@ import { CreditApplication } from "./CreditApplication.entity";
 
 @Entity("signatures")
 export class Signature extends BaseEntity {
-  @Column({ type: "varchar", length: 255, nullable: false })
+  @Column({ type: "varchar", length: 255, nullable: false, name: 'signed_doc' })
+  signedDoc!: string;
+
+  @Column({ type: "varchar", length: 255, nullable: false, name: 'doc_hash' })
   docHash!: string;
 
-  @Column({ type: "varchar", length: 255, nullable: false })
-  docId!: string;
+  @Column({ type: "varchar", length: 500, nullable: true, name: 'public_key' })
+  publicKey?: string;
 
-  @Column({ type: "varchar", length: 500, nullable: true })
-  docUrl?: string;
+  @Column({ type: "varchar", length: 500, nullable: true, name: 'signer_name' })
+  signerName?: string;
 
-  @Column({ type: "varchar", length: 500, nullable: true })
-  callback?: string;
+  @Column({ type: "varchar", length: 500, nullable: true, name: 'signer_surname' })
+  signerSurname?: string;
 
-  @Column({ type: "varchar", length: 500, nullable: true })
-  returnUrl?: string;
-
-  @Column({ type: "text", nullable: true })
-  description?: string;
-
-  @Column({ type: "varchar", length: 255, nullable: true })
+  @Column({ type: "varchar", length: 255, nullable: true, name: 'external_ref' })
   externalRef?: string;
 
   // Relación con CreditApplication

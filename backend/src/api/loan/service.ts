@@ -21,11 +21,13 @@ import {
   getTierFromScore,
   capsFor,
   interestRateFor,
+  ApiFirmaBody,
 } from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
 import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
 import { broadcastLoanStatusUpdate } from "../sse/controller";
 import config from "../../config/enviroment.config";
+import { Signature } from "../../entities/Signature.entity";
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -34,6 +36,7 @@ export default class LoanService {
   private readonly systemConfigRepo: Repository<SystemConfig>;
   private readonly industryRepo: Repository<Industry>;
   private readonly documentRepo: Repository<Document>;
+  private readonly signature: Repository<Signature>
 
   constructor() {
     this.loanRepo = AppDataSource.getRepository(CreditApplication);
@@ -42,6 +45,7 @@ export default class LoanService {
     this.systemConfigRepo = AppDataSource.getRepository(SystemConfig);
     this.industryRepo = AppDataSource.getRepository(Industry);
     this.documentRepo = AppDataSource.getRepository(Document);
+    this.signature = AppDataSource.getRepository(Signature)
   }
 
   async loanRequest(
@@ -462,7 +466,10 @@ export default class LoanService {
       statusHistoryEntry,
     ];
 
+    
     if (newStatus === CreditApplicationStatus.APPROVED) {
+      const docUrlGenerate = "https://puaqabdbobgomkjepvjc.supabase.co/storage/v1/object/public/contrato-pdf/contrato/Contrato_Prestamo_Pyme.pdf"
+      
       const options = {
         method: 'POST',
         headers: {
@@ -472,7 +479,7 @@ export default class LoanService {
         body: JSON.stringify({
           "doc_hash": 'c83e66953f8b303697d4712ce0590e3eeaa2bbc7a0daa05001a01d764e908339',//"DOCUMENT_HASH"
           "doc_id": application.id,//id solicitud
-          "doc_url": "https://puaqabdbobgomkjepvjc.supabase.co/storage/v1/object/public/contrato-pdf/contrato/Contrato_Prestamo_Pyme.pdf",
+          "doc_url": docUrlGenerate,
           "callback": `${config.BACKEND_URL}/api/loanRequest/firma`,
           "return_url": `${config.FRONTEND_URL}/panel`,
           "description": "Contrato para pyme",
@@ -490,6 +497,7 @@ export default class LoanService {
       }
       // const urlFirma = 'https://firma-digital-alpha.vercel.app/panel/firmar-documento?signId=IDFIRMA'
       application.requestId = data.payload.requestId
+      application.contractDocument = docUrlGenerate
     }
 
     await this.loanRepo.save(application);
@@ -805,4 +813,16 @@ export default class LoanService {
       },
     };
   }
+
+  async apiFirma (body: ApiFirmaBody) {
+      await this.signature.save({
+        signedDoc: body.signed_doc,
+        docHash: body.doc_hash,
+        publicKey:body.public_key,
+        signerName:body.signer_name,
+        signerSurname:body.signer_surname,
+        creditApplicationId:body.external_ref
+      })
+      return 200
+  } 
 }
