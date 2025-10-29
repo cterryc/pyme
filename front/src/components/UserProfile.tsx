@@ -8,6 +8,7 @@ import { UserProfileSkeleton } from './Loaders/UserProfileSkeleton'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useGetPymesByUser } from '@/hooks/usePyme'
+import { useDisconnectSSE } from '@/hooks/useSSENotifications'
 
 type EditMode = 'none' | 'profile' | 'email' | 'password'
 
@@ -21,6 +22,7 @@ export const UserProfile = () => {
   // Hooks
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const disconnectSSE = useDisconnectSSE()
   const { data: userProfile, isLoading, isError, error, refetch } = useUserProfile()
 
   const {
@@ -109,6 +111,10 @@ export const UserProfile = () => {
       description: 'Hasta pronto.',
       duration: 2000
     })
+    
+    // Desconectar SSE antes de cerrar sesión
+    disconnectSSE()
+    
     localStorage.removeItem('tokenPyme')
     queryClient.clear()
     setTimeout(() => {

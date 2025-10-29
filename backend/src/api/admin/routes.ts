@@ -20,7 +20,10 @@ import {
 
  const adminRouter = Router();
 
- adminRouter.use(authenticate, authorizeRoles([UserRole.ADMIN, UserRole.OWNER]));
+ adminRouter.use(
+  authenticate, 
+  authorizeRoles([UserRole.ADMIN, UserRole.OWNER])
+);
 
  adminRouter.get("/systemconfig", AdminController.listSystemConfigs);
 

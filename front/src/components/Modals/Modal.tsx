@@ -27,7 +27,7 @@ export const Modal = ({
   return (
     <div
       onClick={handleClose}
-      className='fixed cursor-pointer top-0 z-100 left-0 bg-[rgba(0,0,0,.4)] w-screen h-screen flex justify-center items-center overflow-y-auto'
+      className='fixed cursor-pointer top-0 z-100 left-0 bg-black/50 w-screen h-screen flex justify-center items-center overflow-y-auto'
     >
       <div className='cursor-default class relative ' onClick={(e) => e.stopPropagation()}>
         <button

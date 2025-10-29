@@ -46,7 +46,6 @@ export const SolicitudesContent = () => {
     { 
       key: 'submittedAt', 
       label: 'FECHA DE SOLICITUD', 
-      width: '14%',
       render: (value: string | null) => value 
         ? new Date(value).toLocaleDateString('es-AR', { 
             year: 'numeric', 
@@ -58,7 +57,6 @@ export const SolicitudesContent = () => {
     { 
       key: 'selectedAmount', 
       label: 'MONTO', 
-      width: '12%',
       render: (value: number | null) => value 
         ? new Intl.NumberFormat('es-AR', { 
             style: 'currency', 
@@ -70,7 +68,6 @@ export const SolicitudesContent = () => {
     { 
       key: 'annualRevenue', 
       label: 'INGRESOS ANUALES', 
-      width: '15%',
       render: (_value: unknown, row: AdminCreditApplication) => row.company?.annualRevenue 
         ? new Intl.NumberFormat('es-AR', { 
             style: 'currency', 
@@ -82,16 +79,14 @@ export const SolicitudesContent = () => {
     { 
       key: 'employeeCount', 
       label: 'EMPLEADOS', 
-      width: '9%',
       render: (_value: unknown, row: AdminCreditApplication) => row.company?.employeeCount || 'N/A'
     },
     { 
       key: 'status', 
       label: 'ESTADO', 
-      width: '15%',
       render: (value: string) => {
         // Mapeo de estados con estilos completos
-        let badgeClasses = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium '
+        let badgeClasses = 'inline-flex items-center justify-center min-w-32 w-32 py-2 text-center rounded-full text-xs font-medium '
         let label = value
         
         switch(value) {
@@ -154,9 +149,9 @@ export const SolicitudesContent = () => {
       render: (_value: unknown, row: AdminCreditApplication) => (
         <button 
           onClick={() => setSelectedApplicationId(row.id)}
-          className="text-blue-600 hover:text-blue-800 font-medium"
+          className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center w-full"
         >
-          Ver
+          Detalles
         </button>
       )
     }

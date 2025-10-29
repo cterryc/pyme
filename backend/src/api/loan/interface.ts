@@ -1,6 +1,16 @@
 import { RiskTier } from "../../constants/RiskTier";
 import { RiskTierConfig } from "../../entities/Risk_tier_config.entity";
 
+
+export type apiFirmaResponsePayload={
+  error?:string,
+  requestId?:string
+}
+export interface apiFirmaResponse{
+  success:boolean,
+  payload:apiFirmaResponsePayload
+} 
+
 export interface responseLoanRequest {
     id?: string;
     applicationNumber?: string;
@@ -24,6 +34,7 @@ export interface responseLoanByUser {
     nameCompany?: string;
     requestAmonut?: number;
     subbmitedAt?: Date;
+    notes?: string;
     status?: string;
     id?: string
 }
