@@ -26,14 +26,18 @@ export interface responseLoanRequest {
         amount?: number;
         termMonths?: number;
     };
+    requestId?: string
+    contractDocument?: string
 }
 
 export interface responseLoanByUser {
+    id?: string
     nameCompany?: string;
     requestAmonut?: number;
     subbmitedAt?: Date;
     notes?: string;
     status?: string;
+    id?: string
 }
 
 export interface LoanCalculationResult {
@@ -42,6 +46,15 @@ export interface LoanCalculationResult {
     interestRate: number;
     allowedTerms: number[];
     calculationSnapshot?: any;
+}
+
+export interface ApiFirmaBody {
+    signed_doc: string
+    doc_hash: string
+    public_key: string
+    signer_name: string
+    signer_surname: string
+    external_ref: string
 }
 
 export function calculateCompanyRiskScore(metrics: {

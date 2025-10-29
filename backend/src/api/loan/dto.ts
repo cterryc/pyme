@@ -8,11 +8,13 @@ import { responseLoanRequest, LoanCalculationResult } from "./interface";
  */
 export function responseLoanByUserDto(loan: any): responseLoanByUser {
     return {
+        id: loan.id,
         nameCompany: loan.company?.legalName,
         requestAmonut: loan.selectedAmount,
         subbmitedAt: loan.submittedAt,
         notes: loan.userNotes,
         status: loan.status,
+        id: loan.id
     };
 }
 /**
@@ -49,6 +51,8 @@ export class LoanResponseDto {
             termMonths: app.selectedTermMonths,
           }
         : undefined,
+      requestId: app.requestId,
+      contractDocument: app.requestId && "https://puaqabdbobgomkjepvjc.supabase.co/storage/v1/object/public/contrato-pdf/contrato/Contrato_Prestamo_Pyme.pdf"
     };
   }
 

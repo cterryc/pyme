@@ -19,7 +19,7 @@ const schemaValidator = (
 
             if (paramsSchema) {
                 if (req.params.id) {
-                    paramsSchema.parse(req.params.id);
+                    paramsSchema.parse({ id: req.params.id });
                 } else if (req.params.token) {
                     paramsSchema.parse(req.params.token);
                 }
