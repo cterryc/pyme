@@ -35,8 +35,17 @@ export const UserPymesList = () => {
       return 'Solicitar Credito'
     } else if (status === 'No aplica') {
       return 'No aplica'
-    } else {
-      return ''
+    } else if (status === 'Aprobado') {
+      return 'Solicitud Aprobada'
+    } else if (status === 'Desembolsado') {
+      return 'Desembolsado'
+    } else if (status === 'Cancelado') {
+      return 'Solicitud Cancelada'
+    } else if (status === 'Rechazado') {
+      return 'Solicitud Rechazada'
+    }
+    else {
+      return 'Estado desconocido'
     }
   }
 
