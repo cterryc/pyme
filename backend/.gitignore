@@ -16,7 +16,7 @@ logs
 *.log
 
 # Directorio de construcción
-# dist/
+dist/
 build/
 
 # Archivos de configuración de IDE

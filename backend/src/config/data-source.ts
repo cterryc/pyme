@@ -17,5 +17,4 @@ export const AppDataSource = new DataSource({
   entities: [isProd ? "dist/entities/**/*.js" : "src/entities/**/*.ts"],
   migrations: [isProd ? "dist/migrations/**/*.js" : "src/migrations/**/*.ts"],
   subscribers: [isProd ? "dist/subscribers/**/*.js" : "src/subscribers/**/*.ts"],
-  //   dropSchema: true,
 });

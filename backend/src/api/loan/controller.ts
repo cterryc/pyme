@@ -89,8 +89,8 @@ export default class LoanController {
     try {
       const { page, limit, status } = req.query;
       const result = await this.loanService.listCreditApplications(
-        page as string | number, 
-        limit as string | number, 
+        page as string | number,
+        limit as string | number,
         status as string
       );
       res.status(HttpStatus.OK).json(apiResponse(true, result));
@@ -183,6 +183,16 @@ export default class LoanController {
       res.status(HttpStatus.OK).json(apiResponse(true, result));
     } catch (error) {
       return next(error);
+    }
+  };
+
+  static apiFirma = async (req: Request, res: Response, next: NextFunction) => {
+    const body = req.body;
+    try {
+      const saveData = await this.loanService.apiFirma(body)
+      return res.status(saveData)
+    } catch (error) {
+      return next(error)
     }
   };
 }
