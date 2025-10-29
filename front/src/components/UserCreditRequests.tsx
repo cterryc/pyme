@@ -27,6 +27,8 @@ export const UserCreditRequests = () => {
 
   const typeStatus = (status: string) => {
     switch (status) {
+      case 'Aprobado':
+        return 'bg-green-400 text-white shadow-sm'
       case 'Enviado':
         return 'bg-blue-500 text-white shadow-sm'
       case 'No confirmado':
@@ -78,7 +80,7 @@ export const UserCreditRequests = () => {
                   </th>
                 </tr>
               </thead>
-              {loansByUser?.payload.filter((cr) => cr.status === 'Enviado').length === 0 ? (
+              {loansByUser?.payload.filter((cr) => cr.status === 'Enviado' || cr.status === 'Aprobado').length === 0 ? (
                 <tbody>
                   <tr>
                     <td colSpan={5} className='text-center text-gray-500 py-12'>
@@ -95,7 +97,7 @@ export const UserCreditRequests = () => {
                 <tbody className='divide-y divide-gray-200'>
                   {loansByUser &&
                     loansByUser.payload
-                      .filter((cr) => cr.status === 'Enviado')
+                      .filter((cr) => cr.status === 'Enviado' || cr.status === 'Aprobado')
                       .map((credit: CreditAppplication) => {
                         const amount = new Intl.NumberFormat('es-PE', {
                           style: 'currency',
