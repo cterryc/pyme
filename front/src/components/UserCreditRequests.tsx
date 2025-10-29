@@ -1,19 +1,31 @@
 import { formatDateToSpanish } from "@/helpers/formatDate";
-import { useGetListCreditApplicationsByUser } from "@/hooks/useLoan";
-import type { CreditAppplication } from "@/interfaces/loan.interface";
-import { useEffect } from "react";
+import { useGetCreditApplicationById, useGetListCreditApplicationsByUser } from "@/hooks/useLoan";
+import type { CreditAppplication, LoanRequestPayload } from "@/interfaces/loan.interface";
+import { useEffect, useState } from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
+import { UserCreditModal } from "./Modals/UserCreditModal";
 
 export const UserCreditRequests = () => {
+  const [creditId, setCreditId] = useState<string>('')
+  const [toggleModal, setToggleModal] = useState<boolean>(false)
+  const [getCredit, setGetCredit] = useState<LoanRequestPayload | null>(null);
   const { data: loansByUser, isLoading, isError, error, refetch } = useGetListCreditApplicationsByUser()
-  const tableHeaders = ['Nombre Pyme', 'Monto Solicitado', 'Fecha de envio', 'Estado']
+  const { data: creditById } = useGetCreditApplicationById(creditId)
+  const tableHeaders = ['Nombre Pyme', 'Monto Solicitado', 'Fecha de envio', 'Estado del credito']
 
   useEffect(() => {
     refetch()
   }, [refetch])
 
+  useEffect(() => {
+    if (creditById?.payload) {
+      setGetCredit(creditById.payload);
+    }
+  }, [creditById])
+
+
   const typeStatus = (status: string) => {
-    switch(status) {
+    switch (status) {
       case 'Enviado':
         return 'bg-[#0095d5]/80 text-white'
       case 'No confirmado':
@@ -38,6 +50,7 @@ export const UserCreditRequests = () => {
                     </div>
                   </th>
                 ))}
+                <th className='p-3 text-center !w-full flex items-center justify-center'>Acciones</th>
               </tr>
             </thead>
             {loansByUser?.payload.length === 0 ? (
@@ -51,29 +64,44 @@ export const UserCreditRequests = () => {
             ) : (
               <tbody>
                 {
-                  loansByUser && 
-                    loansByUser.payload
-                      .filter((cr) => cr.status === 'Enviado')
-                      .map((credit: CreditAppplication, index) => {
-                  const amount = '$' + credit.requestAmonut
-                  return (
-                    <tr key={index} className="hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200">
-                      <td className="p-3">{credit.nameCompany}</td>
-                      <td className="p-3">{credit.requestAmonut ? amount : 'Sin Monto'}</td>
-                      <td className="p-3">{formatDateToSpanish(credit.subbmitedAt)}</td>
-                      <td className="p-3">
-                        <span className={`inline-block rounded-full px-6 py-2 ${typeStatus(credit.status)}`}>
-                          {credit.status}
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
+                  loansByUser &&
+                  loansByUser.payload
+                    .filter((cr) => cr.status === 'Enviado')
+                    .map((credit: CreditAppplication, index) => {
+                      const amount = '$' + credit.requestAmonut
+                      return (
+                        <tr key={index} className="hover:bg-gray-100 cursor-pointer border-b-2 border-gray-200">
+                          <td className="p-3">{credit.nameCompany}</td>
+                          <td className="p-3">{credit.requestAmonut ? amount : 'Sin Monto'}</td>
+                          <td className="p-3">{formatDateToSpanish(credit.subbmitedAt)}</td>
+                          <td className="p-3">
+                            <span className={`block w-40 min-w-40 rounded-full px-6 py-2 text-center ${typeStatus(credit.status)}`}>
+                              {credit.status}
+                            </span>
+                          </td>
+                          <td
+                            onClick={() => {
+                              setToggleModal(true)
+                              setCreditId(credit.id)
+                            }}
+                            className="text-blue-500 text-center"
+                          >
+                            Detalles
+                          </td>
+                        </tr>
+                      )
+                    })}
               </tbody>
             )
             }
           </table>
         </div>
+      )}
+      {toggleModal && (
+        <UserCreditModal
+          getCredit={getCredit || null}
+          setToggleModal={() => setToggleModal(!toggleModal)}
+        />
       )}
     </>
   )

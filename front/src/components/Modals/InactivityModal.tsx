@@ -8,7 +8,7 @@ export const InactivityModal = ({ children }: { children: ReactNode }) => {
   const timeRef = useRef<number | null>(null)
 
   const inactivityTime = 15 * 60 * 1000 // 15 minutes
-  const publicRoutes = ["/", "/Login", "/Registro"];
+  const publicRoutes = ["/", "/inicio-sesion", "/registro"];
 
   const resetTimer = () => {
     if (publicRoutes.includes(location.pathname)) return;
