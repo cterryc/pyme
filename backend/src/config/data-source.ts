@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   password: config.DB_PASSWORD,
   database: config.DB_NAME,
   ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
-  synchronize: true, // Auto-sync in dev only
+  synchronize: false, // Auto-sync in dev only
   logging: false,
   entities: ["src/entities/**/*.js"],
   migrations: ["src/migrations/**/*.js"],
