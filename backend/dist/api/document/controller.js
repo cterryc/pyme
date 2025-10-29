@@ -78,4 +78,3 @@ DocumentController.updateDocumentStatus = async (req, res, next) => {
     }
 };
 exports.default = DocumentController;
-//# sourceMappingURL=controller.js.map

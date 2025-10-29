@@ -224,4 +224,3 @@ AdminController.getAllowedStatusTransitions = async (req, res, next) => {
     }
 };
 exports.default = AdminController;
-//# sourceMappingURL=controller.js.map

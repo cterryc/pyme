@@ -91,4 +91,3 @@ exports.updateCreditApplicationStatusSchema = zod_1.z
     message: "Se requiere una razón de rechazo cuando el estado es REJECTED",
     path: ["rejectionReason"],
 });
-//# sourceMappingURL=validator.js.map

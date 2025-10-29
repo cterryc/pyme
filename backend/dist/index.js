@@ -43,4 +43,3 @@ const authenticate_sse_middleware_1 = __importDefault(require("./middlewares/aut
         process.exit(1);
     }
 })();
-//# sourceMappingURL=index.js.map

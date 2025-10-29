@@ -8,4 +8,3 @@ var RiskTier;
     RiskTier["C"] = "C";
     RiskTier["D"] = "D";
 })(RiskTier || (exports.RiskTier = RiskTier = {}));
-//# sourceMappingURL=RiskTier.js.map

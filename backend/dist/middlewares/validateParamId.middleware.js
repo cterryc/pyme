@@ -21,4 +21,3 @@ exports.validateUuid = [
     (0, express_validator_1.param)('id').isUUID().withMessage('El ID proporcionado no es un ID válido.'),
     exports.validationErrors
 ];
-//# sourceMappingURL=validateParamId.middleware.js.map

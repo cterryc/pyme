@@ -25,4 +25,3 @@ exports.updateDocumentStatusValidator = zod_1.z.object({
     })
         .optional(),
 });
-//# sourceMappingURL=validator.js.map

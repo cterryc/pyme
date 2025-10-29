@@ -75,4 +75,3 @@ class MiddlewareConfig {
     }
 }
 exports.default = MiddlewareConfig;
-//# sourceMappingURL=middlewares.config.js.map

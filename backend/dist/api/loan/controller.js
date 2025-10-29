@@ -112,4 +112,3 @@ LoanController.getCreditApplicationsForAdmin = async (req, res, next) => {
     }
 };
 exports.default = LoanController;
-//# sourceMappingURL=controller.js.map

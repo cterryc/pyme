@@ -26,4 +26,3 @@ loanRouter.post("/firma",
     res.status(200).json({ message: "Gracias" });
 });
 exports.default = loanRouter;
-//# sourceMappingURL=routes.js.map

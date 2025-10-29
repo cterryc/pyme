@@ -99,4 +99,3 @@ CompanyController.getAllCompanies = async (req, res, next) => {
     }
 };
 exports.default = CompanyController;
-//# sourceMappingURL=controller.js.map

@@ -154,4 +154,3 @@ __decorate([
 exports.CreditApplication = CreditApplication = __decorate([
     (0, typeorm_1.Entity)("credit_applications")
 ], CreditApplication);
-//# sourceMappingURL=CreditApplication.entity.js.map

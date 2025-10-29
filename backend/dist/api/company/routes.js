@@ -22,4 +22,3 @@ companyRouter.get("/:id", validateParamId_middleware_1.validateUuid, controller_
 companyRouter.patch("/:id", validateParamId_middleware_1.validateUuid, (0, schemaValidators_middlewares_1.default)(validator_1.updateCompanySchema, null), controller_1.default.updateCompany);
 companyRouter.delete("/:id", validateParamId_middleware_1.validateUuid, controller_1.default.deleteCompanyByUser);
 exports.default = companyRouter;
-//# sourceMappingURL=routes.js.map

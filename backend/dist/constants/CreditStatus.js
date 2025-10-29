@@ -84,4 +84,3 @@ var KYCStatus;
     KYCStatus["APPROVED"] = "Approved";
     KYCStatus["REJECTED"] = "Rejected";
 })(KYCStatus || (exports.KYCStatus = KYCStatus = {}));
-//# sourceMappingURL=CreditStatus.js.map

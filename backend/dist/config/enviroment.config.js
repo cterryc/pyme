@@ -77,4 +77,3 @@ const config = {
     BACKEND_FIRMA: process.env.BACKEND_FIRMA || ""
 };
 exports.default = config;
-//# sourceMappingURL=enviroment.config.js.map

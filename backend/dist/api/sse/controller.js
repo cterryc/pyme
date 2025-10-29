@@ -47,4 +47,3 @@ function broadcastLoanStatusUpdate(userId, data) {
     console.log(`📢 [SSE] Enviando a ${userId} (${targets.length})`);
     targets.forEach((client) => client.res.write(msg));
 }
-//# sourceMappingURL=controller.js.map

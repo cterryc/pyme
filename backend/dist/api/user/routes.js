@@ -19,4 +19,3 @@ userRouter.delete("/profile", authenticate_middleware_1.default, controller_1.de
 userRouter.delete("/profile/:userId", authenticate_middleware_1.default, (0, authorization_middleware_1.default)([Roles_1.UserRole.ADMIN]), validateParamId_middleware_1.validateUuid, controller_1.default.deleteUser);
 userRouter.get("/users", authenticate_middleware_1.default, (0, authorization_middleware_1.default)([Roles_1.UserRole.ADMIN]), controller_1.default.getAllUsers);
 exports.default = userRouter;
-//# sourceMappingURL=routes.js.map

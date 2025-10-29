@@ -121,4 +121,3 @@ exports.getAllCompaniesQuerySchema = zod_1.z.object({
     sortOrder: zod_1.z.enum(['ASC', 'DESC']).optional().default('DESC'),
 }).strict();
 exports.updateCompanySchema = exports.createCompanySchema.partial();
-//# sourceMappingURL=validator.js.map

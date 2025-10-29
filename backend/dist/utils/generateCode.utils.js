@@ -22,4 +22,3 @@ const generateUniqueCode = async (prefix = 'CRD') => {
 };
 exports.generateUniqueCode = generateUniqueCode;
 exports.default = { generateUniqueCode: exports.generateUniqueCode };
-//# sourceMappingURL=generateCode.utils.js.map

@@ -31,4 +31,3 @@ async function authenticate(req, res, next) {
         return;
     }
 }
-//# sourceMappingURL=authenticate.middleware.js.map

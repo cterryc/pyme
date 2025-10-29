@@ -40,4 +40,3 @@ __decorate([
 exports.RiskTierConfig = RiskTierConfig = __decorate([
     (0, typeorm_1.Entity)("risk_tier_configs")
 ], RiskTierConfig);
-//# sourceMappingURL=Risk_tier_config.entity.js.map
