@@ -5,7 +5,7 @@ interface UserCreditModalProps {
   setToggleModal: () => void
 }
 
-export const UserCreditModal = ({getCredit, setToggleModal}: UserCreditModalProps) => {
+export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalProps) => {
   const formatCurrency = (amount: number): string => {
     if (amount === null) return 'N/A'
     return new Intl.NumberFormat('es-AR', {
@@ -17,72 +17,117 @@ export const UserCreditModal = ({getCredit, setToggleModal}: UserCreditModalProp
   }
 
   return (
-    <div className="fixed top-0 left-0 w-full min-h-screen bg-black/50 outline flex items-center justify-center z-50">
-      <div className="max-w-3xl w-full bg-white rounded-md">
-        <div className="border-b p-5 flex justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Detalle de Solicitud
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {getCredit?.applicationNumber}
-            </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="max-w-3xl w-full bg-white rounded-2xl shadow-2xl animate-[fadeIn_0.2s_ease-out,scaleIn_0.2s_ease-out] overflow-hidden">
+        <div className="bg-gradient-to-r from-[#1193d4] to-[#0d7ab8] p-6 md:p-8 rounded-t-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex-1">
+              <h2 className="text-2xl md:text-3xl font-bold text-white">
+                Detalle de Solicitud
+              </h2>
+              <div className="mt-2 inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="text-sm font-medium text-white">
+                  {getCredit?.applicationNumber}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={setToggleModal}
+              className="self-end sm:self-start text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 rounded-lg p-2 -m-2"
+              aria-label="Cerrar modal"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <button
-            onClick={setToggleModal}
-            className="text-gray-400 hover:text-gray-600 transition text-2xl font-bold right-0 cursor-pointer"
-          >
-            ×
-          </button>
         </div>
-        <div className="px-5 pb-5">
-          <h3 className="text-lg font-semibold mb-3 text-gray-900 mt-6">Información de la Empresa</h3>
-          <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-600">Nombre Legal</p>
-              <p className="font-medium">{getCredit?.legalName || 'N/A'}</p>
+
+        <div className="p-6 space-y-8">
+          <section>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <span className="w-1 h-5 bg-blue-500 rounded"></span>
+              Información de la Empresa
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
+              <InfoItem label="Nombre Legal" value={getCredit?.legalName} />
+              <InfoItem label="Ingreso Anual" value={getCredit?.annualRevenue} />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Ingreso Anual</p>
-              <p className="font-medium">{getCredit?.annualRevenue || 'N/A'}</p>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <span className="w-1 h-5 bg-indigo-500 rounded"></span>
+              Oferta del Sistema
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
+              <InfoItem
+                label="Rango de Monto"
+                value={`${formatCurrency(getCredit?.offerDetails.minAmount || 0)} - ${formatCurrency(
+                  getCredit?.offerDetails.maxAmount || 0
+                )}`}
+              />
+              <InfoItem
+                label="Plazos Permitidos"
+                value={
+                  getCredit?.offerDetails.allowedTerms
+                    ? `${getCredit?.offerDetails.allowedTerms.join(', ')} meses`
+                    : 'N/A'
+                }
+              />
+              <InfoItem
+                label="Tasa de Interés"
+                value={`${getCredit?.offerDetails.interestRate ?? 0}%`}
+              />
             </div>
-          </div>
-          <h3 className="text-lg font-semibold mb-3 text-gray-900 mt-6">Oferta del Sistema</h3>
-          <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-600">Rango de Monto</p>
-              <p className="font-medium">
-                {formatCurrency(getCredit?.offerDetails.minAmount || 0)} - {formatCurrency(getCredit?.offerDetails.maxAmount || 0)}
-              </p>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <span className="w-1 h-5 bg-green-500 rounded"></span>
+              Detalles del Crédito
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
+              <InfoItem
+                label="Plazo Seleccionado"
+                value={
+                  getCredit?.selectedDetails.termMonths
+                    ? `${getCredit.selectedDetails.termMonths} meses`
+                    : 'N/A'
+                }
+                strong
+              />
+              <InfoItem
+                label="Monto Aprobado"
+                value={formatCurrency(Number(getCredit?.selectedDetails.amount) || 0)}
+                valueClass="text-green-600 font-semibold text-lg"
+              />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Plazos Permitidos</p>
-              <p className="font-medium">
-                {getCredit?.offerDetails.allowedTerms.join(', ')} meses
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Tasa de Interés</p>
-              <p className="font-medium">{getCredit?.offerDetails.interestRate}%</p>
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold mb-3 text-gray-900 mt-6">Detalles del Crédito</h3>
-          <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-600">Plazo Seleccionado</p>
-              <p className="font-medium text-lg">
-                {getCredit?.selectedDetails.termMonths ? `${getCredit?.selectedDetails.termMonths} meses` : 'N/A'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Monto Aprobado</p>
-              <p className="font-medium text-lg text-green-600">
-                {formatCurrency(Number(getCredit?.selectedDetails.amount) || 0)}
-              </p>
-            </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>
   )
 }
+
+const InfoItem = ({
+  label,
+  value,
+  strong,
+  valueClass,
+}: {
+  label: string
+  value: string | number | undefined
+  strong?: boolean
+  valueClass?: string
+}) => (
+  <div>
+    <p className="text-sm text-gray-600">{label}</p>
+    <p className={`mt-0.5 ${strong ? 'font-semibold text-gray-900' : 'font-medium text-gray-800'} ${valueClass ?? ''}`}>
+      {value ?? 'N/A'}
+    </p>
+  </div>
+)

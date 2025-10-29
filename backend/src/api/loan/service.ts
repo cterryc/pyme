@@ -29,6 +29,7 @@ import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
 import { broadcastLoanStatusUpdate } from "../sse/controller";
 import config from "../../config/enviroment.config";
 import { Signature } from "../../entities/Signature.entity";
+import { User } from "../../entities/User.entity";
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -37,7 +38,8 @@ export default class LoanService {
   private readonly systemConfigRepo: Repository<SystemConfig>;
   private readonly industryRepo: Repository<Industry>;
   private readonly documentRepo: Repository<Document>;
-  private readonly signature: Repository<Signature>
+  private readonly signature: Repository<Signature>;
+  private readonly userRepo: Repository<User>;
 
   constructor() {
     this.loanRepo = AppDataSource.getRepository(CreditApplication);
@@ -46,7 +48,8 @@ export default class LoanService {
     this.systemConfigRepo = AppDataSource.getRepository(SystemConfig);
     this.industryRepo = AppDataSource.getRepository(Industry);
     this.documentRepo = AppDataSource.getRepository(Document);
-    this.signature = AppDataSource.getRepository(Signature)
+    this.signature = AppDataSource.getRepository(Signature);
+    this.userRepo = AppDataSource.getRepository(User);
   }
 
   async loanRequest(
@@ -389,6 +392,8 @@ export default class LoanService {
       relations: ["company"],
     });
 
+    const adminUser = await this.userRepo.findOne({ where: { id: adminUserId } });
+
     if (!application) {
       throw new HttpError(
         HttpStatus.NOT_FOUND,
@@ -458,7 +463,7 @@ export default class LoanService {
     const statusHistoryEntry = {
       status: newStatus,
       timestamp: now,
-      changedBy: adminUserId,
+      changedBy: adminUser?.email,
       reason: rejectionReason || userNotes || internalNotes || `Estado actualizado por administrador`,
     };
 
@@ -467,9 +472,14 @@ export default class LoanService {
       statusHistoryEntry,
     ];
 
+
+    if(newStatus === CreditApplicationStatus.APPROVED) {
+      application.approvedAmount = application.selectedAmount;
+    }
+
     
     if (newStatus === CreditApplicationStatus.APPROVED) {
-      const docUrlGenerate = "https://puaqabdbobgomkjepvjc.supabase.co/storage/v1/object/public/contrato-pdf/contrato/Contrato_Prestamo_Pyme.pdf"
+      const docUrlGenerate = "https://puaqabdbobgomkjepvjc.supabase.co/storage/v1/object/public/contrato-pdf/contrato/Contrato_Prestamo_Pyme.pdf";
       
       const options = {
         method: 'POST',
@@ -483,13 +493,13 @@ export default class LoanService {
           "doc_url": docUrlGenerate,
           "callback": `${config.BACKEND_URL}/api/loanRequest/firma`,
           "return_url": `${config.FRONTEND_URL}/panel`,
-          "description": "Contrato para pyme",
+          "description": "Términos y condiciones del contrato con Financia para la solicitud de préstamo",
           "external_ref" : application.id
         }) // Convert the data object to a JSON string
       };
+      console.log(`callback enviado en petición de firma: ${config.BACKEND_URL}/api/loanRequest/firma`);
       const response = await fetch(config.BACKEND_FIRMA, options);
       const data= await response.json() as apiFirmaResponse;
-
       console.log("data ==>",data);
       
       if (!data.success) {
@@ -499,8 +509,8 @@ export default class LoanService {
         );
       }
       // const urlFirma = 'https://firma-digital-alpha.vercel.app/panel/firmar-documento?signId=IDFIRMA'
-      application.requestId = data.payload.requestId
-      application.contractDocument = docUrlGenerate
+      application.requestId = data.payload.requestId;
+      application.contractDocument = docUrlGenerate;
     }
 
     await this.loanRepo.save(application);
@@ -624,7 +634,7 @@ export default class LoanService {
       rejectionReason: application.rejectionReason,
       internalNotes: application.internalNotes,
       userNotes: application.userNotes,
-      riskScore: application.riskScore,
+      riskScore: application.offerDetails?.calculationSnapshot.riskTierConfig,
       submittedAt: application.submittedAt,
       reviewedAt: application.reviewedAt,
       approvedAt: application.approvedAt,
@@ -825,7 +835,7 @@ export default class LoanService {
         signerName:body.signer_name,
         signerSurname:body.signer_surname,
         creditApplicationId:body.external_ref
-      })
-      return 200
+      });
+      return 200;
   } 
 }

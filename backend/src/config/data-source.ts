@@ -12,9 +12,10 @@ export const AppDataSource = new DataSource({
   password: config.DB_PASSWORD,
   database: config.DB_NAME,
   ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
-  synchronize: false, // Auto-sync in dev only
+  synchronize: !isProd, // Auto-sync in dev only, disabled in production
   logging: false,
   entities: [isProd ? "dist/entities/**/*.js" : "src/entities/**/*.ts"],
   migrations: [isProd ? "dist/migrations/**/*.js" : "src/migrations/**/*.ts"],
   subscribers: [isProd ? "dist/subscribers/**/*.js" : "src/subscribers/**/*.ts"],
+  //   dropSchema: true,
 });
