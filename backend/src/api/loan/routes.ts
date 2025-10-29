@@ -50,15 +50,9 @@ loanRouter.get(
 
 loanRouter.get(
     "/:id",
-    authenticate,
-    // schemaValidator(null, getCreditApplicationByIdParamsSchema),
-    validateUuid,
-    schemaValidator(null, getCreditApplicationByIdParamsSchema),
-
-    authenticate,
-    // schemaValidator(null, getCreditApplicationByIdParamsSchema),
+    // authenticate,
     // validateUuid,
-    // schemaValidator(null, getCreditApplicationByIdParamsSchema),
+    schemaValidator(null, getCreditApplicationByIdParamsSchema),
     LoanController.getCreditApplicationById
 );
 
