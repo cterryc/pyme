@@ -37,7 +37,6 @@ export interface responseLoanByUser {
     subbmitedAt?: Date;
     notes?: string;
     status?: string;
-    id?: string
 }
 
 export interface LoanCalculationResult {

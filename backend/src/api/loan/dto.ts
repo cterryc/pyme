@@ -14,7 +14,6 @@ export function responseLoanByUserDto(loan: any): responseLoanByUser {
         subbmitedAt: loan.submittedAt,
         notes: loan.userNotes,
         status: loan.status,
-        id: loan.id
     };
 }
 /**
