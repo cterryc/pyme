@@ -4,10 +4,10 @@ import { CreditApplication } from "./CreditApplication.entity";
 
 @Entity("signatures")
 export class Signature extends BaseEntity {
-  @Column({ type: "varchar", length: 255, nullable: false, name: 'signed_doc' })
+  @Column({ type: "varchar", length: 500, nullable: false, name: 'signed_doc' })
   signedDoc!: string;
 
-  @Column({ type: "varchar", length: 255, nullable: false, name: 'doc_hash' })
+  @Column({ type: "varchar", length: 500, nullable: false, name: 'doc_hash' })
   docHash!: string;
 
   @Column({ type: "varchar", length: 500, nullable: true, name: 'public_key' })
@@ -19,7 +19,7 @@ export class Signature extends BaseEntity {
   @Column({ type: "varchar", length: 500, nullable: true, name: 'signer_surname' })
   signerSurname?: string;
 
-  @Column({ type: "varchar", length: 255, nullable: true, name: 'external_ref' })
+  @Column({ type: "varchar", length: 500, nullable: true, name: 'external_ref' })
   externalRef?: string;
 
   // Relación con CreditApplication
