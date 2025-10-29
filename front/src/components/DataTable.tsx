@@ -49,16 +49,16 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
     return value
   }
 
-  const getAlignmentClass = (align?: string) => {
-    switch (align) {
-      case 'center':
-        return 'text-center'
-      case 'right':
-        return 'text-right'
-      default:
-        return 'text-left'
-    }
-  }
+  // const getAlignmentClass = (align?: string) => {
+  //   switch (align) {
+  //     case 'center':
+  //       return 'text-center'
+  //     case 'right':
+  //       return 'text-right'
+  //     default:
+  //       return 'text-left'
+  //   }
+  // }
 
   return (
     <div className='bg-white rounded-lg shadow overflow-hidden'>
@@ -69,10 +69,9 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignmentClass(
-                    column.align
-                  )}`}
-                  style={{ width: column.width }}
+                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider
+                  ${column.key != 'acciones' && 'text-left'}
+                    `}
                 >
                   {column.label}
                 </th>
@@ -81,15 +80,16 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
           </thead>
           <tbody className='bg-white divide-y divide-gray-200'>
             {data.map((row, index) => (
-              <tr
-                key={index}
-                className={`${onRowClick ? 'hover:bg-gray-50 cursor-pointer' : ''}`}
-                onClick={() => onRowClick?.(row)}
-              >
-                {columns.map((column) => (
+              <tr key={index}>
+                {columns.map((column, colIndex) => (
                   <td
                     key={column.key}
-                    className={`px-6 py-4 whitespace-nowrap text-sm ${getAlignmentClass(column.align)}`}
+                    className={`px-6 py-4 whitespace-nowrap text-sm`}
+                    onClick={() => {
+                      if (colIndex === columns.length - 1) {
+                        onRowClick?.(row)
+                      }
+                    }}
                   >
                     {renderCellValue(column, row[column.key], row)}
                   </td>

@@ -22,6 +22,7 @@ import {
   capsFor,
   interestRateFor,
   ApiFirmaBody,
+  apiFirmaResponse,
 } from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
 import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
@@ -486,13 +487,15 @@ export default class LoanService {
           "external_ref" : application.id
         }) // Convert the data object to a JSON string
       };
-      const response = await fetch(config.BACKEND_FIRMA, options)
-      const data = await response.json()
-      console.log("data ==>",data)
+      const response = await fetch(config.BACKEND_FIRMA, options);
+      const data= await response.json() as apiFirmaResponse;
+
+      console.log("data ==>",data);
+      
       if (!data.success) {
         throw new HttpError(
           HttpStatus.BAD_REQUEST,
-          data.payload.error
+          data.payload.error||'Error al crear la solicitud de firma'
         );
       }
       // const urlFirma = 'https://firma-digital-alpha.vercel.app/panel/firmar-documento?signId=IDFIRMA'

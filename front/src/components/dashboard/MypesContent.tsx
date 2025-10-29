@@ -70,40 +70,17 @@ export const MypesContent = () => {
   // ]
 
   const tableColumns = [
-    { key: 'legalName', label: 'NOMBRE LEGAL', width: '20%' },
-    { key: 'email', label: 'EMAIL', width: '25%' },
-    { key: 'phone', label: 'TELÉFONO', width: '10%' },
-    { key: 'industryName', label: 'EMPRESA', width: '20%', align: 'center' },
-    { key: 'createdAt', label: 'FECHA REGISTRO', width: '10%', align: 'center' },
-    { key: 'statusCredit', label: 'ESTADO DE CREDITO', width: '5%', align: 'center' },
+    { key: 'legalName', label: 'NOMBRE LEGAL' },
+    { key: 'industryName', label: 'TIPO DE EMPRESA' },
+    { key: 'createdAt', label: 'FECHA DE REGISTRO DE PYME'},
+    { key: 'statusCredit', label: 'ESTADO DE CREDITO' },
     {
       key: 'acciones',
       label: 'ACCIONES',
-      width: '15%',
-      render: (_value: any, row: any) => (
-        // <Select
-        //   options={[
-        //     { value: 'ver', label: 'Ver', icon: '👁️' },
-        //     { value: 'editar', label: 'Editar', icon: '✏️' }
-        //   ]}
-        //   placeholder='Opciones'
-        //   variant='button'
-        //   size='sm'
-        //   onSelect={(option) => {
-        //     // console.log(`Acción seleccionada: ${option.value} para cliente:`, row)
-        //     if (option.value === 'ver') {
-        //       // console.log('Ver cliente:', row.nombre)
-        //       setSelectedPymeData(row)
-        //       setAction('VIEW')
-        //     } else if (option.value === 'editar') {
-        //       // console.log('Editar cliente:', row.nombre)
-        //       setAction('EDIT')
-        //       setSelectedPymeData(row)
-        //     }
-        //   }}
-        // />
-        <div className='flex justify-between w-full text-xl'>
+      render: (_value: any, row) => (
+        <div className='flex justify-center items-center gap-5'>
           <button
+            className='text-xl cursor-pointer'
             onClick={() => {
               setAction('VIEW')
             }}
@@ -111,6 +88,7 @@ export const MypesContent = () => {
             👁️
           </button>
           <button
+            className='text-xl cursor-pointer'
             onClick={() => {
               setAction('EDIT')
             }}
@@ -138,7 +116,7 @@ export const MypesContent = () => {
     <div className='flex-1 bg-white'>
       {/* Header del contenido */}
       <div className='px-8 py-6 border-b border-gray-200'>
-        <h1 className='text-2xl font-bold text-gray-900'>Gestión de Clientes</h1>
+        <h1 className='text-2xl font-bold text-gray-900'>Gestión de Clientes Pymes</h1>
         <p className='text-gray-600 text-sm mt-1'>Administra y consulta la información de tus clientes PyME</p>
       </div>
 
@@ -184,7 +162,7 @@ export const MypesContent = () => {
                 </div>
               </div>
               <div className='ml-3'>
-                <p className='text-sm font-medium text-blue-800'>Total Clientes</p>
+                <p className='text-sm font-medium text-blue-800'>Total Clientes Pymes</p>
                 <p className='text-lg font-bold text-blue-900'>{totalClients}</p>
               </div>
             </div>
