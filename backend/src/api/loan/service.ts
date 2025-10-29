@@ -476,13 +476,13 @@ export default class LoanService {
           "doc_url": "https://puaqabdbobgomkjepvjc.supabase.co/storage/v1/object/public/contrato-pdf/contrato/Contrato_Prestamo_Pyme.pdf",
           "callback": `${config.BACKEND_URL}/api/loanRequest/firma`,
           "return_url": `${config.FRONTEND_URL}/panel`,
-          "description": "Contrato para pyme",
+          "description": "Términos y condiciones del contrato con Financia para la solicitud de préstamo",
           "external_ref" : application.id
         }) // Convert the data object to a JSON string
       };
+      console.log(`callback enviado en petición de firma: ${config.BACKEND_URL}/api/loanRequest/firma`)
       const response = await fetch(config.BACKEND_FIRMA, options);
       const data= await response.json() as apiFirmaResponse;
-
       console.log("data ==>",data);
       
       if (!data.success) {
