@@ -53,7 +53,7 @@ loanRouter.get(
 loanRouter.get(
     "/:id",
     authenticate,
-    schemaValidator(null, getCreditApplicationByIdParamsSchema),
+    // schemaValidator(null, getCreditApplicationByIdParamsSchema),
     LoanController.getCreditApplicationById
 );
 
@@ -64,13 +64,16 @@ loanRouter.delete(
     LoanController.deleteCreditApplication
 );
 
-loanRouter.post(
-    "/firma",
-    // schemaValidator(createCreditApplicationSchema, null),
-    (req, res) => {
-        console.log(req.body)
-        res.status(200).json({message: "Gracias"})
-    }
-);
+// loanRouter.post(
+//     "/firma",
+//     // schemaValidator(createCreditApplicationSchema, null),
+//     LoanController.apiFirma
+// );
+
+// loanRouter.post(
+//     "/firma",
+//     // schemaValidator(createCreditApplicationSchema, null),
+//     LoanController.apiFirma
+// );
 
 export default loanRouter;

@@ -116,6 +116,9 @@ export class CreditApplication extends BaseEntity {
   @Column({ type: "jsonb", nullable: true })
   formData?: Record<string, any>; // Store dynamic form data
 
+  @Column({ name: "contract_document", nullable: true })
+  contractDocument?: string;
+
   // Relations
   @ManyToOne(() => Company, (company) => company.creditApplications, {
     onDelete: "CASCADE",
