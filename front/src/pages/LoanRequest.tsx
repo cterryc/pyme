@@ -1,14 +1,14 @@
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import type { LoanRequestOptions } from '@/interfaces/pyme.interface'
 import { usePymeLoanRequest, usePymeLoanRequestConfirm } from '@/hooks/usePyme'
 import { formatToDolar } from '@/helpers/formatToDolar'
 import { toast } from 'sonner'
-import { Loading } from '@/components/Loading'
+import { SkeletonLoanForm } from '@/components/SkeletonLoanForm'
 import { useQueryClient } from '@tanstack/react-query'
-import { ImSpinner8 } from 'react-icons/im'
+import { debounce } from '@/utils/debounce'
 
 export const LoanRequest = () => {
   const queryClient = useQueryClient()
@@ -19,6 +19,17 @@ export const LoanRequest = () => {
   const [enableSend, setEnableSend] = useState(false)
 
   const { id: pymeID } = useParams<{ id: string }>()
+
+  const debouncedToastInfo = useCallback(
+    debounce((message: string, description: string) => {
+      toast.info(message, {
+        style: { borderColor: '#3b82f6', backgroundColor: '#eff6ff', borderWidth: '2px' },
+        description,
+        duration: 3000
+      })
+    }, 1500),
+    []
+  )
 
   const { mutate: loanRequest, isPending } = usePymeLoanRequest({
     onSuccess: (data) => {
@@ -129,85 +140,97 @@ export const LoanRequest = () => {
   }
 
   return (
-    <div className='flex flex-col min-h-screen'>
+    <div className='flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50'>
       <Header />
       {!isPending ? (
-        <section className='flex-1 flex flex-col gap-15 justify-center items-center py-5'>
-          <form className='p-10 rounded-xl grid grid-cols-2 bg-white max-w-xl shadow-2xl gap-6' onSubmit={handleSubmit}>
-            <div className='col-span-2'>
-              <p className='text-[#334155] font-medium'>Nombre de la empresa:</p>
+        <section className='flex-1 flex flex-col justify-center items-center py-8 px-4'>
+          <div className='w-full max-w-2xl mb-6 text-center'>
+            <div className='inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-lg mb-4' style={{ background: 'linear-gradient(135deg, #1193d4 0%, #0a7ab8 100%)' }}>
+              <svg className='w-8 h-8 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+              </svg>
+            </div>
+            <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-2'>Solicitud de Crédito</h2>
+            <p className='text-gray-600'>Completa los detalles para tu préstamo empresarial</p>
+          </div>
+          <form className='p-6 sm:p-10 rounded-2xl grid grid-cols-1 sm:grid-cols-2 bg-white max-w-2xl w-full shadow-2xl gap-6 border border-gray-100' onSubmit={handleSubmit}>
+            <div className='sm:col-span-2'>
+              <label className='text-sm font-semibold text-gray-700 mb-2 block'>Nombre de la empresa</label>
               <input
                 type='text'
-                className='border border-[#bbb] p-3 text-[#6e7d93] bg-[#f1f5f9] w-full rounded-md'
+                className='border-2 border-gray-200 p-3 text-gray-600 bg-gray-50 w-full rounded-xl font-medium'
                 disabled
                 value={loanOptions?.legalName}
               />
             </div>
-            <div className='col-span-1'>
-              <p className='text-[#334155] font-medium'>Monto mínimo</p>
-              <input
-                type='text'
-                className='border border-[#bbb] p-3 text-[#6e7d93] bg-[#f1f5f9] w-full rounded-md'
-                disabled
-                value={formatToDolar(Number(loanOptions?.offerDetails.minAmount))}
-              />
+            <div className='sm:col-span-1'>
+              <label className='text-sm font-semibold text-gray-700 mb-2 block'>Monto mínimo</label>
+              <div className='border-2 border-green-200 bg-green-50 p-3 rounded-xl'>
+                <p className='text-green-700 font-bold text-lg'>{formatToDolar(Number(loanOptions?.offerDetails.minAmount))}</p>
+              </div>
             </div>
-            <div className='col-span-1'>
-              <p className='text-[#334155] font-medium'>Monto máximo</p>
-              <input
-                type='text'
-                className='border border-[#bbb] p-3 text-[#6e7d93] bg-[#f1f5f9] w-full rounded-md'
-                disabled
-                value={formatToDolar(Number(loanOptions?.offerDetails.maxAmount))}
-              />
+            <div className='sm:col-span-1'>
+              <label className='text-sm font-semibold text-gray-700 mb-2 block'>Monto máximo</label>
+              <div className='border-2 bg-blue-50 p-3 rounded-xl' style={{ borderColor: '#1193d4' }}>
+                <p className='font-bold text-lg' style={{ color: '#1193d4' }}>{formatToDolar(Number(loanOptions?.offerDetails.maxAmount))}</p>
+              </div>
             </div>
 
-            <div className='flex flex-col gap-1 col-span-2 '>
-              <p className='text-sm'>Monto a solicitar</p>
+            <div className='flex flex-col gap-2 sm:col-span-2'>
+              <label className='text-sm font-semibold text-gray-700'>Monto a solicitar</label>
 
-              <div className='flex items-center border gap-2 border-[#D1D5DB] overflow-hidden rounded-md focus-within:border-black '>
-                <span className='text-[var(--font-title-light)] bg-[#D1D5DB] p-3'>$</span>
+              <div className='flex items-center border-2 gap-0 border-gray-300 overflow-hidden rounded-xl transition-all focus-within:ring-2' style={{ '--tw-ring-color': '#1193d433' } as React.CSSProperties} onFocus={(e) => e.currentTarget.style.borderColor = '#1193d4'} onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}>
+                <span className='text-gray-700 bg-gray-100 px-4 py-3 font-semibold'>$</span>
                 <input
                   type='number'
-                  className='w-full outline-none py-3'
-                  placeholder='1000'
+                  className='w-full outline-none py-3 px-4 text-lg font-semibold text-gray-800'
+                  placeholder='Ingresa el monto'
                   value={selectedAmount || ''}
-                  // min={successResponse.minAmount}
-                  // max={successResponse.maxAmount}
                   onChange={(e) => {
                     const value = Number(e.target.value)
                     const maxAmount = Number(loanOptions?.offerDetails.maxAmount)
                     const minAmount = Number(loanOptions?.offerDetails.minAmount)
                     
+                    // Simplemente establecer el valor sin validaciones automáticas
+                    setSelectedAmount(value)
+                    
+                    // Mostrar advertencia si está fuera del rango (con debounce)
                     if (value > maxAmount) {
-                      setSelectedAmount(maxAmount)
-                      toast.info('Monto ajustado', {
-                        style: { borderColor: '#3b82f6', backgroundColor: '#eff6ff', borderWidth: '2px' },
-                        description: `El monto ingresado supera el máximo permitido. Se ha ajustado a ${formatToDolar(maxAmount)}.`,
-                        duration: 3000
-                      })
-                    } else if (value < minAmount && value > 0) {
-                      setSelectedAmount(minAmount)
-                      toast.info('Monto ajustado', {
-                        style: { borderColor: '#3b82f6', backgroundColor: '#eff6ff', borderWidth: '2px' },
-                        description: `El monto ingresado es menor al mínimo permitido. Se ha ajustado a ${formatToDolar(minAmount)}.`,
-                        duration: 3000
-                      })
-                    } else {
-                      setSelectedAmount(value)
+                      debouncedToastInfo(
+                        'Monto fuera de rango',
+                        `El monto máximo permitido es ${formatToDolar(maxAmount)}.`
+                      )
+                    } else if (value > 0 && value < minAmount) {
+                      debouncedToastInfo(
+                        'Monto fuera de rango',
+                        `El monto mínimo permitido es ${formatToDolar(minAmount)}.`
+                      )
                     }
                   }}
                 />
-                <span className='text-[#414141FF] bg-[#D1D5DB] p-3'>US$</span>
+                <span className='text-gray-700 bg-gray-100 px-4 py-3 font-semibold'>USD</span>
               </div>
+              {selectedAmount > 0 && (
+                <p className={`text-xs font-medium mt-1 ${
+                  selectedAmount >= Number(loanOptions?.offerDetails.minAmount) && 
+                  selectedAmount <= Number(loanOptions?.offerDetails.maxAmount)
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}>
+                  {selectedAmount >= Number(loanOptions?.offerDetails.minAmount) && 
+                   selectedAmount <= Number(loanOptions?.offerDetails.maxAmount)
+                    ? '✓ Monto válido'
+                    : '✗ Monto fuera del rango permitido'}
+                </p>
+              )}
             </div>
 
-            <div className='col-span-2'>
-              <p className='text-[#334155] font-medium '>Seleccione el plazo de pago</p>
-              <div className='flex gap-4 justify-center flex-wrap my-4'>
+            <div className='sm:col-span-2'>
+              <label className='text-sm font-semibold text-gray-700 mb-3 block'>Seleccione el plazo de pago</label>
+              <div className='flex gap-3 justify-center flex-wrap'>
                 {loanOptions?.offerDetails.allowedTerms.map((term, i) => (
                   <RadioButton
-                    text={`${term} MESES`}
+                    text={`${term} meses`}
                     key={i}
                     selected={selectedTerm == term}
                     onClick={() => {
@@ -219,47 +242,69 @@ export const LoanRequest = () => {
             </div>
 
             {selectedAmount > 0 && selectedTerm > 0 && (
-              <div className='col-span-2 flex gap-1 flex-col items-center bg-[#f8fafc] border border-[#ccc] rounded-xl p-5'>
-                <p className='text-[#334155] font-medium mb-2'>Resumen de la solicitud:</p>
+              <div className='sm:col-span-2 flex gap-3 flex-col rounded-2xl p-6 shadow-lg animate-in fade-in slide-in-from-bottom duration-300' style={{ background: 'linear-gradient(135deg, #e6f6fc 0%, #f0f9ff 100%)', borderWidth: '2px', borderColor: '#1193d4' }}>
+                <div className='flex items-center gap-2 mb-2'>
+                  <svg className='w-5 h-5' style={{ color: '#1193d4' }} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
+                  </svg>
+                  <p className='text-gray-800 font-bold text-lg'>Resumen de la solicitud</p>
+                </div>
 
-                <div className='flex w-full justify-between text-sm'>
-                  <p>Monto del crédito :</p>
-                  <p className='text-[#333] font-medium'>{formatToDolar(selectedAmount)}</p>
-                </div>
-                <div className='flex w-full justify-between text-sm'>
-                  <p>Cantidad de cuotas :</p>
-                  <p className='text-[#333] font-medium'>{selectedTerm}</p>
-                </div>
-                <div className='flex w-full justify-between text-sm'>
-                  <p>Monto por cuota :</p>
-                  <p className='text-[#333] font-medium'>
-                    {formatToDolar(
-                      (selectedAmount * (1 + Number(loanOptions?.offerDetails.interestRate) / 100)) / selectedTerm
-                    )}
-                  </p>
-                </div>
-                <div className='flex w-full justify-between text-sm '>
-                  <p>Interés :</p>
-                  <p className='text-[#333] font-medium'>{loanOptions?.offerDetails.interestRate} %</p>
-                </div>
-                <div className='flex w-full justify-between text border-t-1 mt-3 border-[#ccc] py-2'>
-                  <p className='text-[#333] font-medium'>Total a pagar:</p>
-                  <p className='text-[var(--primary)] font-medium'>
-                    {formatToDolar(selectedAmount * (1 + Number(loanOptions?.offerDetails.interestRate) / 100))}
-                  </p>
+                <div className='space-y-3'>
+                  <div className='flex w-full justify-between items-center bg-white/60 backdrop-blur-sm px-4 py-2 rounded-lg'>
+                    <p className='text-gray-600 text-sm font-medium'>Monto del crédito</p>
+                    <p className='text-gray-900 font-bold'>{formatToDolar(selectedAmount)}</p>
+                  </div>
+                  <div className='flex w-full justify-between items-center bg-white/60 backdrop-blur-sm px-4 py-2 rounded-lg'>
+                    <p className='text-gray-600 text-sm font-medium'>Cantidad de cuotas</p>
+                    <p className='text-gray-900 font-bold'>{selectedTerm} meses</p>
+                  </div>
+                  <div className='flex w-full justify-between items-center bg-white/60 backdrop-blur-sm px-4 py-2 rounded-lg'>
+                    <p className='text-gray-600 text-sm font-medium'>Monto por cuota</p>
+                    <p className='text-gray-900 font-bold'>
+                      {formatToDolar(
+                        (selectedAmount * (1 + Number(loanOptions?.offerDetails.interestRate) / 100)) / selectedTerm
+                      )}
+                    </p>
+                  </div>
+                  <div className='flex w-full justify-between items-center bg-white/60 backdrop-blur-sm px-4 py-2 rounded-lg'>
+                    <p className='text-gray-600 text-sm font-medium'>Tasa de interés</p>
+                    <p className='text-gray-900 font-bold'>{loanOptions?.offerDetails.interestRate}%</p>
+                  </div>
+                  <div className='flex w-full justify-between items-center px-4 py-3 rounded-xl shadow-md mt-2' style={{ background: 'linear-gradient(90deg, #1193d4 0%, #0a7ab8 100%)' }}>
+                    <p className='text-white font-bold text-base'>Total a pagar</p>
+                    <p className='text-white font-bold text-xl'>
+                      {formatToDolar(selectedAmount * (1 + Number(loanOptions?.offerDetails.interestRate) / 100))}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
             {!isPendingLoanConfirm ? (
-              <input
+              <button
                 type='submit'
-                className='bg-[var(--primary)] col-span-2 py-3 rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150'
-                value='Enviar solicitud'
-                style={{ 
-                  background: !enableSend ? 'gray' : '',
-                  cursor: !enableSend ? 'not-allowed' : 'pointer'
-                }}
                 disabled={!enableSend}
+                className='sm:col-span-2 py-3 px-6 rounded-xl font-bold text-white transition-all duration-200 shadow-lg flex items-center justify-center gap-2'
+                style={enableSend ? { 
+                  background: 'linear-gradient(90deg, #1193d4 0%, #0a7ab8 100%)',
+                  cursor: 'pointer'
+                } : {
+                  background: '#9ca3af',
+                  cursor: 'not-allowed',
+                  opacity: 0.6
+                }}
+                onMouseEnter={(e) => {
+                  if (enableSend) {
+                    e.currentTarget.style.background = 'linear-gradient(90deg, #0a7ab8 0%, #085a8f 100%)'
+                    e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (enableSend) {
+                    e.currentTarget.style.background = 'linear-gradient(90deg, #1193d4 0%, #0a7ab8 100%)'
+                    e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                  }
+                }}
                 onClick={(e) => {
                   if (!enableSend) {
                     e.preventDefault()
@@ -270,24 +315,32 @@ export const LoanRequest = () => {
                     })
                   }
                 }}
-              />
+              >
+                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
+                </svg>
+                <span>Enviar solicitud</span>
+              </button>
             ) : (
-              <div className='bg-[gray] text-center col-span-2 py-3 flex justify-center rounded-md text-white font-medium cursor-pointer'>
-                <ImSpinner8 className='animate-spin' />
+              <div className='sm:col-span-2 text-center py-3 flex justify-center items-center gap-3 rounded-xl text-white font-bold shadow-lg' style={{ background: 'linear-gradient(90deg, #1193d4 0%, #0a7ab8 100%)' }}>
+                <div className='relative w-5 h-5'>
+                  <div className='absolute inset-0 rounded-full border-2 border-t-transparent border-white animate-spin'></div>
+                </div>
+                <span>Procesando solicitud...</span>
               </div>
             )}
             <Link
               to='/panel'
-              className='bg-[var(--primary)] col-span-2 p-3  rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150 w-full text-center'
+              className='sm:col-span-2 bg-white border-2 border-gray-300 text-gray-700 p-3 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-center shadow-sm'
             >
               Volver al inicio
             </Link>
           </form>
         </section>
       ) : (
-        <div className='flex-1'>
-          <Loading dark />
-        </div>
+        <section className='flex-1 flex flex-col gap-15 justify-center items-center py-5 px-4'>
+          <SkeletonLoanForm />
+        </section>
       )}
       <Footer />
     </div>
@@ -301,19 +354,38 @@ const RadioButton = ({
 }: {
   text: string
   selected: boolean
-  onClick: React.MouseEventHandler<HTMLSpanElement>
+  onClick: React.MouseEventHandler<HTMLButtonElement>
 }) => {
   return (
-    <span
+    <button
+      type='button'
       onClick={onClick}
-      className='bg-white text-black p-2 px-4 border ccc  rounded-xlrounded-lg block cursor-pointer text-center'
-      style={{
-        background: selected ? 'var(--primary)' : 'white',
-        color: selected ? 'white' : 'var(--font-title-light)',
-        borderColor: selected ? 'var(--primary)' : '#ccc'
+      className={`relative px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 border-2 ${
+        selected
+          ? 'text-white shadow-lg scale-105'
+          : 'bg-white border-gray-300 text-gray-700 hover:bg-blue-50'
+      }`}
+      style={selected ? {
+        background: 'linear-gradient(90deg, #1193d4 0%, #0a7ab8 100%)',
+        borderColor: '#1193d4'
+      } : undefined}
+      onMouseEnter={(e) => {
+        if (!selected) {
+          e.currentTarget.style.borderColor = '#1193d4'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!selected) {
+          e.currentTarget.style.borderColor = '#d1d5db'
+        }
       }}
     >
+      {selected && (
+        <svg className='absolute top-1 right-1 w-4 h-4 text-white' fill='currentColor' viewBox='0 0 20 20'>
+          <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+        </svg>
+      )}
       {text}
-    </span>
+    </button>
   )
 }
