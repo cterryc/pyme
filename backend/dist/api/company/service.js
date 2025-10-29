@@ -292,4 +292,3 @@ class CompanyService {
     }
 }
 exports.default = CompanyService;
-//# sourceMappingURL=service.js.map

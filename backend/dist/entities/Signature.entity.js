@@ -58,4 +58,3 @@ __decorate([
 exports.Signature = Signature = __decorate([
     (0, typeorm_1.Entity)("signatures")
 ], Signature);
-//# sourceMappingURL=Signature.entity.js.map

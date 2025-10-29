@@ -40,4 +40,3 @@ const schemaValidator = (schema, paramsSchema) => {
     };
 };
 exports.default = schemaValidator;
-//# sourceMappingURL=schemaValidators.middlewares.js.map

@@ -147,4 +147,3 @@ class AdminService {
     }
 }
 exports.default = AdminService;
-//# sourceMappingURL=service.js.map

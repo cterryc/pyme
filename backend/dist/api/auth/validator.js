@@ -113,4 +113,3 @@ exports.verifyEmailValidator = zod_1.z.object({
 exports.resendVerificationValidator = zod_1.z.object({
     email: zod_1.z.string().email({ message: "Dirección de email inválida" }),
 });
-//# sourceMappingURL=validator.js.map

@@ -17,9 +17,8 @@ exports.AppDataSource = new typeorm_1.DataSource({
     ssl: enviroment_config_1.default.DB_SSL ? { rejectUnauthorized: false } : false,
     synchronize: true, // Auto-sync in dev only
     logging: false,
-    entities: ["src/entities/**/*.ts"],
-    migrations: ["src/migrations/**/*.ts"],
-    subscribers: ["src/subscribers/**/*.ts"],
+    entities: ["src/entities/**/*.js"],
+    migrations: ["src/migrations/**/*.js"],
+    subscribers: ["src/subscribers/**/*.js"],
     //   dropSchema: true,
 });
-//# sourceMappingURL=data-source.js.map

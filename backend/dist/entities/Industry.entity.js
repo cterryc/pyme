@@ -40,4 +40,3 @@ __decorate([
 exports.Industry = Industry = __decorate([
     (0, typeorm_1.Entity)("industries")
 ], Industry);
-//# sourceMappingURL=Industry.entity.js.map

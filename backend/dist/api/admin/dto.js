@@ -23,4 +23,3 @@ const mapIndustryToDto = (entity) => ({
     description: entity.description,
 });
 exports.mapIndustryToDto = mapIndustryToDto;
-//# sourceMappingURL=dto.js.map

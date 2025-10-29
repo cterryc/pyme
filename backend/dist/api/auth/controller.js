@@ -102,4 +102,3 @@ AuthController.resendVerification = async (req, res, next) => {
     }
 };
 exports.default = AuthController;
-//# sourceMappingURL=controller.js.map

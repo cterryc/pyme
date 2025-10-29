@@ -31,4 +31,3 @@ __decorate([
 exports.SystemConfig = SystemConfig = __decorate([
     (0, typeorm_1.Entity)("system_configs")
 ], SystemConfig);
-//# sourceMappingURL=System_config.entity.js.map

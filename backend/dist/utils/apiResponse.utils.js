@@ -14,4 +14,3 @@ const apiResponse = (success, payload) => {
     };
 };
 exports.default = apiResponse;
-//# sourceMappingURL=apiResponse.utils.js.map

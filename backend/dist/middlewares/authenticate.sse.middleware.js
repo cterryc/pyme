@@ -54,4 +54,3 @@ async function authenticateSSE(req, res, next) {
         return;
     }
 }
-//# sourceMappingURL=authenticate.sse.middleware.js.map

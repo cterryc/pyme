@@ -25,4 +25,3 @@ apiRouter.use("/" /* path */, (req, res) => {
     console.log("API is working!");
 });
 exports.default = apiRouter;
-//# sourceMappingURL=index.js.map

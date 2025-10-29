@@ -15,4 +15,3 @@ class HttpError extends Error {
     }
 }
 exports.default = HttpError;
-//# sourceMappingURL=HttpError.utils.js.map

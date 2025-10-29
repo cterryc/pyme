@@ -24,4 +24,3 @@ documentRouter.delete("/:id", validateParamId_middleware_1.validateUuid, control
 documentRouter.get("/:id/download", validateParamId_middleware_1.validateUuid, controller_1.default.getDocumentDownloadUrl);
 documentRouter.patch("/:id/status", validateParamId_middleware_1.validateUuid, (0, schemaValidators_middlewares_1.default)(validator_1.updateDocumentStatusValidator, null), controller_1.default.updateDocumentStatus);
 exports.default = documentRouter;
-//# sourceMappingURL=routes.js.map

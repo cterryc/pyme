@@ -314,7 +314,7 @@ class LoanService {
             const data = await response.json();
             console.log("data ==>", data);
             if (!data.success) {
-                throw new HttpError_utils_1.default(HttpStatus_1.HttpStatus.BAD_REQUEST, data.payload.error);
+                throw new HttpError_utils_1.default(HttpStatus_1.HttpStatus.BAD_REQUEST, data.payload.error || 'Error al crear la solicitud de firma');
             }
             // const urlFirma = 'https://firma-digital-alpha.vercel.app/panel/firmar-documento?signId=IDFIRMA'
             application.requestId = data.payload.requestId;
@@ -576,4 +576,3 @@ class LoanService {
     }
 }
 exports.default = LoanService;
-//# sourceMappingURL=service.js.map

@@ -14,4 +14,3 @@ var HttpStatus;
     HttpStatus[HttpStatus["SERVER_ERROR"] = 500] = "SERVER_ERROR";
 })(HttpStatus || (exports.HttpStatus = HttpStatus = {}));
 exports.default = HttpStatus;
-//# sourceMappingURL=HttpStatus.js.map

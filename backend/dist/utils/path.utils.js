@@ -7,4 +7,3 @@ const currentFilePath = __filename;
 const currentDir = (0, path_1.dirname)(currentFilePath);
 const rootPath = (0, path_1.resolve)(currentDir, "../");
 exports.rootPath = rootPath;
-//# sourceMappingURL=path.utils.js.map

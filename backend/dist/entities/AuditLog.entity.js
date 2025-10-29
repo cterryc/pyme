@@ -63,4 +63,3 @@ __decorate([
 exports.AuditLog = AuditLog = __decorate([
     (0, typeorm_1.Entity)("audit_logs")
 ], AuditLog);
-//# sourceMappingURL=AuditLog.entity.js.map

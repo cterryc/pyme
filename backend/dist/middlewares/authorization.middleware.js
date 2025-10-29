@@ -22,4 +22,3 @@ const authorizeRoles = (roles) => {
     };
 };
 exports.default = authorizeRoles;
-//# sourceMappingURL=authorization.middleware.js.map

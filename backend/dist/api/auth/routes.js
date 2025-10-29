@@ -19,4 +19,3 @@ authRouter.post("/resend-verification", (0, schemaValidators_middlewares_1.defau
 // Protected routes
 authRouter.patch("/profile", authenticate_middleware_1.default, (0, schemaValidators_middlewares_1.default)(validator_1.userUpdatePayloadValidator, null), controller_1.default.updateUser);
 exports.default = authRouter;
-//# sourceMappingURL=routes.js.map

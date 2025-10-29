@@ -37,4 +37,3 @@ adminRouter.get("/credit-applications/:id", validateParamId_middleware_1.validat
 adminRouter.get("/credit-applications/:id/allowed-transitions", validateParamId_middleware_1.validateUuid, controller_1.default.getAllowedStatusTransitions);
 adminRouter.patch("/credit-applications/:id/status", validateParamId_middleware_1.validateUuid, (0, schemaValidators_middlewares_1.default)(validator_2.updateCreditApplicationStatusBodySchema, null), controller_1.default.updateCreditApplicationStatus);
 exports.default = adminRouter;
-//# sourceMappingURL=routes.js.map

@@ -7,4 +7,3 @@ var UserRole;
     UserRole["COMPANY"] = "Company";
     UserRole["OWNER"] = "Owner";
 })(UserRole || (exports.UserRole = UserRole = {}));
-//# sourceMappingURL=Roles.js.map

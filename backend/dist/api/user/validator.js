@@ -54,4 +54,3 @@ exports.userUpdatePayloadValidator = zod_1.z.object({
         .optional(),
     currentPassword: zod_1.z.string().optional(),
 });
-//# sourceMappingURL=validator.js.map

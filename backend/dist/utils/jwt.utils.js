@@ -78,4 +78,3 @@ const generateVerificationCode = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 exports.generateVerificationCode = generateVerificationCode;
-//# sourceMappingURL=jwt.utils.js.map
