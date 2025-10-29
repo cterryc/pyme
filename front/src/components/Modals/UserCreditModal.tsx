@@ -1,4 +1,5 @@
 import type { LoanRequestPayload } from "@/interfaces/loan.interface"
+import { getSecureIdUrlSafe } from "@/config/SecureIdUrl"
 
 interface UserCreditModalProps {
   getCredit: LoanRequestPayload | null
@@ -16,6 +17,24 @@ export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalPr
     }).format(amount)
   }
 
+  const handleSignDocument = () => {
+    const baseUrl = getSecureIdUrlSafe()
+    if (!baseUrl) {
+      console.error('URL de firma no configurada')
+      return
+    }
+    
+    const requestId = getCredit?.id
+    if (!requestId) {
+      console.error('ID de solicitud no disponible')
+      return
+    }
+
+    const signUrl = `${baseUrl}/panel/firmar-documento?signId=${requestId}`
+    window.open(signUrl, '_blank')
+  }
+
+  console.log(getCredit)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="max-w-3xl w-full bg-white rounded-2xl shadow-2xl animate-[fadeIn_0.2s_ease-out,scaleIn_0.2s_ease-out] overflow-hidden">
@@ -107,6 +126,24 @@ export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalPr
               />
             </div>
           </section>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+            <button
+              onClick={setToggleModal}
+              className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition-all duration-200 hover:shadow-md"
+            >
+              Cerrar
+            </button>
+            <button
+              onClick={handleSignDocument}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1193d4] to-[#0d7ab8] hover:from-[#0d7ab8] hover:to-[#0a6399] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Firmar
+            </button>
+          </div>
         </div>
       </div>
     </div>
