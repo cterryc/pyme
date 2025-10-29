@@ -29,6 +29,7 @@ export interface responseLoanRequest {
 }
 
 export interface responseLoanByUser {
+    id?: string
     nameCompany?: string;
     requestAmonut?: number;
     subbmitedAt?: Date;

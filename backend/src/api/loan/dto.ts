@@ -8,6 +8,7 @@ import { responseLoanRequest, LoanCalculationResult } from "./interface";
  */
 export function responseLoanByUserDto(loan: any): responseLoanByUser {
     return {
+        id: loan.id,
         nameCompany: loan.company?.legalName,
         requestAmonut: loan.selectedAmount,
         subbmitedAt: loan.submittedAt,
