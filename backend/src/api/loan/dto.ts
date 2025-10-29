@@ -11,6 +11,7 @@ export function responseLoanByUserDto(loan: any): responseLoanByUser {
         nameCompany: loan.company?.legalName,
         requestAmonut: loan.selectedAmount,
         subbmitedAt: loan.submittedAt,
+        notes: loan.userNotes,
         status: loan.status,
         id: loan.id
     };
