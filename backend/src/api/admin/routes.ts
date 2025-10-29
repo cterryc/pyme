@@ -14,14 +14,16 @@ import {
  updateIndustrySchema,
  } from "./validator";
 import { 
-  updateCreditApplicationStatusParamsSchema,
   updateCreditApplicationStatusBodySchema,
   getCreditApplicationsForAdminQuerySchema 
 } from "../loan/validator";
 
  const adminRouter = Router();
 
- adminRouter.use(authenticate, authorizeRoles([UserRole.ADMIN, UserRole.OWNER]));
+ adminRouter.use(
+  authenticate, 
+  authorizeRoles([UserRole.ADMIN, UserRole.OWNER])
+);
 
  adminRouter.get("/systemconfig", AdminController.listSystemConfigs);
 
@@ -108,13 +110,28 @@ adminRouter.delete(
 
 // CREDIT APPLICATIONS MANAGEMENT
 adminRouter.get(
+  "/dashboard/stats",
+  AdminController.getDashboardStats
+);
+adminRouter.get(
   "/credit-applications", 
   schemaValidator(null, getCreditApplicationsForAdminQuerySchema),
   AdminController.getCreditApplicationsForAdmin
 );
+adminRouter.get(
+  "/credit-applications/:id",
+  validateUuid,
+  AdminController.getCreditApplicationByIdForAdmin
+);
+adminRouter.get(
+  "/credit-applications/:id/allowed-transitions",
+  validateUuid,
+  AdminController.getAllowedStatusTransitions
+);
 adminRouter.patch(
   "/credit-applications/:id/status",
-  schemaValidator(updateCreditApplicationStatusBodySchema, updateCreditApplicationStatusParamsSchema),
+  validateUuid,
+  schemaValidator(updateCreditApplicationStatusBodySchema, null),
   AdminController.updateCreditApplicationStatus
 );
 

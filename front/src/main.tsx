@@ -10,13 +10,18 @@ import { InactivityModal } from './components/Modals/InactivityModal.tsx'
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+
     <QueryClientProvider client={queryClient}>
       <InactivityModal>
-        <Toaster position='top-center' closeButton
-          visibleToasts={1} />
+        <Toaster 
+          position='top-center' 
+          closeButton
+          visibleToasts={3}
+          richColors
+          expand={false}
+          duration={4000}
+        />
         <RouterProvider router={mainRouter} />
       </InactivityModal>
     </QueryClientProvider>
-  </StrictMode>
 )

@@ -42,18 +42,6 @@ export interface UserDTO {
   updatedAt: Date;
 }
 
-// export interface UserDTO {
-//   id: string;
-//   email: string;
-//   firstName: string;
-//   lastName: string;
-//   phone?: string | null;
-//   role: UserRole
-//   isEmailVerified: boolean;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
-
 export interface IForgotPasswordPayload {
   email: string;
 }

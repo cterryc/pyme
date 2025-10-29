@@ -12,6 +12,7 @@ const textField = (minChars: number, requiredMessage?: string, minMessage?: stri
       (val) => val.replace(/\s/g, '').length >= minChars,
       minMessage || `Debe tener al menos ${minChars} caracteres`
     )
+    .refine((val) => /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9.,-\s]+$/.test(val), 'No se permiten caracteres especiales')
 }
 
 const validateUrl = (url: string) => {
@@ -45,7 +46,7 @@ const getPhoneRegexForCountry = (countryCode: number) => {
 
 const getCountryFormatMessage = (countryCode: number) => {
   const countryNames = {
-    0: 'Para Uruguay es 9 XXX XXX',
+    0: 'Para Uruguay es 9X XXX XXX',
     1: 'Para Argentina es 9 XXX XXX XXX',
     2: 'Para Perú es 9 XX XX XX XX',
     3: 'Para Paraguay es 9 XX XXX XXX'

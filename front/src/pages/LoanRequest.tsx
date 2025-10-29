@@ -171,10 +171,31 @@ export const LoanRequest = () => {
                   type='number'
                   className='w-full outline-none py-3'
                   placeholder='1000'
+                  value={selectedAmount || ''}
                   // min={successResponse.minAmount}
                   // max={successResponse.maxAmount}
                   onChange={(e) => {
-                    setSelectedAmount(Number(e.target.value))
+                    const value = Number(e.target.value)
+                    const maxAmount = Number(loanOptions?.offerDetails.maxAmount)
+                    const minAmount = Number(loanOptions?.offerDetails.minAmount)
+                    
+                    if (value > maxAmount) {
+                      setSelectedAmount(maxAmount)
+                      toast.info('Monto ajustado', {
+                        style: { borderColor: '#3b82f6', backgroundColor: '#eff6ff', borderWidth: '2px' },
+                        description: `El monto ingresado supera el máximo permitido. Se ha ajustado a ${formatToDolar(maxAmount)}.`,
+                        duration: 3000
+                      })
+                    } else if (value < minAmount && value > 0) {
+                      setSelectedAmount(minAmount)
+                      toast.info('Monto ajustado', {
+                        style: { borderColor: '#3b82f6', backgroundColor: '#eff6ff', borderWidth: '2px' },
+                        description: `El monto ingresado es menor al mínimo permitido. Se ha ajustado a ${formatToDolar(minAmount)}.`,
+                        duration: 3000
+                      })
+                    } else {
+                      setSelectedAmount(value)
+                    }
                   }}
                 />
                 <span className='text-[#414141FF] bg-[#D1D5DB] p-3'>US$</span>
@@ -234,8 +255,21 @@ export const LoanRequest = () => {
                 type='submit'
                 className='bg-[var(--primary)] col-span-2 py-3 rounded-md text-white font-medium cursor-pointer hover:bg-[#0c6b9b] duration-150'
                 value='Enviar solicitud'
-                style={{ background: !enableSend ? 'gray' : '' }}
+                style={{ 
+                  background: !enableSend ? 'gray' : '',
+                  cursor: !enableSend ? 'not-allowed' : 'pointer'
+                }}
                 disabled={!enableSend}
+                onClick={(e) => {
+                  if (!enableSend) {
+                    e.preventDefault()
+                    toast.error('No se puede enviar la solicitud', {
+                      style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
+                      description: 'Por favor, verifica que hayas ingresado un monto válido y seleccionado un plazo de pago.',
+                      duration: 3000
+                    })
+                  }
+                }}
               />
             ) : (
               <div className='bg-[gray] text-center col-span-2 py-3 flex justify-center rounded-md text-white font-medium cursor-pointer'>

@@ -4,10 +4,12 @@ import { HiOutlineChevronDown, HiOutlineUserCircle, HiOutlineLogout, HiMenuAlt1 
 import { useUserAuthenticate } from '@/hooks/useUser'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useDisconnectSSE } from '@/hooks/useSSENotifications'
 
 export const Header = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const disconnectSSE = useDisconnectSSE()
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false)
 
   const imageDefault = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaotZTcu1CLMGOJMDl-f_LYBECs7tqwhgpXA&s'
@@ -20,6 +22,10 @@ export const Header = () => {
       description: 'Hasta pronto. Esperamos verte de nuevo.',
       duration: 2000
     })
+    
+    // Desconectar SSE antes de cerrar sesión
+    disconnectSSE()
+    
     localStorage.removeItem('tokenPyme')
     queryClient.clear()
     setTimeout(() => {
@@ -28,7 +34,7 @@ export const Header = () => {
   }
 
   return (
-    <header className='flex justify-between p-3 md:px-10 items-center border-b-1 border-gray-200'>
+    <header className='flex justify-between p-3 md:px-10 items-center border-b-1 border-gray-200 relative z-[45] bg-white'>
       <Link to='/' className='flex items-center gap-6'>
         <img src='/assets/logo.png' className='h-[25px]' alt='' />
         <h1 className='font-medium text-2xl text-[var(--font-title-light)]'>Financia</h1>
@@ -45,7 +51,7 @@ export const Header = () => {
             <HiOutlineChevronDown className='text-xl' />
           </button>
           {isAvatarMenuOpen && (
-            <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1'>
+            <ul className='absolute flex flex-col gap-2 items-start p-5 w-[180px] right-0 top-13 bg-[var(--bg-light)] outline-gray-200 outline-1 z-[70] shadow-lg'>
               <li className='hover:text-[var(--primary)]'>
                 <button onClick={() => navigate('/panel')} className='flex gap-4 items-center cursor-pointer'>
                   <HiMenuAlt1 className='text-xl' /> Panel

@@ -46,7 +46,6 @@ export default class AuthController {
     next: NextFunction
   ) => {
     try {
-      // El userId viene del token JWT decodificado en el middleware authenticate
       const userId = res.locals.user.id;
 
       const payload: IUpdateUserPayload = {

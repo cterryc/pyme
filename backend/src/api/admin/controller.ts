@@ -3,6 +3,7 @@ import { HttpStatus } from "../../constants/HttpStatus";
 import apiResponse from "../../utils/apiResponse.utils";
 import AdminService from "./service";
 import LoanService from "../loan/service";
+import { ALLOWED_STATUS_TRANSITIONS, CreditApplicationStatus } from "../../constants/CreditStatus";
 import {
   createSystemConfigSchema,
   updateSystemConfigSchema,
@@ -260,6 +261,7 @@ export default class AdminController {
         newStatus,
         rejectionReason,
         internalNotes,
+        userNotes,
         approvedAmount,
         riskScore,
       } = req.body;
@@ -270,11 +272,60 @@ export default class AdminController {
         adminUserId,
         rejectionReason,
         internalNotes,
+        userNotes,
         approvedAmount,
         riskScore
       );
 
       res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+
+  static getCreditApplicationByIdForAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { id } = req.params;
+      const result = await this.loanService.getCreditApplicationByIdForAdmin(id);
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+
+  static getDashboardStats = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.loanService.getDashboardStats();
+      res.status(HttpStatus.OK).json(apiResponse(true, result));
+    } catch (error) {
+      return next(error);
+    }
+  };
+
+  static getAllowedStatusTransitions = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { id } = req.params;
+      const application = await this.loanService.getCreditApplicationByIdForAdmin(id);
+      
+      const currentStatus = application.status as CreditApplicationStatus;
+      const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentStatus] || [];
+      
+      res.status(HttpStatus.OK).json(apiResponse(true, { 
+        currentStatus, 
+        allowedTransitions 
+      }));
     } catch (error) {
       return next(error);
     }

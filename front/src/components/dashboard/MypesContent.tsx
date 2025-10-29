@@ -1,15 +1,23 @@
 import { SearchBar } from '../SearchBar'
-// import { FilterDropdown } from '../FilterDropdown'
 import { DataTable } from '../DataTable'
 import { Select } from '../Select'
-// import { useDashboard } from '../../context/DashboardContext'
 import { useDashboard } from '../../hooks/Admin/useDashboard'
-import { Loading } from '../Loading'
 import { Paginator } from '../Paginator'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Modal } from '../Modals/Modal'
+import type { RegisterPymeFormData } from '@/schemas/pyme.schema'
+import { PymeForm } from '../pymeForm'
+type Actions = 'NOTHING' | 'VIEW' | 'EDIT'
+
+interface PymeData extends RegisterPymeFormData {
+  industryName: string
+}
 
 export const MypesContent = () => {
+  const [action, setAction] = useState<Actions>('NOTHING')
+  const [selectedPymeData, setSelectedPymeData] = useState<PymeData>()
+  const [enableModa, setEnableModal] = useState(false)
   const {
     searchTerm,
     setSearchTerm,
@@ -62,34 +70,32 @@ export const MypesContent = () => {
   // ]
 
   const tableColumns = [
-    { key: 'legalName', label: 'NOMBRE LEGAL', width: '20%' },
-    { key: 'email', label: 'EMAIL', width: '25%' },
-    { key: 'phone', label: 'TELÉFONO', width: '15%' },
-    { key: 'industryName', label: 'EMPRESA', width: '20%', align: 'center' },
-    { key: 'createdAt', label: 'FECHA REGISTRO', width: '15%', align: 'center' },
-    { key: 'statusCredit', label: 'ESTADO DE CREDITO', width: '5%', align: 'center' },
+    { key: 'legalName', label: 'NOMBRE LEGAL' },
+    { key: 'industryName', label: 'TIPO DE EMPRESA' },
+    { key: 'createdAt', label: 'FECHA DE REGISTRO DE PYME'},
+    { key: 'statusCredit', label: 'ESTADO DE CREDITO' },
     {
       key: 'acciones',
       label: 'ACCIONES',
-      width: '10%',
-      render: (_value: any, row: any) => (
-        <Select
-          options={[
-            { value: 'ver', label: 'Ver', icon: '👁️' },
-            { value: 'editar', label: 'Editar', icon: '✏️' }
-          ]}
-          placeholder='Opciones'
-          variant='button'
-          size='sm'
-          onSelect={(option) => {
-            console.log(`Acción seleccionada: ${option.value} para cliente:`, row)
-            if (option.value === 'ver') {
-              console.log('Ver cliente:', row.nombre)
-            } else if (option.value === 'editar') {
-              console.log('Editar cliente:', row.nombre)
-            }
-          }}
-        />
+      render: (_value: any, row) => (
+        <div className='flex justify-center items-center gap-5'>
+          <button
+            className='text-xl cursor-pointer'
+            onClick={() => {
+              setAction('VIEW')
+            }}
+          >
+            👁️
+          </button>
+          <button
+            className='text-xl cursor-pointer'
+            onClick={() => {
+              setAction('EDIT')
+            }}
+          >
+            ✏️
+          </button>
+        </div>
       )
     }
   ]
@@ -110,7 +116,7 @@ export const MypesContent = () => {
     <div className='flex-1 bg-white'>
       {/* Header del contenido */}
       <div className='px-8 py-6 border-b border-gray-200'>
-        <h1 className='text-2xl font-bold text-gray-900'>Gestión de Clientes</h1>
+        <h1 className='text-2xl font-bold text-gray-900'>Gestión de Clientes Pymes</h1>
         <p className='text-gray-600 text-sm mt-1'>Administra y consulta la información de tus clientes PyME</p>
       </div>
 
@@ -120,20 +126,15 @@ export const MypesContent = () => {
           <SearchBar placeholder='Buscar por nombre de empresa' value={searchTerm} onChange={setSearchTerm} />
 
           <div className='flex items-center gap-4'>
-            {/* <FilterDropdown value={estadoFilter} options={['Todos', 'Activo', 'Inactivo']} onChange={setEstadoFilter} /> */}
-
-            {/* { FILTER DROW DOWN TUNEADO} */}
-            {/* { FILTER DROW DOWN TUNEADO} */}
             <div className='relative'>
               <select
-                // onChange={(e) => console.log(e.target.value)}
                 value={industryFilter}
                 onChange={(e) => {
                   setIndustryFilter(e.target.value)
                 }}
                 className='appearance-none bg-white border border-gray-300 rounded-md py-2 px-4 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
               >
-                <option value=''>_</option>
+                <option value=''>Filtrar por industria</option>
                 {industryList.map((pair) => (
                   <option key={pair.id} value={pair.id}>
                     {pair.name}
@@ -146,12 +147,6 @@ export const MypesContent = () => {
                 </svg>
               </div>
             </div>
-            {/* { FILTER DROW DOWN TUNEADO} */}
-            {/* { FILTER DROW DOWN TUNEADO} */}
-
-            <button className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors'>
-              Nuevo Cliente
-            </button>
           </div>
         </div>
       </div>
@@ -167,42 +162,8 @@ export const MypesContent = () => {
                 </div>
               </div>
               <div className='ml-3'>
-                <p className='text-sm font-medium text-blue-800'>Total Clientes</p>
+                <p className='text-sm font-medium text-blue-800'>Total Clientes Pymes</p>
                 <p className='text-lg font-bold text-blue-900'>{totalClients}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className='bg-green-50 p-4 rounded-lg'>
-            <div className='flex items-center'>
-              <div className='flex-shrink-0'>
-                <div className='w-6 h-6 bg-green-500 rounded-full flex items-center justify-center'>
-                  <span className='text-white text-xs font-bold'>✓</span>
-                </div>
-              </div>
-              <div className='ml-3'>
-                <p className='text-sm font-medium text-green-800'>Activos</p>
-                <p className='text-lg font-bold text-green-900'>
-                  {/* {clients.filter((client) => client.estado === 'Activo').length} */}
-                  0000
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className='bg-gray-50 p-4 rounded-lg'>
-            <div className='flex items-center'>
-              <div className='flex-shrink-0'>
-                <div className='w-6 h-6 bg-gray-500 rounded-full flex items-center justify-center'>
-                  <span className='text-white text-xs font-bold'>⏸</span>
-                </div>
-              </div>
-              <div className='ml-3'>
-                <p className='text-sm font-medium text-gray-800'>Inactivos</p>
-                <p className='text-lg font-bold text-gray-900'>
-                  000
-                  {/* {clients.filter((client) => client.estado === 'Inactivo').length} */}
-                </p>
               </div>
             </div>
           </div>
@@ -211,22 +172,26 @@ export const MypesContent = () => {
 
       {/* Tabla de datos */}
       <div className='px-8 py-6'>
-        {!isLoading ? (
-          <div>
-            <DataTable
-              columns={tableColumns}
-              data={filteredData}
-              onRowClick={(row) => console.log('Clicked client:', row)}
-              isLoading={isLoading}
-            />
-          </div>
-        ) : (
+        {/* {!isLoading ? ( 
+        <div>*/}
+        <DataTable
+          columns={tableColumns}
+          data={filteredData}
+          // onRowClick={(row) => console.log('Clicked client:', row)}
+          onRowClick={(row) => {
+            setSelectedPymeData(row)
+            setEnableModal(true)
+          }}
+          isLoading={isLoading}
+        />
+        {/*</div>
+         ) : (
           //   <div className='flex flex-col min-h-[20vh] justify-center '>
           <Loading dark={true} />
           //   </div>
-        )}
+        )} */}
 
-        <Paginator totalPages={totalPages} onPagChange={setCurrentPage} />
+        <Paginator totalPages={totalPages} disable={isLoading} onPagChange={setCurrentPage} />
 
         {!isLoading && filteredData && filteredData.length === 0 && (
           <div className='text-center py-12'>
@@ -236,6 +201,69 @@ export const MypesContent = () => {
           </div>
         )}
       </div>
+      {
+        <Modal
+          enable={action == 'VIEW' && enableModa}
+          onClose={() => {
+            setEnableModal(false)
+          }}
+        >
+          <div className='bg-white grid grid-cols-2 gap-7 p-10 rounded-md text-xl'>
+            <h3 className='text-[var(--font-title-light)] font-medium text-3xl col-span-2 mb-5'>Detalles de la pyme</h3>
+            <p className='col-span-1 font-medium'>
+              Ingresos anuales:<span className='font-normal'>{selectedPymeData?.annualRevenue || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Ciudad:<span className='font-normal'>{selectedPymeData?.city || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              País:<span className='font-normal'>{selectedPymeData?.country || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Email empresarial:<span className='font-normal'>{selectedPymeData?.email || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Cantidad de empleados:<span className='font-normal'>{selectedPymeData?.employeeCount || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              CUIT:<span className='font-normal'>{selectedPymeData?.taxId || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Fecha de fundación:
+              <span className='font-normal'>
+                {new Date(selectedPymeData?.foundedDate || '01-01-2005').toISOString().substring(0, 10) || ''}
+              </span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Industria: <span className='font-normal'>{selectedPymeData?.industryName || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Nombre legal: <span className='font-normal'>{selectedPymeData?.legalName || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Telefono: <span className='font-normal'>{selectedPymeData?.phone || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Estado/Provincia: <span className='font-normal'>{selectedPymeData?.state || ''}</span>
+            </p>
+            <p className='col-span-1 font-medium'>
+              Nombre comercial: <span className='font-normal'>{selectedPymeData?.tradeName || ''}</span>
+            </p>
+          </div>
+        </Modal>
+      }
+      {
+        <Modal enable={action == 'EDIT' && enableModa} onClose={() => setEnableModal(false)}>
+          <div className='max-h-[90vh] px-5 py-15 overflow-y-scroll bg-white rounded-md w-6xl text-black'>
+            <h3 className='text-3xl text-center font-medium text-[var(--font-title-light)]'>Editar pyme</h3>
+            <PymeForm
+              industriesList={industryList}
+              defaultValues={selectedPymeData}
+              onCancel={() => setEnableModal(false)}
+            />
+          </div>
+        </Modal>
+      }
     </div>
   )
 }

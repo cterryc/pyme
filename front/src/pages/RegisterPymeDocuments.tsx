@@ -20,7 +20,7 @@ interface DocumentField {
 }
 
 export const RegisterPymeDocuments = () => {
-  const MAX_DOCUMENTS = 5
+  const MAX_DOCUMENTS = 4
   const navigate = useNavigate()
   const { id: pymeID } = useParams<{ id: string }>()
 

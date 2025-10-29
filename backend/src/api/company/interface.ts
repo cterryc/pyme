@@ -41,7 +41,11 @@ export interface responseAdminCompanyDto {
     foundedDate?: Date;
     employeeCount?: number;
     annualRevenue?: number;
+    postalCode?: string;
+    website?: string;
+    description?: string;
     city?: string;
+    address?: string;
     state?: string;
     country?: string;
     phone?: string;

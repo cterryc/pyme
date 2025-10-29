@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
+import { ImSpinner8 } from 'react-icons/im'
 
-export const Paginator = ({ totalPages, onPagChange }: { totalPages: number; onPagChange?: (pag: number) => void }) => {
+export const Paginator = ({
+  totalPages,
+  onPagChange,
+  disable
+}: {
+  totalPages: number
+  onPagChange?: (pag: number) => void
+  disable?: boolean
+}) => {
   //   const Pages = Array.from({ length: totalPages }, (_, i) => i + 1)
   const [currentPage, setCurrentPage] = useState(1)
   const [visiblePags, setVisiblePags] = useState<Array<number>>([])
@@ -37,8 +46,15 @@ export const Paginator = ({ totalPages, onPagChange }: { totalPages: number; onP
   if (totalPages == 1) {
     return <></>
   }
+  if (disable) {
+    return (
+      <div className='flex justify-center py-3 my-5 text-[var(--primary)] text-2xl'>
+        <ImSpinner8 className='animate-spin' />
+      </div>
+    )
+  }
   return (
-    <div className='py-3 my-5 flex gap-5 justify-center'>
+    <div className='py-3 my-5 flex gap-5 justify-center '>
       {visiblePags.map((pag, i) => {
         if (pag == 0) {
           return (

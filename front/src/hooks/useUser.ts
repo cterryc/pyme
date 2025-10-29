@@ -19,10 +19,14 @@ export const useUserAuthenticate = () => {
   const queryClient = useQueryClient()
   const [hasUser, setHasUser] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-
+  const [role, setRole] = useState('user')
   useEffect(() => {
     const token = localStorage.getItem('tokenPyme')
     const user = decodeToken(token || '')
+
+    if (user.status == 'admin') {
+      setRole(user.status)
+    }
 
     if (typeof user === 'string') {
       queryClient.clear()
@@ -33,7 +37,7 @@ export const useUserAuthenticate = () => {
     setIsLoading(false)
   }, [queryClient])
 
-  return { hasUser, isLoading }
+  return { role, hasUser, isLoading }
 }
 
 interface UseUpdateProfile {

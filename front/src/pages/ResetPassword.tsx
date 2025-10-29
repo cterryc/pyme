@@ -87,18 +87,29 @@ export const ResetPasword = () => {
   }
 
   return (
-    <div className='flex flex-col min-h-screen'>
+    <div className='flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-blue-50'>
       <Header />
       {!resetPassToken ? (
-        <div className='flex-1 flex justify-center items-start'>
-          {/* <section className='w-full max-w-md p-9 border-1 border-[#ccc] self-start my-15 rounded-md shadow-xl '> */}
-          <section className='my-20 w-md'>
+        <div className='flex-1 flex justify-center items-center px-4 py-12'>
+          <section className='w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100'>
             {!isDone ? (
-              <form className={`flex flex-col gap-0`} onSubmit={handleSubmit(onSubmit)}>
-                <h2 className='text-2xl  text-[var(--font-title-light)] font-medium mb-5'>Recupera tu contraseña</h2>
+              <form className='flex flex-col gap-5' onSubmit={handleSubmit(onSubmit)}>
+                <div className='text-center mb-2'>
+                  <h2 className='text-3xl text-[var(--font-title-light)] font-semibold mb-2'>
+                    Recupera tu contraseña
+                  </h2>
+                  <p className='text-gray-600 text-sm'>
+                    Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
+                  </p>
+                </div>
+                
                 <div className='flex flex-col gap-2'>
+                  <label htmlFor='email' className='text-sm font-medium text-gray-700'>
+                    Correo electrónico
+                  </label>
                   <input
-                    type='text'
+                    id='email'
+                    type='email'
                     {...register('email', {
                       required: 'El email es obligatorio',
                       pattern: {
@@ -106,71 +117,120 @@ export const ResetPasword = () => {
                         message: 'Ingresa un email válido'
                       }
                     })}
-                    className='border border-[#ccc] rounded-md p-3 w-full placeholder:text-[#7d7d7e] text-gray-600 outline-none '
-                    placeholder='Correo electrónico'
-                    // style={{ borderColor: 'red' }}
+                    className={`border ${errors.email ? 'border-red-400 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200'} rounded-lg p-3 w-full placeholder:text-gray-400 text-gray-700 outline-none focus:ring-2 focus:border-transparent transition-all`}
+                    placeholder='correo@ejemplo.com'
                   />
-                  {errors.email?.message && <p className='text-red-500'>{errors.email?.message.toString()}</p>}
+                  {errors.email?.message && (
+                    <p className='text-red-500 text-sm flex items-center gap-1'>
+                      <span>⚠</span> {errors.email?.message.toString()}
+                    </p>
+                  )}
                 </div>
+                
                 <div className='flex justify-end'>
-                  <Link to='/inicio-sesion' className='text-[#0095d5] text-right mt-4 cursor-pointer hover:underline'>
-                    Volver al inicio de sesión
+                  <Link 
+                    to='/inicio-sesion' 
+                    className='text-[var(--primary)] text-sm font-medium hover:underline hover:text-[#28a9d6ff] transition-colors'
+                  >
+                    ← Volver al inicio de sesión
                   </Link>
                 </div>
 
-                <input
+                <button
                   type='submit'
-                  value='Enviar'
                   disabled={isPending}
-                  className='bg-[var(--primary)] py-3 text-white cursor-pointer mt-5 rounded-md hover:bg-[#28a9d6ff] duration-150'
-                  style={{ background: isPending ? 'gray' : '' }}
-                />
+                  className='bg-[var(--primary)] py-3 px-6 text-white font-medium cursor-pointer rounded-lg hover:bg-[#28a9d6ff] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-150 shadow-md hover:shadow-lg'
+                >
+                  {isPending ? 'Enviando...' : 'Enviar enlace de recuperación'}
+                </button>
               </form>
             ) : (
-              <div className='flex flex-col gap-2'>
-                <h3 className='text-2xl font-medium text-[var(--font-title-light)] mb-5'>
-                  Su solicitud ha sido enviada
+              <div className='flex flex-col gap-6 text-center'>
+                <div className='mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-2'>
+                  <span className='text-3xl'>✓</span>
+                </div>
+                <h3 className='text-2xl font-semibold text-[var(--font-title-light)]'>
+                  Solicitud enviada
                 </h3>
-                <p className='text-md mb-5'>Si su correo está registrado, recibirá un correo para continuar.</p>
-                <p className='text-[var(--primary)] mb-5 text-center'>¿Aún no recibes el correo electrónico?</p>
-                <button
-                  onClick={() => {
-                    setIsDone(false)
-                  }}
-                  className='bg-[#0095d5] text-white outline-1 h-10 w-32 rounded-md hover:bg-[#28a9d6] transition-colors cursor-pointer self-center'
-                >
-                  Reenviar
-                </button>
+                <p className='text-gray-600 leading-relaxed'>
+                  Si tu correo está registrado, recibirás un enlace para restablecer tu contraseña en los próximos minutos.
+                </p>
+                <p className='text-sm text-gray-500'>
+                  Revisa tu bandeja de entrada y la carpeta de spam.
+                </p>
+                <div className='border-t border-gray-200 pt-6 mt-2'>
+                  <p className='text-[var(--primary)] font-medium mb-4'>¿Aún no recibes el correo electrónico?</p>
+                  <button
+                    onClick={() => {
+                      setIsDone(false)
+                    }}
+                    className='bg-[var(--primary)] text-white font-medium px-6 py-3 rounded-lg hover:bg-[#28a9d6ff] transition-all duration-150 shadow-md hover:shadow-lg'
+                  >
+                    Reenviar correo
+                  </button>
+                </div>
               </div>
             )}
           </section>
         </div>
       ) : (
-        <div className='flex-1 content-center'>
-          <form className='flex flex-col gap-0 m-auto max-w-md' onSubmit={handleSubmitPass(onSubmitNewPass)}>
-            <h2 className='text-2xl  text-[var(--font-title-light)] font-medium mb-5'>Recupera tu contraseña</h2>
-            <div className='flex flex-col gap-2'>
-              <label>Nueva contraseña</label>
-              <input type='text' className='border p-2 border-[#D1D5DB] rounded-md' {...registerPass('password')} />
-              {errorsPass.password && <p className='text-red-500'>{errorsPass.password.message}</p>}
+        <div className='flex-1 flex justify-center items-center px-4 py-12'>
+          <form 
+            className='flex flex-col gap-6 w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100' 
+            onSubmit={handleSubmitPass(onSubmitNewPass)}
+          >
+            <div className='text-center mb-2'>
+              <h2 className='text-3xl text-[var(--font-title-light)] font-semibold mb-2'>
+                Nueva contraseña
+              </h2>
+              <p className='text-gray-600 text-sm'>
+                Ingresa tu nueva contraseña para completar el proceso
+              </p>
             </div>
+            
             <div className='flex flex-col gap-2'>
-              <label>Confirme la nueva contraseña</label>
-              <input
-                type='text'
-                {...registerPass('confirmPassword')}
-                className='border p-2 border-[#D1D5DB] rounded-md'
+              <label htmlFor='password' className='text-sm font-medium text-gray-700'>
+                Nueva contraseña
+              </label>
+              <input 
+                id='password'
+                type='password' 
+                className={`border ${errorsPass.password ? 'border-red-400 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200'} p-3 rounded-lg outline-none focus:ring-2 focus:border-transparent transition-all text-gray-700`}
+                {...registerPass('password')} 
+                placeholder='Mínimo 8 caracteres'
               />
-              {errorsPass.confirmPassword && <p className='text-red-500'>{errorsPass.confirmPassword.message}</p>}
+              {errorsPass.password && (
+                <p className='text-red-500 text-sm flex items-center gap-1'>
+                  <span>⚠</span> {errorsPass.password.message}
+                </p>
+              )}
+            </div>
+            
+            <div className='flex flex-col gap-2'>
+              <label htmlFor='confirmPassword' className='text-sm font-medium text-gray-700'>
+                Confirmar nueva contraseña
+              </label>
+              <input
+                id='confirmPassword'
+                type='password'
+                {...registerPass('confirmPassword')}
+                className={`border ${errorsPass.confirmPassword ? 'border-red-400 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200'} p-3 rounded-lg outline-none focus:ring-2 focus:border-transparent transition-all text-gray-700`}
+                placeholder='Repite la contraseña'
+              />
+              {errorsPass.confirmPassword && (
+                <p className='text-red-500 text-sm flex items-center gap-1'>
+                  <span>⚠</span> {errorsPass.confirmPassword.message}
+                </p>
+              )}
             </div>
 
-            <input
+            <button
               type='submit'
-              value='Enviar'
               disabled={isPendingPass}
-              className='bg-[var(--primary)] px-5 py-3 text-white cursor-pointer mt-5 rounded-md hover:bg-[#28a9d6ff] duration-150'
-              style={{ background: isPendingPass ? 'gray' : '' }}
-            />
+              className='bg-[var(--primary)] px-6 py-3 text-white font-medium cursor-pointer rounded-lg hover:bg-[#28a9d6ff] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-150 shadow-md hover:shadow-lg mt-2'
+            >
+              {isPendingPass ? 'Actualizando...' : 'Restablecer contraseña'}
+            </button>
           </form>
         </div>
       )}
