@@ -366,13 +366,13 @@ export const CreditApplicationDetailModal = ({
               <div>
                 <p className="text-sm text-gray-600">Score de Riesgo</p>
                 <p className="font-medium">
-                  {application.riskScore !== null ? `${application.riskScore}/100` : 'No evaluado'}
+                  {application.offerDetails !== null ? `${application.offerDetails.calculationSnapshot.riskTierConfig.tier}: %${application.offerDetails.calculationSnapshot.riskTierConfig.factor}` : 'No evaluado'}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Revisado por</p>
                 <p className="font-medium">
-                  {application.reviewedBy ? application.reviewedBy.name : 'No asignado'}
+                  {application.reviewedBy ? application.reviewedBy.email : 'No asignado'}
                 </p>
               </div>
               {application.rejectionReason && (
