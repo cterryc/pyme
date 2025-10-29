@@ -43,7 +43,7 @@ export const UserDashboard = () => {
         />
       )}
 
-      <section className='flex flex-1 relative'>
+      <section className='flex flex-1'>
         <aside
           className={`
           fixed lg:static inset-y-0 left-0 z-[50]

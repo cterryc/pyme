@@ -2,6 +2,8 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import config from "./enviroment.config";
 
+const isProd = process.env.NODE_ENV === "production";
+
 export const AppDataSource = new DataSource({
   type: "postgres",
   host: config.DB_HOST,
@@ -12,8 +14,8 @@ export const AppDataSource = new DataSource({
   ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
   synchronize: false, // Auto-sync in dev only
   logging: false,
-  entities: ["src/entities/**/*.ts"],
-  migrations: ["src/migrations/**/*.ts"],
-  subscribers: ["src/subscribers/**/*.ts"],
+  entities: [isProd ? "dist/entities/**/*.js" : "src/entities/**/*.ts"],
+  migrations: [isProd ? "dist/migrations/**/*.js" : "src/migrations/**/*.ts"],
+  subscribers: [isProd ? "dist/subscribers/**/*.js" : "src/subscribers/**/*.ts"],
   //   dropSchema: true,
 });
