@@ -20,10 +20,10 @@ import authenticateSSE from './middlewares/authenticate.sse.middleware';
     app.options("/api/events", handleSSEPreflight);
     app.get("/api/events", authenticateSSE, subscribeLoanStatus);
 
-    app.post("/api/loanRequest/firma",(req:any,res:any)=>{
-      console.log("Lo que llega de api firma es :",req.body);
-      res.status(200).json({message:"Good soup!"});
-    });
+    // app.post("/api/loanRequest/firma",(req:any,res:any)=>{
+    //   console.log("Lo que llega de api firma es :",req.body)
+    //   res.status(200).json({message:"Good soup!"})
+    // })
   
     app.use("/api", apiRouter);
     
