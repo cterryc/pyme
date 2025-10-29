@@ -51,12 +51,20 @@ loanRouter.get(
 loanRouter.get(
     "/:id",
 <<<<<<< HEAD
+<<<<<<< HEAD
     authenticate,
     // schemaValidator(null, getCreditApplicationByIdParamsSchema),
 =======
     validateUuid,
     schemaValidator(null, getCreditApplicationByIdParamsSchema),
 >>>>>>> 8d96d536b9fa85a0fa3dfe6b1aa9dcf283ca8809
+=======
+
+    authenticate,
+    // schemaValidator(null, getCreditApplicationByIdParamsSchema),
+    // validateUuid,
+    // schemaValidator(null, getCreditApplicationByIdParamsSchema),
+>>>>>>> a4547e617995e3de8a61e7805fe7beb31bb76652
     LoanController.getCreditApplicationById
 );
 
@@ -68,6 +76,9 @@ loanRouter.delete(
 );
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a4547e617995e3de8a61e7805fe7beb31bb76652
 // loanRouter.post(
 //     "/firma",
 //     // schemaValidator(createCreditApplicationSchema, null),
@@ -79,6 +90,7 @@ loanRouter.delete(
 //     // schemaValidator(createCreditApplicationSchema, null),
 //     LoanController.apiFirma
 // );
+<<<<<<< HEAD
 =======
 loanRouter.post(
     "/firma",
@@ -89,5 +101,7 @@ loanRouter.post(
     }
 );
 >>>>>>> 8d96d536b9fa85a0fa3dfe6b1aa9dcf283ca8809
+=======
+>>>>>>> a4547e617995e3de8a61e7805fe7beb31bb76652
 
 export default loanRouter;

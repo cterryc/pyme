@@ -21,8 +21,8 @@ import {
   getTierFromScore,
   capsFor,
   interestRateFor,
-  apiFirmaResponse,
   ApiFirmaBody,
+  apiFirmaResponse,
 } from "./interface";
 import { generateUniqueCode } from "../../utils/generateCode.utils";
 import { LoanResponseDto, responseLoanByUserListDto } from "./dto";
@@ -499,7 +499,6 @@ export default class LoanService {
         );
       }
       // const urlFirma = 'https://firma-digital-alpha.vercel.app/panel/firmar-documento?signId=IDFIRMA'
-      application.requestId = data.payload.requestId;
       application.requestId = data.payload.requestId
       application.contractDocument = docUrlGenerate
     }
