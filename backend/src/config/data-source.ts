@@ -12,8 +12,8 @@ export const AppDataSource = new DataSource({
   ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
   synchronize: false, // Auto-sync in dev only
   logging: false,
-  entities: ["src/entities/**/*.js"],
-  migrations: ["src/migrations/**/*.js"],
-  subscribers: ["src/subscribers/**/*.js"],
+  entities: ["src/entities/**/*.ts"],
+  migrations: ["src/migrations/**/*.ts"],
+  subscribers: ["src/subscribers/**/*.ts"],
   //   dropSchema: true,
 });
