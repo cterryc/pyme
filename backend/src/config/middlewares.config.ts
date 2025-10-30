@@ -29,11 +29,7 @@ export default class MiddlewareConfig {
    * - Serving the Swagger UI for API documentation
    */
   static config(app: express.Application): void {
-    // � Trust proxy - Necesario para Render, Railway, Heroku, etc.
-    // Permite que Express confíe en los proxies inversos y lea correctamente IPs
     app.set('trust proxy', 1);
-
-    // �🔒 Helmet - Security HTTP Headers
     app.use(
       helmet({
         contentSecurityPolicy: {
@@ -52,7 +48,6 @@ export default class MiddlewareConfig {
       })
     );
 
-    // 🚦 Rate Limiting - General API Protection
     const limiter = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutos
       max: 100, // Máximo 100 requests por ventana
@@ -62,7 +57,6 @@ export default class MiddlewareConfig {
     });
     app.use("/api/" as any, limiter as any);
 
-    // 🔐 Rate Limiting - Autenticación (más estricto)
     const authLimiter = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutos
       max: 10, // Solo 10 intentos
@@ -73,30 +67,34 @@ export default class MiddlewareConfig {
     app.use("/api/auth/login" as any, authLimiter as any);
     app.use("/api/auth/register" as any, authLimiter as any);
 
-    // 📦 Compresión de respuestas
     app.use(compression());
-
-    // 🛡️ Protección contra HTTP Parameter Pollution
     app.use(hpp());
 
-    // 🌐 CORS dinámico según entorno
     const allowedOrigins =
       process.env.NODE_ENV === "production"
         ? [process.env.FRONTEND_URL || "https://your-domain.com"]
-        : ["http://localhost:5173", "http://localhost:5174"];
+        : ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"];
 
     app.use(
       cors({
         origin: (origin, callback) => {
-          // Permitir requests sin origin (mobile apps, Postman)
-          if (!origin) return callback(null, true);
+          if (!origin) {
+            if (process.env.NODE_ENV === "production") {
+              return callback(
+                new Error(
+                  "CORS: Requests without origin are not allowed in production"
+                )
+              );
+            }
+            return callback(null, true);
+          }
 
           if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
           } else {
             callback(
               new Error(
-                "The CORS policy for this site does not allow access from the specified Origin."
+                `CORS: Origin ${origin} is not allowed. Allowed origins: ${allowedOrigins.join(", ")}`
               )
             );
           }

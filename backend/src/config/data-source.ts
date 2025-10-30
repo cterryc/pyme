@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   database: config.DB_NAME,
   ssl: config.DB_SSL
     ? {
-        rejectUnauthorized: false, // Permite certificados auto-firmados
+        rejectUnauthorized: false, 
       }
     : false,
   synchronize: !isProd, 
@@ -22,7 +22,6 @@ export const AppDataSource = new DataSource({
   migrations: [isProd ? 'dist/migrations/**/*.js' : 'src/migrations/**/*.ts'],
   subscribers: [isProd ? 'dist/subscribers/**/*.js' : 'src/subscribers/**/*.ts'],
   extra: {
-    // Connection pooling
     max: 20, // Máximo de conexiones
     min: 5, // Mínimo de conexiones
     idleTimeoutMillis: 30000,
