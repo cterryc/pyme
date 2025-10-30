@@ -90,6 +90,48 @@ export default class MiddlewareConfig {
         ],
       })
     );
+
+    // 🔒 Helmet - Security HTTP Headers (DESPUÉS de CORS)
+    app.use(
+      helmet({
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+        contentSecurityPolicy: false,
+        hidePoweredBy: true,
+        hsts: {
+          maxAge: 31536000,
+          includeSubDomains: true,
+          preload: true,
+        },
+      })
+    );
+
+    // 🚦 Rate Limiting (DESPUÉS de CORS, para que no bloquee preflight)
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutos
+      max: 100, // límite de 100 requests por windowMs
+      message: "Too many requests from this IP, please try again later",
+      standardHeaders: true,
+      legacyHeaders: false,
+      skip: (req) => req.method === "OPTIONS", // ✅ Skip preflight requests
+    });
+
+    const authLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 5, // solo 5 intentos de login
+      message: "Too many login attempts, please try again later",
+      standardHeaders: true,
+      legacyHeaders: false,
+      skip: (req) => req.method === "OPTIONS", // ✅ Skip preflight requests
+    });
+
+    app.use("/api/" as any, limiter as any);
+    app.use("/api/auth/login" as any, authLimiter as any);
+    app.use("/api/auth/register" as any, authLimiter as any);
+
+    // 📦 Compression y HPP (DESPUÉS de CORS)
+    app.use(compression());
+    app.use(hpp());
+
     app.use(express.static(path.join(process.cwd(), "src", "public")));
     app.use(cookieParser());
 
