@@ -21,9 +21,14 @@ export function subscribeLoanStatus(req: Request, res: Response) {
   console.log(`[SSE] 🔗 Nueva conexión solicitada por usuario: ${userId}`);
 
   // --- 🔥 Configuración correcta del stream SSE ---
-  // Usar el origin del request en lugar de hardcoded
-  const origin = req.headers.origin || "http://localhost:5173";
-  if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+  // Usar el origin dinámico según entorno
+  const allowedOrigins =
+    process.env.NODE_ENV === "production"
+      ? [process.env.FRONTEND_URL || ""]
+      : ["http://localhost:5173", "http://localhost:5174"];
+
+  const origin = req.headers.origin || "";
+  if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -51,9 +56,14 @@ export function subscribeLoanStatus(req: Request, res: Response) {
 export function handleSSEPreflight(req: Request, res: Response) {
   console.log("[SSE] 📋 Recibida solicitud OPTIONS preflight");
   
-  // Usar el origin del request en lugar de hardcoded
-  const origin = req.headers.origin || "http://localhost:5173";
-  if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+  // Usar el origin dinámico según entorno
+  const allowedOrigins =
+    process.env.NODE_ENV === "production"
+      ? [process.env.FRONTEND_URL || ""]
+      : ["http://localhost:5173", "http://localhost:5174"];
+
+  const origin = req.headers.origin || "";
+  if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");

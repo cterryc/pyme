@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon --watch src -e ts,tsx --exec node -r ts-node/register/transpile-only src/index.ts",
-    "build" :"npx tsc --module CommonJS --target ES2020",
+    "build": "npx tsc --module CommonJS --target ES2020",
     "start": "node dist/index.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "npm run typeorm -- migration:generate -d src/config/data-source.ts",
@@ -44,9 +44,11 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/hpp": "^0.2.7",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.13.4",
