@@ -29,7 +29,11 @@ export default class MiddlewareConfig {
    * - Serving the Swagger UI for API documentation
    */
   static config(app: express.Application): void {
-    // 🔒 Helmet - Security HTTP Headers
+    // � Trust proxy - Necesario para Render, Railway, Heroku, etc.
+    // Permite que Express confíe en los proxies inversos y lea correctamente IPs
+    app.set('trust proxy', 1);
+
+    // �🔒 Helmet - Security HTTP Headers
     app.use(
       helmet({
         contentSecurityPolicy: {
