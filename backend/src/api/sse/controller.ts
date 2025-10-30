@@ -19,10 +19,11 @@ setInterval(() => {
     console.log(`[SSE] 🧹 Limpiadas ${deadConnections} conexión(es) muerta(s)`);
   }
 
-  // Enviar keep-alive
+  // Enviar keep-alive como evento real (no comentario)
   clients.forEach((c) => {
     try {
-      c.res.write(`: keep-alive ${new Date().toISOString()}\n\n`);
+      // Enviar evento heartbeat para mantener conexión activa
+      c.res.write(`event: heartbeat\ndata: ${JSON.stringify({ timestamp: new Date().toISOString() })}\n\n`);
     } catch (err) {
       console.error(`[SSE] ❌ Error enviando keep-alive a ${c.userId}:`, err);
     }
@@ -88,7 +89,8 @@ export function subscribeLoanStatus(req: Request, res: Response) {
     clients = clients.filter(c => c.userId !== userId);
   }
 
-  res.write(`: connected ${new Date().toISOString()}\n\n`);
+  // Enviar evento de conexión inicial
+  res.write(`event: connected\ndata: ${JSON.stringify({ timestamp: new Date().toISOString(), userId })}\n\n`);
 
   clients.push({ res, userId, connectedAt: new Date() });
   console.log(`👤 [SSE] ✅ Cliente conectado exitosamente: ${userId} (Total: ${clients.length})`);
@@ -137,8 +139,15 @@ export interface LoanStatusEvent {
 
 // ✅ Enviar evento a un usuario
 export function broadcastLoanStatusUpdate(userId: string, data: LoanStatusEvent) {
-  const msg = `data: ${JSON.stringify(data)}\n\n`;
+  // Evento con tipo explícito para actualización de préstamo
+  const msg = `event: loanUpdate\ndata: ${JSON.stringify(data)}\n\n`;
   const targets = clients.filter((c) => c.userId === userId);
-  console.log(`📢 [SSE] Enviando a ${userId} (${targets.length})`);
-  targets.forEach((client) => client.res.write(msg));
+  console.log(`📢 [SSE] Enviando evento loanUpdate a ${userId} (${targets.length} conexión(es))`);
+  targets.forEach((client) => {
+    try {
+      client.res.write(msg);
+    } catch (err) {
+      console.error(`[SSE] ❌ Error enviando evento a ${userId}:`, err);
+    }
+  });
 }
