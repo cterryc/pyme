@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   database: config.DB_NAME,
   ssl: config.DB_SSL
     ? {
-        rejectUnauthorized: isProd,
+        rejectUnauthorized: false, // Permite certificados auto-firmados
       }
     : false,
   synchronize: !isProd, 
