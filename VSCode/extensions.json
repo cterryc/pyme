@@ -1,8 +1,0 @@
-{
-  "recommendations": [],
-  "unwantedRecommendations": [
-    "esbenp.prettier-vscode",
-    "rvest.vs-code-prettier-eslint",
-    "hookyqr.beautify"
-  ]
-}
