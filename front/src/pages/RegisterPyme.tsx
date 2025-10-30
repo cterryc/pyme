@@ -78,12 +78,7 @@ export const RegisterPyme = () => {
     pymeRegister(data)
   }
 
-  const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
-    e.preventDefault()
-    if (step < maxStep) {
-      setStep(step + 1)
-    }
-  }
+
   const prevStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
     if (step > 0) {

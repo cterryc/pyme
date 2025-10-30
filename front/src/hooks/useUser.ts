@@ -24,7 +24,7 @@ export const useUserAuthenticate = () => {
     const token = localStorage.getItem('tokenPyme')
     const user = decodeToken(token || '')
 
-    if (user.status == 'admin') {
+    if (typeof user !== 'string' && user.status === 'admin') {
       setRole(user.status)
     }
 
