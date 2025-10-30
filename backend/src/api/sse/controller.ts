@@ -10,7 +10,16 @@ let clients: SSEClient[] = [];
 
 // Limpieza y heartbeat cada 15s (más frecuente para evitar timeout de 60s)
 setInterval(() => {
+  // Filtrar conexiones muertas
+  const beforeCount = clients.length;
   clients = clients.filter((c) => !c.res.writableEnded);
+  const deadConnections = beforeCount - clients.length;
+  
+  if (deadConnections > 0) {
+    console.log(`[SSE] 🧹 Limpiadas ${deadConnections} conexión(es) muerta(s)`);
+  }
+
+  // Enviar keep-alive
   clients.forEach((c) => {
     try {
       c.res.write(`: keep-alive ${new Date().toISOString()}\n\n`);
@@ -18,7 +27,10 @@ setInterval(() => {
       console.error(`[SSE] ❌ Error enviando keep-alive a ${c.userId}:`, err);
     }
   });
-  console.log(`[SSE] 💓 Keep-alive enviado a ${clients.length} clientes`);
+
+  // Contar usuarios únicos
+  const uniqueUsers = new Set(clients.map(c => c.userId)).size;
+  console.log(`[SSE] 💓 Keep-alive enviado a ${clients.length} conexión(es) de ${uniqueUsers} usuario(s) único(s)`);
 }, 15000);
 
 // ✅ Handler para GET /api/events
@@ -61,6 +73,20 @@ export function subscribeLoanStatus(req: Request, res: Response) {
   res.setHeader("X-Accel-Buffering", "no"); 
   res.flushHeaders();
 
+  // 🔒 Cerrar conexiones antiguas del mismo usuario (evitar duplicados)
+  const existingConnections = clients.filter(c => c.userId === userId);
+  if (existingConnections.length > 0) {
+    console.log(`[SSE] ⚠️ Usuario ${userId} ya tiene ${existingConnections.length} conexión(es) activa(s), cerrando...`);
+    existingConnections.forEach(oldClient => {
+      try {
+        oldClient.res.end();
+      } catch (err) {
+        console.error(`[SSE] Error cerrando conexión antigua:`, err);
+      }
+    });
+    // Limpiar del array
+    clients = clients.filter(c => c.userId !== userId);
+  }
 
   res.write(`: connected ${new Date().toISOString()}\n\n`);
 
