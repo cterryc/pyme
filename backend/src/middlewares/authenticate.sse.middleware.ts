@@ -7,9 +7,8 @@ import config from "../config/enviroment.config";
  * En lugar de enviar JSON cuando falla la autenticación, cierra la conexión
  * para que el EventSource del cliente pueda manejar el error correctamente
  * 
- * Acepta el token de dos formas:
- * 1. Header Authorization: Bearer {token}
- * 2. Query parameter: ?token={token}
+ * Acepta el token únicamente desde el header Authorization por seguridad:
+ * - Header Authorization: Bearer {token}
  */
 export default async function authenticateSSE(
     req: Request,
@@ -18,26 +17,27 @@ export default async function authenticateSSE(
 ) {
     let token: string | undefined;
 
-    // Intentar obtener token del header Authorization
+    
     if (
         req.headers.authorization &&
-        req.headers.authorization.indexOf("Bearer ") !== -1
+        req.headers.authorization.startsWith("Bearer ")
     ) {
         token = req.headers.authorization.substring(7);
     }
-    // Si no está en el header, intentar obtenerlo del query parameter
-    else if (req.query.token && typeof req.query.token === 'string') {
-        token = req.query.token;
-    }
 
-    // Si no se encontró token en ningún lado
+
     if (!token) {
-        console.error("[SSE Auth] ❌ No se proporcionó token de autorización");
-        console.error("[SSE Auth] Headers recibidos:", req.headers);
-        console.error("[SSE Auth] Query params recibidos:", req.query);
+        console.error("[SSE Auth] ❌ No se proporcionó token de autorización en el header");
+        console.error("[SSE Auth] Headers recibidos:", {
+            authorization: req.headers.authorization || 'No proporcionado',
+            origin: req.headers.origin,
+        });
 
-        // Asegurar headers CORS antes de cerrar
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+       
+        const origin = req.headers.origin || "http://localhost:5173";
+        if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+            res.setHeader("Access-Control-Allow-Origin", origin);
+        }
         res.setHeader("Access-Control-Allow-Credentials", "true");
         res.status(401).end();
         return;
@@ -54,8 +54,11 @@ export default async function authenticateSSE(
     } catch (error) {
         console.error("[SSE Auth] ❌ Token inválido:", error);
 
-        // Asegurar headers CORS antes de cerrar
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+        
+        const origin = req.headers.origin || "http://localhost:5173";
+        if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+            res.setHeader("Access-Control-Allow-Origin", origin);
+        }
         res.setHeader("Access-Control-Allow-Credentials", "true");
         res.status(401).end();
         return;

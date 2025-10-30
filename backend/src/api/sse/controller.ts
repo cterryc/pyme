@@ -21,9 +21,13 @@ export function subscribeLoanStatus(req: Request, res: Response) {
   console.log(`[SSE] 🔗 Nueva conexión solicitada por usuario: ${userId}`);
 
   // --- 🔥 Configuración correcta del stream SSE ---
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+  // Usar el origin del request en lugar de hardcoded
+  const origin = req.headers.origin || "http://localhost:5173";
+  if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Cache-Control");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
@@ -46,10 +50,16 @@ export function subscribeLoanStatus(req: Request, res: Response) {
 // ✅ Handler para preflight CORS (OPTIONS)
 export function handleSSEPreflight(req: Request, res: Response) {
   console.log("[SSE] 📋 Recibida solicitud OPTIONS preflight");
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+  
+  // Usar el origin del request en lugar de hardcoded
+  const origin = req.headers.origin || "http://localhost:5173";
+  if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Cache-Control");
   res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Max-Age", "86400"); // Cache preflight por 24 horas
   res.status(204).end();
 }
 
