@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaFileInvoiceDollar } from "react-icons/fa";
 import { UserCreditModal } from "./Modals/UserCreditModal";
+import { CongratsModal } from "./Modals/CongratsModal";
 
 export const UserCreditRequests = () => {
   const [creditId, setCreditId] = useState<string>('')
   const [toggleModal, setToggleModal] = useState<boolean>(false)
+  const [showCongratsModal, setShowCongratsModal] = useState<boolean>(false)
   const [getCredit, setGetCredit] = useState<LoanRequestPayload | null>(null);
   const { data: loansByUser, isLoading, isError, error, refetch } = useGetListCreditApplicationsByUser()
   const { data: creditById } = useGetCreditApplicationById(creditId)
@@ -24,6 +26,22 @@ export const UserCreditRequests = () => {
     }
   }, [creditById])
 
+  useEffect(() => {
+    // Esto se guarda en localstorage, pero se comenta para pruebas. Si quieres trabajar con localstorage, descomenta las líneas correspondientes.
+    if (loansByUser?.payload) {
+      const hasApprovedLoan = loansByUser.payload.some(
+        (loan) => loan.status === 'Aprobado'
+      );
+      if (hasApprovedLoan) {
+        //const hasShownCongrats = localStorage.getItem('hasShownCongratsModal');
+        //if (!hasShownCongrats) {
+          setShowCongratsModal(true);
+          //localStorage.setItem('hasShownCongratsModal', 'true');
+        //}
+      }
+    }
+  }, [loansByUser])
+
 
   const typeStatus = (status: string) => {
     switch (status) {
@@ -31,6 +49,10 @@ export const UserCreditRequests = () => {
         return 'bg-green-400 text-white shadow-sm'
       case 'Enviado':
         return 'bg-blue-500 text-white shadow-sm'
+      case 'En revisión':
+        return 'bg-purple-400 text-white shadow-sm'
+      case 'Rechazado':
+        return 'bg-red-500 text-white shadow-sm'
       case 'No confirmado':
         return 'bg-gray-200 text-gray-700'
       default:
@@ -80,7 +102,12 @@ export const UserCreditRequests = () => {
                   </th>
                 </tr>
               </thead>
-              {loansByUser?.payload.filter((cr) => cr.status === 'Enviado' || cr.status === 'Aprobado').length === 0 ? (
+              {loansByUser?.payload.filter((cr) => 
+                cr.status === 'Enviado' || 
+                cr.status === 'Aprobado' || 
+                cr.status === 'En revisión' || 
+                cr.status === 'Rechazado'
+              ).length === 0 ? (
                 <tbody>
                   <tr>
                     <td colSpan={5} className='text-center text-gray-500 py-12'>
@@ -97,7 +124,12 @@ export const UserCreditRequests = () => {
                 <tbody className='divide-y divide-gray-200'>
                   {loansByUser &&
                     loansByUser.payload
-                      .filter((cr) => cr.status === 'Enviado' || cr.status === 'Aprobado')
+                      .filter((cr) => 
+                        cr.status === 'Enviado' || 
+                        cr.status === 'Aprobado' || 
+                        cr.status === 'En revisión' || 
+                        cr.status === 'Rechazado'
+                      )
                       .map((credit: CreditAppplication) => {
                         const amount = new Intl.NumberFormat('es-PE', {
                           style: 'currency',
@@ -160,7 +192,12 @@ export const UserCreditRequests = () => {
                   </th>
                 </tr>
               </thead>
-              {loansByUser?.payload.filter((cr) => cr.status === 'Enviado').length === 0 ? (
+              {loansByUser?.payload.filter((cr) => 
+                cr.status === 'Enviado' || 
+                cr.status === 'Aprobado' || 
+                cr.status === 'En revisión' || 
+                cr.status === 'Rechazado'
+              ).length === 0 ? (
                 <tbody>
                   <tr>
                     <td colSpan={5} className='text-center text-gray-500 py-12'>
@@ -177,7 +214,12 @@ export const UserCreditRequests = () => {
                 <tbody className='divide-y divide-gray-200'>
                   {loansByUser &&
                     loansByUser.payload
-                      .filter((cr) => cr.status === 'Enviado')
+                      .filter((cr) => 
+                        cr.status === 'Enviado' || 
+                        cr.status === 'Aprobado' || 
+                        cr.status === 'En revisión' || 
+                        cr.status === 'Rechazado'
+                      )
                       .map((credit: CreditAppplication) => {
                         const amount = new Intl.NumberFormat('es-PE', {
                           style: 'currency',
@@ -231,6 +273,11 @@ export const UserCreditRequests = () => {
           setToggleModal={() => setToggleModal(!toggleModal)}
         />
       )}
+
+      <CongratsModal
+        isOpen={showCongratsModal}
+        onClose={() => setShowCongratsModal(false)}
+      />
     </div>
   )
 }
