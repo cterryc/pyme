@@ -1,16 +1,21 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { sseService, type LoanStatusEvent } from '@/services/sse.service'
 
 /**
  * Hook para manejar notificaciones SSE de cambios de estado de créditos
+ * ✅ Optimizado para evitar conexiones duplicadas
  */
 export const useSSENotifications = () => {
   const queryClient = useQueryClient()
+  
+  // Ref para almacenar el callback actual (siempre usa la versión más reciente)
+  const callbackRef = useRef<((event: LoanStatusEvent) => void) | null>(null)
 
-  const handleStatusUpdate = useCallback((event: LoanStatusEvent) => {
-    console.log('[SSE Hook] Nuevo evento recibido:', event)
+  // Actualizar el ref cada vez que cambia queryClient
+  callbackRef.current = (event: LoanStatusEvent) => {
+    console.log('[SSE Hook] 📨 Nuevo evento recibido:', event)
 
     // Invalidar queries relacionadas con créditos para refrescar la UI automáticamente
     queryClient.invalidateQueries({ queryKey: ['loansByUser'] })
@@ -66,33 +71,37 @@ export const useSSENotifications = () => {
       description: `Tu solicitud de crédito ha cambiado a: ${event.newStatus}`,
       duration: 6000,
     })
-  }, [queryClient])
+  }
+
+  // Wrapper estable que llama al ref
+  const handleStatusUpdate = useCallback((event: LoanStatusEvent) => {
+    callbackRef.current?.(event)
+  }, []) // ✅ Sin dependencias - nunca cambia
 
   useEffect(() => {
     // Obtener token de autenticación
     const token = localStorage.getItem('tokenPyme')
     
     if (!token) {
-      console.log('[SSE Hook] No hay token, no se conectará a SSE')
+      console.log('[SSE Hook] ⚠️ No hay token, no se conectará a SSE')
       return
     }
 
-    console.log('[SSE Hook] Conectando a SSE...')
+    console.log('[SSE Hook] 🔌 Montando hook SSE...')
     
-    // Conectar al servicio SSE
+    // Conectar al servicio SSE (el servicio previene duplicados internamente)
     sseService.connect(token)
 
     // Suscribirse a eventos
     const unsubscribe = sseService.subscribe(handleStatusUpdate)
+    console.log('[SSE Hook] ✅ Suscripción registrada')
 
     // Cleanup: desuscribirse cuando el componente se desmonte
     return () => {
-      console.log('[SSE Hook] Limpiando suscripción...')
+      console.log('[SSE Hook] 🧹 Limpiando suscripción del componente...')
       unsubscribe()
-      // Nota: No desconectamos completamente el servicio aquí
-      // porque puede ser usado por múltiples componentes
     }
-  }, [handleStatusUpdate])
+  }, [handleStatusUpdate]) // ✅ handleStatusUpdate nunca cambia
 
   return {
     isConnected: sseService.isConnected(),

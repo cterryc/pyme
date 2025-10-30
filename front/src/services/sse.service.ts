@@ -20,15 +20,27 @@ class SSEService {
    * Conectar al stream SSE del backend
    */
   connect(token: string): void {
-    if (this.eventSource) {
-      console.log('[SSE] Ya existe una conexión activa')
+    // Verificar si ya existe una conexión ABIERTA (readyState = 1)
+    if (this.eventSource && this.eventSource.readyState === 1) {
+      console.log('[SSE] ⚠️ Ya existe una conexión ACTIVA, ignorando nueva conexión')
       return
+    }
+
+    // Si existe pero está cerrada o en error, cerrarla primero
+    if (this.eventSource) {
+      console.log('[SSE] 🧹 Limpiando conexión anterior en estado:', this.eventSource.readyState)
+      try {
+        this.eventSource.close()
+      } catch (e) {
+        console.warn('[SSE] Error al cerrar conexión anterior:', e)
+      }
+      this.eventSource = null
     }
 
     // Usar EventSourcePolyfill para enviar el token de forma segura en los headers
     const url = `${import.meta.env.VITE_API_URL}/events`
     
-    console.log('[SSE] 🔗 Conectando a:', url)
+    console.log('[SSE] 🔗 Conectando a:', url, '| Callbacks activos:', this.callbacks.size)
 
     this.eventSource = new EventSourcePolyfill(url, {
       headers: {
