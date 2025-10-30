@@ -20,13 +20,11 @@ class SSEService {
    * Conectar al stream SSE del backend
    */
   connect(token: string): void {
-    // Verificar si ya existe una conexión ABIERTA (readyState = 1)
     if (this.eventSource && this.eventSource.readyState === 1) {
       console.log('[SSE] ⚠️ Ya existe una conexión ACTIVA, ignorando nueva conexión')
       return
     }
 
-    // Si existe pero está cerrada o en error, cerrarla primero
     if (this.eventSource) {
       console.log('[SSE] 🧹 Limpiando conexión anterior en estado:', this.eventSource.readyState)
       try {
@@ -37,7 +35,6 @@ class SSEService {
       this.eventSource = null
     }
 
-    // Usar EventSourcePolyfill para enviar el token de forma segura en los headers
     const url = `${import.meta.env.VITE_API_URL}/events`
     
     console.log('[SSE] 🔗 Conectando a:', url, '| Callbacks activos:', this.callbacks.size)
@@ -50,53 +47,45 @@ class SSEService {
       heartbeatTimeout: 60000, // 60 segundos
     })
 
-    // Evento: Conexión abierta
     this.eventSource.onopen = () => {
       console.log('[SSE] ✅ Conexión establecida exitosamente')
       this.currentReconnectDelay = 1000 // Resetear delay de reconexión
     }
 
-    // Evento: Mensaje de conexión inicial
     this.eventSource.addEventListener('connected', (event) => {
       const messageEvent = event as MessageEvent
       console.log('[SSE] 🔗 Evento de conexión:', messageEvent.data)
     })
 
-    // Evento: Heartbeat (keep-alive)
     this.eventSource.addEventListener('heartbeat', (event) => {
       const messageEvent = event as MessageEvent
       const data = JSON.parse(messageEvent.data)
       console.log('[SSE] 💓 Heartbeat recibido:', data.timestamp)
     })
 
-    // Evento: Actualización de préstamo (evento con tipo específico)
     this.eventSource.addEventListener('loanUpdate', (event) => {
       const messageEvent = event as MessageEvent
       try {
         const data: LoanStatusEvent = JSON.parse(messageEvent.data)
         console.log('[SSE] 📨 Actualización de préstamo recibida:', data)
         
-        // Notificar a todos los callbacks registrados
         this.callbacks.forEach(callback => callback(data))
       } catch (error) {
         console.error('[SSE] Error al parsear evento loanUpdate:', error)
       }
     })
 
-    // Evento: Mensaje genérico (fallback)
     this.eventSource.onmessage = (event) => {
       console.log('[SSE] 📬 Mensaje genérico recibido:', event.data)
     }
 
-    // Evento: Error de conexión
+  
     this.eventSource.onerror = (error) => {
       console.error('[SSE] ❌ Error de conexión:', error)
-      
-      // Cerrar la conexión actual
+   
       this.eventSource?.close()
       this.eventSource = null
 
-      // Intentar reconectar con backoff exponencial
       this.scheduleReconnect(token)
     }
   }
@@ -113,8 +102,6 @@ class SSEService {
 
     this.reconnectTimeout = setTimeout(() => {
       this.connect(token)
-      
-      // Incrementar delay para próxima reconexión (backoff exponencial)
       this.currentReconnectDelay = Math.min(
         this.currentReconnectDelay * 2,
         this.maxReconnectDelay
@@ -128,7 +115,6 @@ class SSEService {
   subscribe(callback: SSEEventCallback): () => void {
     this.callbacks.add(callback)
     
-    // Retornar función de cleanup
     return () => {
       this.callbacks.delete(callback)
     }
@@ -158,7 +144,7 @@ class SSEService {
    * Verificar si hay una conexión activa
    */
   isConnected(): boolean {
-    return this.eventSource !== null && this.eventSource.readyState === 1 // 1 = OPEN
+    return this.eventSource !== null && this.eventSource.readyState === 1 
   }
 }
 
