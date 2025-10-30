@@ -29,47 +29,10 @@ export default class MiddlewareConfig {
    * - Serving the Swagger UI for API documentation
    */
   static config(app: express.Application): void {
+    // 🔧 Trust proxy - PRIMERO
     app.set('trust proxy', 1);
-    app.use(
-      helmet({
-        contentSecurityPolicy: {
-          directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", "data:", "https:"],
-          },
-        },
-        hsts: {
-          maxAge: 31536000, // 1 año
-          includeSubDomains: true,
-          preload: true,
-        },
-      })
-    );
 
-    const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutos
-      max: 100, // Máximo 100 requests por ventana
-      message: "Too many requests from this IP, please try again later.",
-      standardHeaders: true,
-      legacyHeaders: false,
-    });
-    app.use("/api/" as any, limiter as any);
-
-    const authLimiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutos
-      max: 10, // Solo 10 intentos
-      message: "Too many login attempts, please try again later.",
-      standardHeaders: true,
-      legacyHeaders: false,
-    });
-    app.use("/api/auth/login" as any, authLimiter as any);
-    app.use("/api/auth/register" as any, authLimiter as any);
-
-    app.use(compression());
-    app.use(hpp());
-
+    // 🌐 CORS - DEBE IR ANTES de helmet y rate-limit para manejar preflight
     // Limpiar URLs removiendo barras finales
     const cleanUrl = (url: string | undefined) => {
       if (!url) return null;
