@@ -70,10 +70,16 @@ export default class MiddlewareConfig {
     app.use(compression());
     app.use(hpp());
 
+    // Limpiar URLs removiendo barras finales
+    const cleanUrl = (url: string | undefined) => {
+      if (!url) return null;
+      return url.replace(/\/$/, ''); // Remover barra final
+    };
+
     const allowedOrigins =
       process.env.NODE_ENV === "production"
         ? [
-            process.env.FRONTEND_URL,
+            cleanUrl(process.env.FRONTEND_URL),
             // Agregar más dominios permitidos aquí si es necesario
           ].filter(Boolean) // Filtrar undefined/null
         : [
