@@ -222,14 +222,18 @@ export const SolicitudesContent = () => {
       {/* Tabla de datos */}
       {!isLoading && !error && (
         <>
-          <div className="px-8 py-6">
-            <DataTable
-              columns={tableColumns}
-              data={applications}
-              onRowClick={(row) => console.log('Clicked row:', row)}
-            />
-            
-            {applications.length === 0 && (
+          <div className="px-4 sm:px-6 lg:px-8 py-6">
+            {applications.length > 0 ? (
+              <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
+                <div className="inline-block min-w-full align-middle px-4 sm:px-6 lg:px-8">
+                  <DataTable
+                    columns={tableColumns}
+                    data={applications}
+                    onRowClick={(row) => console.log('Clicked row:', row)}
+                  />
+                </div>
+              </div>
+            ) : (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-5xl mb-4">📋</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron solicitudes</h3>

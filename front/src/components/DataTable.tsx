@@ -69,7 +69,8 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider
+                  style={{ width: column.width }}
+                  className={`px-3 sm:px-4 lg:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider
                   ${column.key != 'acciones' && 'text-left'}
                     `}
                 >
@@ -80,11 +81,15 @@ export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {
           </thead>
           <tbody className='bg-white divide-y divide-gray-200'>
             {data.map((row, index) => (
-              <tr key={index}>
+              <tr key={index} className='hover:bg-gray-50 transition-colors'>
                 {columns.map((column, colIndex) => (
                   <td
                     key={column.key}
-                    className={`px-6 py-4 whitespace-nowrap text-sm`}
+                    className={`px-3 sm:px-4 lg:px-6 py-4 text-sm ${
+                      column.key === 'companyName' || column.key === 'selectedAmount' 
+                        ? 'whitespace-nowrap' 
+                        : 'whitespace-nowrap'
+                    }`}
                     onClick={() => {
                       if (colIndex === columns.length - 1) {
                         onRowClick?.(row)
