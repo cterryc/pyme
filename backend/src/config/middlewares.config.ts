@@ -128,8 +128,6 @@ export default class MiddlewareConfig {
     app.use("/api/auth/login" as any, authLimiter as any);
     app.use("/api/auth/register" as any, authLimiter as any);
 
-    // 📦 Compression y HPP (DESPUÉS de CORS)
-    app.use(compression());
     app.use(hpp());
 
     app.use(express.static(path.join(process.cwd(), "src", "public")));
