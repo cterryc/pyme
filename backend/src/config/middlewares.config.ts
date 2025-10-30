@@ -72,29 +72,39 @@ export default class MiddlewareConfig {
 
     const allowedOrigins =
       process.env.NODE_ENV === "production"
-        ? [process.env.FRONTEND_URL || "https://your-domain.com"]
-        : ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"];
+        ? [
+            process.env.FRONTEND_URL,
+            // Agregar más dominios permitidos aquí si es necesario
+          ].filter(Boolean) // Filtrar undefined/null
+        : [
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:3000",
+          ];
 
     app.use(
       cors({
         origin: (origin, callback) => {
+          // Log para debugging en producción
+          console.log(`🌐 CORS Request from: ${origin || "NO ORIGIN"}`);
+          console.log(`📋 Allowed origins:`, allowedOrigins);
+
+          // Permitir requests sin origin (SSR, mobile apps, same-origin, Health checks)
           if (!origin) {
-            if (process.env.NODE_ENV === "production") {
-              return callback(
-                new Error(
-                  "CORS: Requests without origin are not allowed in production"
-                )
-              );
-            }
+            console.log("✅ Allowing request without origin");
             return callback(null, true);
           }
 
-          if (allowedOrigins.indexOf(origin) !== -1) {
+          // Verificar si el origin está permitido
+          if (allowedOrigins.includes(origin)) {
+            console.log(`✅ Origin ${origin} is allowed`);
             callback(null, true);
           } else {
+            console.log(`❌ Origin ${origin} is NOT allowed`);
+            console.log(`💡 Check FRONTEND_URL env var: ${process.env.FRONTEND_URL}`);
             callback(
               new Error(
-                `CORS: Origin ${origin} is not allowed. Allowed origins: ${allowedOrigins.join(", ")}`
+                `CORS: Origin ${origin} is not allowed. Expected: ${allowedOrigins.join(", ")}`
               )
             );
           }
