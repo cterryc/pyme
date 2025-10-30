@@ -49,7 +49,7 @@ export const SignSingleDocument = ({
     setPDFName(file.name)
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
     const cantidadPaginas = pdf.numPages
-    const images = []
+    const images: Array<PDFImagesProcessed> = []
     for (let i = 1; i <= cantidadPaginas; i++) {
       const pag = await pdf.getPage(i)
 
