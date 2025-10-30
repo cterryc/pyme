@@ -56,17 +56,36 @@ class SSEService {
       this.currentReconnectDelay = 1000 // Resetear delay de reconexión
     }
 
-    // Evento: Mensaje recibido
-    this.eventSource.onmessage = (event) => {
+    // Evento: Mensaje de conexión inicial
+    this.eventSource.addEventListener('connected', (event) => {
+      const messageEvent = event as MessageEvent
+      console.log('[SSE] 🔗 Evento de conexión:', messageEvent.data)
+    })
+
+    // Evento: Heartbeat (keep-alive)
+    this.eventSource.addEventListener('heartbeat', (event) => {
+      const messageEvent = event as MessageEvent
+      const data = JSON.parse(messageEvent.data)
+      console.log('[SSE] 💓 Heartbeat recibido:', data.timestamp)
+    })
+
+    // Evento: Actualización de préstamo (evento con tipo específico)
+    this.eventSource.addEventListener('loanUpdate', (event) => {
+      const messageEvent = event as MessageEvent
       try {
-        const data: LoanStatusEvent = JSON.parse(event.data)
-        console.log('[SSE] 📨 Evento recibido:', data)
+        const data: LoanStatusEvent = JSON.parse(messageEvent.data)
+        console.log('[SSE] 📨 Actualización de préstamo recibida:', data)
         
         // Notificar a todos los callbacks registrados
         this.callbacks.forEach(callback => callback(data))
       } catch (error) {
-        console.error('[SSE] Error al parsear evento:', error)
+        console.error('[SSE] Error al parsear evento loanUpdate:', error)
       }
+    })
+
+    // Evento: Mensaje genérico (fallback)
+    this.eventSource.onmessage = (event) => {
+      console.log('[SSE] 📬 Mensaje genérico recibido:', event.data)
     }
 
     // Evento: Error de conexión
