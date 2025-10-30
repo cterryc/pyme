@@ -23,8 +23,7 @@ export const ModuleSelectionPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Header avatar='/assets/defaultAvatar.jpg' />
-      
+      <Header />
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="max-w-6xl w-full">
           <div className="text-center mb-12">

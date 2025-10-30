@@ -101,7 +101,7 @@ export const createCompanySchema = z.object({
     z.undefined()
   ]).optional(),
   description: optionalNonEmptyString(1000),
-}).strict();
+})
 
 export const getAllCompaniesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
