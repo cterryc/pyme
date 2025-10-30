@@ -8,11 +8,18 @@ interface SSEClient {
 
 let clients: SSEClient[] = [];
 
-// Limpieza y heartbeat cada 25s
+// Limpieza y heartbeat cada 15s (más frecuente para evitar timeout de 60s)
 setInterval(() => {
   clients = clients.filter((c) => !c.res.writableEnded);
-  clients.forEach((c) => c.res.write(`: keep-alive\n\n`));
-}, 25000);
+  clients.forEach((c) => {
+    try {
+      c.res.write(`: keep-alive ${new Date().toISOString()}\n\n`);
+    } catch (err) {
+      console.error(`[SSE] ❌ Error enviando keep-alive a ${c.userId}:`, err);
+    }
+  });
+  console.log(`[SSE] 💓 Keep-alive enviado a ${clients.length} clientes`);
+}, 15000);
 
 // ✅ Handler para GET /api/events
 export function subscribeLoanStatus(req: Request, res: Response) {
@@ -21,15 +28,29 @@ export function subscribeLoanStatus(req: Request, res: Response) {
   console.log(`[SSE] 🔗 Nueva conexión solicitada por usuario: ${userId}`);
 
   // --- 🔥 Configuración correcta del stream SSE ---
+  // Limpiar URLs removiendo barras finales
+  const cleanUrl = (url: string | undefined) => {
+    if (!url) return null;
+    return url.replace(/\/$/, ''); // Remover barra final
+  };
+
   // Usar el origin dinámico según entorno
   const allowedOrigins =
     process.env.NODE_ENV === "production"
-      ? [process.env.FRONTEND_URL || ""]
+      ? [cleanUrl(process.env.FRONTEND_URL)].filter(Boolean)
       : ["http://localhost:5173", "http://localhost:5174"];
 
   const origin = req.headers.origin || "";
-  if (allowedOrigins.includes(origin)) {
+  const cleanOrigin = cleanUrl(origin);
+  
+  console.log(`[SSE] 🌐 Origin: ${origin} (cleaned: ${cleanOrigin})`);
+  console.log(`[SSE] 🌐 Allowed origins:`, allowedOrigins);
+  
+  if (allowedOrigins.includes(cleanOrigin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
+    console.log(`[SSE] ✅ Origin permitido: ${origin}`);
+  } else {
+    console.log(`[SSE] ❌ Origin NO permitido: ${origin}`);
   }
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Cache-Control");
@@ -56,14 +77,22 @@ export function subscribeLoanStatus(req: Request, res: Response) {
 export function handleSSEPreflight(req: Request, res: Response) {
   console.log("[SSE] 📋 Recibida solicitud OPTIONS preflight");
   
+  // Limpiar URLs removiendo barras finales
+  const cleanUrl = (url: string | undefined) => {
+    if (!url) return null;
+    return url.replace(/\/$/, ''); // Remover barra final
+  };
+
   // Usar el origin dinámico según entorno
   const allowedOrigins =
     process.env.NODE_ENV === "production"
-      ? [process.env.FRONTEND_URL || ""]
+      ? [cleanUrl(process.env.FRONTEND_URL)].filter(Boolean)
       : ["http://localhost:5173", "http://localhost:5174"];
 
   const origin = req.headers.origin || "";
-  if (allowedOrigins.includes(origin)) {
+  const cleanOrigin = cleanUrl(origin);
+  
+  if (allowedOrigins.includes(cleanOrigin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
