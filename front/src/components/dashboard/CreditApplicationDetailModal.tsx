@@ -28,6 +28,7 @@ export const CreditApplicationDetailModal = ({
   const [userNotes, setUserNotes] = useState('')
   const [allowedTransitions, setAllowedTransitions] = useState<string[]>([])
   const [selectedDocument, setSelectedDocument] = useState<{ fileUrl: string; fileName: string } | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Query para obtener los detalles de la solicitud
   const { data, isLoading, error } = useQuery({
@@ -55,13 +56,30 @@ export const CreditApplicationDetailModal = ({
   const updateStatusMutation = useMutation({
     mutationFn: (updateData: UpdateCreditApplicationStatusData) => 
       updateCreditApplicationStatus(applicationId, updateData),
-    onSuccess: () => {
+    onSuccess: async () => {
       // Descartar toast de carga
       toast.dismiss('update-status')
       
-      // Invalidar queries para refrescar la lista
-      queryClient.invalidateQueries({ queryKey: ['creditApplications'] })
-      queryClient.invalidateQueries({ queryKey: ['creditApplicationDetail', applicationId] })
+      // Activar indicador de refresco
+      setIsRefreshing(true)
+      
+      try {
+        // Invalidar y refrescar queries inmediatamente
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['creditApplications'] }),
+          queryClient.invalidateQueries({ queryKey: ['creditApplicationDetail', applicationId] }),
+          queryClient.invalidateQueries({ queryKey: ['allowedTransitions', applicationId] })
+        ])
+        
+        // Refrescar datos inmediatamente sin cerrar el modal
+        await Promise.all([
+          queryClient.refetchQueries({ queryKey: ['creditApplicationDetail', applicationId] }),
+          queryClient.refetchQueries({ queryKey: ['allowedTransitions', applicationId] })
+        ])
+      } finally {
+        // Desactivar indicador de refresco
+        setIsRefreshing(false)
+      }
       
       // Resetear formulario
       setNewStatus('')
@@ -71,13 +89,16 @@ export const CreditApplicationDetailModal = ({
       
       // Toast de éxito
       toast.success('Estado actualizado exitosamente', {
-        description: 'La solicitud ha sido actualizada correctamente',
+        description: 'La solicitud ha sido actualizada. Puedes continuar editando.',
         duration: 4000,
       })
     },
     onError: (error: Error) => {
       // Descartar toast de carga
       toast.dismiss('update-status')
+      
+      // Desactivar indicador de refresco si hubo error
+      setIsRefreshing(false)
       
       // Toast de error
       toast.error('Error al actualizar estado', {
@@ -224,13 +245,26 @@ export const CreditApplicationDetailModal = ({
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Detalle de Solicitud
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {application.applicationNumber}
-            </p>
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Detalle de Solicitud
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {application.applicationNumber}
+                </p>
+              </div>
+              {isRefreshing && (
+                <div className="flex items-center gap-2 text-blue-600 text-sm animate-pulse">
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Actualizando...</span>
+                </div>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -557,8 +591,9 @@ export const CreditApplicationDetailModal = ({
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as CreditApplicationStatus)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     required
+                    disabled={updateStatusMutation.isPending || isRefreshing}
                   >
                     <option value="">Seleccionar estado...</option>
                     {allowedTransitions.map((status) => (
@@ -582,10 +617,11 @@ export const CreditApplicationDetailModal = ({
                     <textarea
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       rows={3}
                       placeholder="Explicar la razón del rechazo..."
                       required={newStatus === 'Rechazado'}
+                      disabled={updateStatusMutation.isPending || isRefreshing}
                     />
                   </div>
                 )}
@@ -597,10 +633,11 @@ export const CreditApplicationDetailModal = ({
                   <textarea
                     value={userNotes}
                     onChange={(e) => setUserNotes(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     rows={3}
                     placeholder="Notas que verá el usuario sobre esta solicitud..."
                     required
+                    disabled={updateStatusMutation.isPending || isRefreshing}
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Estas notas serán visibles para el usuario de la empresa
@@ -614,9 +651,10 @@ export const CreditApplicationDetailModal = ({
                   <textarea
                     value={internalNotes}
                     onChange={(e) => setInternalNotes(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     rows={3}
                     placeholder="Notas internas solo para administradores (opcional)..."
+                    disabled={updateStatusMutation.isPending || isRefreshing}
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Estas notas son privadas y solo visibles para administradores
@@ -628,17 +666,23 @@ export const CreditApplicationDetailModal = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  disabled={updateStatusMutation.isPending}
+                  className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  disabled={updateStatusMutation.isPending || isRefreshing}
                 >
-                  Cancelar
+                  Cerrar
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-                  disabled={updateStatusMutation.isPending}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                  disabled={updateStatusMutation.isPending || isRefreshing}
                 >
-                  {updateStatusMutation.isPending ? 'Actualizando...' : 'Actualizar Estado'}
+                  {(updateStatusMutation.isPending || isRefreshing) && (
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  )}
+                  {updateStatusMutation.isPending ? 'Actualizando...' : isRefreshing ? 'Refrescando...' : 'Actualizar Estado'}
                 </button>
               </div>
             </form>
