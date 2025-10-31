@@ -145,7 +145,7 @@ export const UserProfile = () => {
     }
   }
 
-  const handleWelcomeSubmit = (data: { firstName: string; lastName: string; phone: string }) => {
+  const handleWelcomeSubmit = (data: { firstName: string; lastName: string; phone: string; countryCode: number }) => {
     updateProfile({ 
       firstName: data.firstName,
       lastName: data.lastName,
