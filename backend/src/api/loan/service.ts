@@ -493,7 +493,7 @@ export default class LoanService {
           "doc_id": application.id,//id solicitud
           "doc_url": docUrlGenerate,
           "callback": `${config.BACKEND_URL}/api/loanRequest/firma`,
-          "return_url": `${config.FRONTEND_URL}/panel`,
+          "return_url": `${config.FRONTEND_URL}/panel/firma`,
           "description": "Términos y condiciones del contrato con Financia para la solicitud de préstamo",
           "external_ref" : application.id
         }) // Convert the data object to a JSON string
