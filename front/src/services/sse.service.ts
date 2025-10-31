@@ -1,4 +1,5 @@
 // Servicio para manejar conexiones SSE (Server-Sent Events)
+import { EventSourcePolyfill } from 'event-source-polyfill';
 
 export interface LoanStatusEvent {
   id: string;
@@ -9,7 +10,7 @@ export interface LoanStatusEvent {
 export type SSEEventCallback = (event: LoanStatusEvent) => void;
 
 class SSEService {
-  private eventSource: EventSource | null = null;
+  private eventSource: EventSourcePolyfill | null = null;
   private reconnectTimeout: number | null = null;
   private callbacks: Set<SSEEventCallback> = new Set();
   private maxReconnectDelay = 30000; // 30 segundos
@@ -19,18 +20,34 @@ class SSEService {
    * Conectar al stream SSE del backend
    */
   connect(token: string): void {
-    if (this.eventSource) {
-      console.log('[SSE] Ya existe una conexión activa')
+    // Verificar si ya existe una conexión ABIERTA (readyState = 1)
+    if (this.eventSource && this.eventSource.readyState === 1) {
+      console.log('[SSE] ⚠️ Ya existe una conexión ACTIVA, ignorando nueva conexión')
       return
     }
 
-    // EventSource no soporta headers personalizados, así que enviamos el token como query param
-    const url = `${import.meta.env.VITE_API_URL}/events?token=${encodeURIComponent(token)}`
-    
-    console.log('[SSE] 🔗 Conectando a:', url.replace(token, '***'))
+    // Si existe pero está cerrada o en error, cerrarla primero
+    if (this.eventSource) {
+      console.log('[SSE] 🧹 Limpiando conexión anterior en estado:', this.eventSource.readyState)
+      try {
+        this.eventSource.close()
+      } catch (e) {
+        console.warn('[SSE] Error al cerrar conexión anterior:', e)
+      }
+      this.eventSource = null
+    }
 
-    this.eventSource = new EventSource(url, {
+    // Usar EventSourcePolyfill para enviar el token de forma segura en los headers
+    const url = `${import.meta.env.VITE_API_URL}/events`
+    
+    console.log('[SSE] 🔗 Conectando a:', url, '| Callbacks activos:', this.callbacks.size)
+
+    this.eventSource = new EventSourcePolyfill(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
       withCredentials: true,
+      heartbeatTimeout: 60000, // 60 segundos
     })
 
     // Evento: Conexión abierta
@@ -122,7 +139,7 @@ class SSEService {
    * Verificar si hay una conexión activa
    */
   isConnected(): boolean {
-    return this.eventSource !== null && this.eventSource.readyState === EventSource.OPEN
+    return this.eventSource !== null && this.eventSource.readyState === 1 // 1 = OPEN
   }
 }
 

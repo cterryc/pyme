@@ -54,8 +54,8 @@ export const RegisterPyme = () => {
     handleSubmit,
     formState: { errors }
   } = useForm<RegisterPymeFormData>({
-    resolver: zodResolver(registerPymeSchema),
-    defaultValues: getStoredData(),
+    resolver: zodResolver(registerPymeSchema) as any,
+    defaultValues: getStoredData() as RegisterPymeFormData,
     mode: 'onChange'
   })
 
@@ -64,8 +64,7 @@ export const RegisterPyme = () => {
   }, [industries])
 
   const onSubmit = (dataForm: RegisterPymeFormData) => {
-    const { countryCode, ...data } = dataForm
-    console.log(countryCode)
+    const { ...data } = dataForm
     let fixedWebsite
     try {
       if (data.website != undefined) {
@@ -79,12 +78,7 @@ export const RegisterPyme = () => {
     pymeRegister(data)
   }
 
-  const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
-    e.preventDefault()
-    if (step < maxStep) {
-      setStep(step + 1)
-    }
-  }
+
   const prevStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
     if (step > 0) {

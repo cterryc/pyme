@@ -1,7 +1,8 @@
-import { param, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import HTTP_STATUS from '../constants/HttpStatus';
 import apiResponse from '../utils/apiResponse.utils';
+
+const { param, validationResult } = require('express-validator');
 
 export const validationErrors = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

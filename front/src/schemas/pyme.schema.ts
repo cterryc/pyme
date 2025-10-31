@@ -35,8 +35,8 @@ const getPhoneRegexForCountry = (countryCode: number) => {
     // 1: /^(\+54|54)?[9]\d{9,10}$/, // Argentina
     // 2: /^(\+595|595)?[9]\d{8}$/, // Paraguay
     // 3: /^(\+51|51)?[9]\d{8}$/ // Perú
-    0: /^[9]\d{7}$/, // Uruguay
-    1: /^(\+54|54)?[9]\d{9,10}$/, // Argentina
+    0: /^(\+594|594)?[9]\d{7}$/, // Uruguay
+    1: /^(\+54|0054|54)?\s?[-()\s.]*((1[1-9]|[2-9]\d{0,3}))?[-()\s.]*(\d{2,4})[-()\s.]*(\d{2,4})$/, // Argentina
     2: /^(\+595|595)?[9]\d{8}$/, // Paraguay
     3: /^(\+51|51)?[9]\d{8}$/ // Perú
   }
@@ -47,7 +47,7 @@ const getPhoneRegexForCountry = (countryCode: number) => {
 const getCountryFormatMessage = (countryCode: number) => {
   const countryNames = {
     0: 'Para Uruguay es 9X XXX XXX',
-    1: 'Para Argentina es 9 XXX XXX XXX',
+    1: 'Para Argentina es 9 XX XXXX XXXX',
     2: 'Para Perú es 9 XX XX XX XX',
     3: 'Para Paraguay es 9 XX XXX XXX'
   }

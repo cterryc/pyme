@@ -1,6 +1,6 @@
 import { registerPymeSchema, type RegisterPymeFormData } from '@/schemas/pyme.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, type Resolver } from 'react-hook-form'
 
 export const PymeForm = ({
   industriesList,
@@ -18,7 +18,7 @@ export const PymeForm = ({
     handleSubmit,
     formState: { errors }
   } = useForm<RegisterPymeFormData>({
-    resolver: zodResolver(registerPymeSchema),
+    resolver: zodResolver(registerPymeSchema) as Resolver<RegisterPymeFormData>,
     defaultValues: defaultValues, //getStoredData(),
     mode: 'onChange'
   })

@@ -7,9 +7,15 @@ import HttpError from './utils/HttpError.utils'
 import apiResponse from './utils/apiResponse.utils'
 import { handleSSEPreflight, subscribeLoanStatus } from './api/sse/controller'
 import authenticateSSE from './middlewares/authenticate.sse.middleware'
+import { validateEnvironment } from './utils/validateEnv.utils'
 
 ;(async () => {
   try {
+    // Validar entorno en producción
+    if (process.env.NODE_ENV === 'production') {
+      validateEnvironment()
+    }
+
     const appCreator = new ExpressAppCreator()
     const app = await appCreator.createExpressApp()
 
