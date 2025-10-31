@@ -301,3 +301,206 @@ export const htmlResetPasswordContent = (
 </html>
   `;
 };
+
+// Configuración de colores por estado
+const statusColorConfig: Record<string, { primary: string; secondary: string; emoji: string; title: string }> = {
+  'Aprobado': { 
+    primary: '#10b981', 
+    secondary: '#059669', 
+    emoji: '✅', 
+    title: '¡Felicitaciones! Tu crédito ha sido aprobado' 
+  },
+  'Rechazado': { 
+    primary: '#ef4444', 
+    secondary: '#dc2626', 
+    emoji: '❌', 
+    title: 'Actualización sobre tu solicitud de crédito' 
+  },
+  'En revisión': { 
+    primary: '#3b82f6', 
+    secondary: '#2563eb', 
+    emoji: '🔍', 
+    title: 'Tu crédito está siendo revisado' 
+  },
+  'Documentos requeridos': { 
+    primary: '#f59e0b', 
+    secondary: '#d97706', 
+    emoji: '📄', 
+    title: 'Se requieren documentos adicionales' 
+  },
+  'Desembolsado': { 
+    primary: '#10b981', 
+    secondary: '#047857', 
+    emoji: '💰', 
+    title: '¡Tu crédito ha sido desembolsado!' 
+  },
+  'Pendiente': { 
+    primary: '#8b5cf6', 
+    secondary: '#7c3aed', 
+    emoji: '⏳', 
+    title: 'Tu solicitud está en proceso' 
+  }
+};
+
+/**
+ * Genera el contenido HTML para el email de cambio de estado de crédito
+ */
+export const htmlLoanStatusUpdate = (
+  userName: string,
+  companyName: string,
+  applicationNumber: string,
+  newStatus: string,
+  amount: number,
+  statusReason?: string,
+  frontendUrl: string = process.env.FRONTEND_URL || 'http://localhost:5173'
+): string => {
+  const config = statusColorConfig[newStatus] || statusColorConfig['Pendiente'];
+  const formattedAmount = new Intl.NumberFormat('es-AR', { 
+    style: 'currency', 
+    currency: 'ARS' 
+  }).format(amount);
+
+  return `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualización de Estado - Crédito ${applicationNumber}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="min-height: 100vh; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" border="0" cellpadding="0" cellspacing="0" style="background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; max-width: 100%;">
+                    
+                    <!-- Header con gradiente dinámico -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, ${config.primary} 0%, ${config.secondary} 100%); padding: 50px 40px; text-align: center;">
+                            <div style="font-size: 60px; margin-bottom: 15px;">${config.emoji}</div>
+                            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                ${config.title}
+                            </h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <p style="color: #2d3748; font-size: 18px; margin: 0 0 10px 0; font-weight: 600;">
+                                Hola ${userName},
+                            </p>
+                            
+                            <p style="color: #4a5568; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+                                Te informamos que el estado de tu solicitud de crédito ha sido actualizado.
+                            </p>
+
+                            <!-- Card de información del crédito -->
+                            <div style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-left: 4px solid ${config.primary}; border-radius: 12px; padding: 25px; margin: 30px 0;">
+                                <h3 style="color: #2d3748; margin: 0 0 20px 0; font-size: 18px; font-weight: 600;">
+                                    📋 Detalles de la Solicitud
+                                </h3>
+                                
+                                <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                                    <tr>
+                                        <td style="color: #718096; font-size: 14px; padding: 8px 0;">
+                                            <strong>Empresa:</strong>
+                                        </td>
+                                        <td style="color: #2d3748; font-size: 14px; text-align: right; padding: 8px 0;">
+                                            ${companyName}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: #718096; font-size: 14px; padding: 8px 0; border-top: 1px solid #e2e8f0;">
+                                            <strong>N° de Solicitud:</strong>
+                                        </td>
+                                        <td style="color: #2d3748; font-size: 14px; text-align: right; padding: 8px 0; border-top: 1px solid #e2e8f0;">
+                                            ${applicationNumber}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: #718096; font-size: 14px; padding: 8px 0; border-top: 1px solid #e2e8f0;">
+                                            <strong>Monto:</strong>
+                                        </td>
+                                        <td style="color: #2d3748; font-size: 16px; font-weight: 600; text-align: right; padding: 8px 0; border-top: 1px solid #e2e8f0;">
+                                            ${formattedAmount}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: #718096; font-size: 14px; padding: 8px 0; border-top: 1px solid #e2e8f0;">
+                                            <strong>Nuevo Estado:</strong>
+                                        </td>
+                                        <td style="text-align: right; padding: 8px 0; border-top: 1px solid #e2e8f0;">
+                                            <span style="background: ${config.primary}; color: white; padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 600; display: inline-block;">
+                                                ${newStatus}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            ${statusReason ? `
+                            <!-- Nota/Razón del estado -->
+                            <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <p style="margin: 0; color: #4a5568; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #2d3748;">Nota del administrador:</strong><br>
+                                    ${statusReason}
+                                </p>
+                            </div>
+                            ` : ''}
+
+                            ${newStatus === 'Aprobado' ? `
+                            <!-- Mensaje especial para aprobados -->
+                            <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <p style="margin: 0; color: #065f46; font-size: 15px; line-height: 1.6;">
+                                    <strong>🎉 ¡Excelentes noticias!</strong><br>
+                                    Tu crédito ha sido aprobado. En breve nos pondremos en contacto contigo para finalizar el proceso de desembolso.
+                                </p>
+                            </div>
+                            ` : ''}
+
+                            ${newStatus === 'Documentos requeridos' ? `
+                            <!-- Mensaje para documentos requeridos -->
+                            <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <p style="margin: 0; color: #78350f; font-size: 15px; line-height: 1.6;">
+                                    <strong>📄 Acción requerida:</strong><br>
+                                    Para continuar con el proceso de evaluación, necesitamos que subas documentación adicional a través de tu panel de control.
+                                </p>
+                            </div>
+                            ` : ''}
+
+                            ${newStatus === 'Desembolsado' ? `
+                            <!-- Mensaje para desembolsado -->
+                            <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <p style="margin: 0; color: #065f46; font-size: 15px; line-height: 1.6;">
+                                    <strong>💰 ¡Fondos transferidos!</strong><br>
+                                    El monto de ${formattedAmount} ha sido desembolsado exitosamente. Deberías verlo reflejado en tu cuenta bancaria en las próximas 24-48 horas hábiles.
+                                </p>
+                            </div>
+                            ` : ''}
+
+                            <p style="color: #718096; font-size: 14px; line-height: 1.6; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                                Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarnos. Estamos aquí para ayudarte.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background: #f7f9fc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+                            <p style="color: #718096; font-size: 14px; margin: 0 0 10px 0;">
+                                Este es un correo automático, por favor no respondas a este mensaje.
+                            </p>
+                            <div style="color: #a0aec0; font-size: 14px; margin-top: 20px;">
+                                © 2025 Pyme. Todos los derechos reservados.
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+  `;
+};

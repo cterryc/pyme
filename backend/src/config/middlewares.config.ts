@@ -6,7 +6,6 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import compression from "compression";
 import hpp from "hpp";
 import { rootPath } from "../utils/path.utils";
 
@@ -98,27 +97,33 @@ export default class MiddlewareConfig {
       })
     );
 
-    const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutos
-      max: 100, // límite de 100 requests por windowMs
-      message: "Too many requests from this IP, please try again later",
-      standardHeaders: true,
-      legacyHeaders: false,
-      skip: (req) => req.method === "OPTIONS",
-    });
+    if (process.env.NODE_ENV === "production") {
+      const limiter = rateLimit({
+        windowMs: 15 * 60 * 1000, 
+        max: 100, 
+        message: "Too many requests from this IP, please try again later",
+        standardHeaders: true,
+        legacyHeaders: false,
+        skip: (req) => req.method === "OPTIONS",
+      });
 
-    const authLimiter = rateLimit({
-      windowMs: 15 * 60 * 1000,
-      max: 5, // solo 5 intentos de login
-      message: "Too many login attempts, please try again later",
-      standardHeaders: true,
-      legacyHeaders: false,
-      skip: (req) => req.method === "OPTIONS", // ✅ Skip preflight requests
-    });
+      const authLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 10, 
+        message: "Too many login attempts, please try again later",
+        standardHeaders: true,
+        legacyHeaders: false,
+        skip: (req) => req.method === "OPTIONS",
+      });
 
-    app.use("/api/" as any, limiter as any);
-    app.use("/api/auth/login" as any, authLimiter as any);
-    app.use("/api/auth/register" as any, authLimiter as any);
+      app.use("/api/" as any, limiter as any);
+      app.use("/api/auth/login" as any, authLimiter as any);
+      app.use("/api/auth/register" as any, authLimiter as any);
+
+      console.log("🚦 Rate limiting enabled (production mode)");
+    } else {
+      console.log("⚠️  Rate limiting DISABLED (development mode)");
+    }
 
     app.use(hpp());
 
