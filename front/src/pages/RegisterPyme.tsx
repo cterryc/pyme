@@ -16,11 +16,13 @@ export const RegisterPyme = () => {
   const [step, setStep] = useState(0)
   const [pymeId, setPymeId] = useState('')
   const [industriesList, setIndustriesList] = useState<Array<{ id: string; name: string }>>()
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const { data: industries, isLoading: getIndustriesIsLoading, isError: getIndustriesError } = useGetIndustries()
 
-  const { mutate: pymeRegister } = usePymeRegister({
+  const { mutate: pymeRegister, isPending } = usePymeRegister({
     onSuccess: (data) => {
+      setIsSubmitted(false)
       toast.success('¡MYPE registrada exitosamente!', {
         style: { borderColor: '#3cbb38ff', backgroundColor: '#f5fff1ff', borderWidth: '2px' },
         description: 'Ahora debes adjuntar los documentos requeridos y firmarlos para completar el registro.',
@@ -30,6 +32,7 @@ export const RegisterPyme = () => {
       setPymeId(data.payload.id)
     },
     onError: (dataError) => {
+      setIsSubmitted(false)
       toast.error('Error al registrar la MYPE', {
         style: { borderColor: '#fa4545ff', backgroundColor: '#fff1f1ff', borderWidth: '2px' },
         description: dataError.payload.message || 'No se pudo completar el registro. Verifica los datos ingresados.',
@@ -54,8 +57,8 @@ export const RegisterPyme = () => {
     handleSubmit,
     formState: { errors }
   } = useForm<RegisterPymeFormData>({
-    resolver: zodResolver(registerPymeSchema),
-    defaultValues: getStoredData(),
+    resolver: zodResolver(registerPymeSchema) as any,
+    defaultValues: getStoredData() as RegisterPymeFormData,
     mode: 'onChange'
   })
 
@@ -64,8 +67,8 @@ export const RegisterPyme = () => {
   }, [industries])
 
   const onSubmit = (dataForm: RegisterPymeFormData) => {
-    const { countryCode, ...data } = dataForm
-    console.log(countryCode)
+    setIsSubmitted(true)
+    const { ...data } = dataForm
     let fixedWebsite
     try {
       if (data.website != undefined) {
@@ -74,17 +77,12 @@ export const RegisterPyme = () => {
       data.website = fixedWebsite.origin
     } catch {
       data.website = ''
-    }
+    } 
 
     pymeRegister(data)
   }
 
-  const nextStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
-    e.preventDefault()
-    if (step < maxStep) {
-      setStep(step + 1)
-    }
-  }
+
   const prevStep = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
     if (step > 0) {
@@ -488,12 +486,20 @@ export const RegisterPyme = () => {
                     </button>
                   )} */}
                   {/* {step == maxStep && ( */}
-                  <input
+                  {isSubmitted || isPending ? (
+                    <button
+                      disabled
+                      className='bg-gray-400 w-[120px] py-1 text-white rounded border border-gray-400 cursor-not-allowed opacity-70'
+                    >
+                      Enviando...
+                    </button>
+                  ) : (
+                    <input
                     type='submit'
                     className='bg-[var(--primary)] w-[120px] py-1 text-white rounded border border-[var(--primary)] hover:bg-white hover:text-[var(--primary)] duration-150 cursor-pointer'
                     value='Confirmar'
-                  />
-                  {/* )} */}
+                    />
+                  )}
                 </div>
               </form>
             </section>

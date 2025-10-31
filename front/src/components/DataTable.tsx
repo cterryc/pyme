@@ -12,6 +12,7 @@ interface DataTableProps {
   columns: Column[]
   data: any[]
   onRowClick?: (row: any) => void
+  isLoading?: boolean
 }
 
 export const DataTable = ({ columns, data, onRowClick }: DataTableProps) => {

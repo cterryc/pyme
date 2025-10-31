@@ -24,7 +24,8 @@ export default class ExpressAppCreator {
     constructor() {
         this.app = express();
         this.modeCluster = config.MODE === "CLUSTER";
-        this.PORT = Number(config.PORT) || 8082;
+        // Render usa PORT en variables de entorno
+        this.PORT = Number(process.env.PORT || config.PORT) || 10000;
     }
 
     /**
@@ -39,7 +40,11 @@ export default class ExpressAppCreator {
          const status = await TypeORMManager.getDatabaseStatus();
         console.log("🎯 Estado final de la base de datos:", status);
 
-        if (this.modeCluster && cluster.isPrimary) {
+        // En producción (Render, Railway, etc) NO usar cluster mode
+        const isProduction = process.env.NODE_ENV === 'production';
+        const useCluster = this.modeCluster && !isProduction;
+
+        if (useCluster && cluster.isPrimary) {
             this.setupCluster();
         } else {
             this.startServer();

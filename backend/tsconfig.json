@@ -1,40 +1,27 @@
-// {
-//   "compilerOptions": {
-//     "target": "ES2020",
-//     "module": "CommonJS",
-//     "moduleResolution": "node",
-//     "experimentalDecorators": true,
-//     "emitDecoratorMetadata": true,
-//     "useDefineForClassFields": false,
-//     "esModuleInterop": true,
-//     "strict": true,
-//     "strictPropertyInitialization": false,
-//     "outDir": "./dist",
-//     "rootDir": "./src",
-//     "sourceMap": true,
-//     "skipLibCheck": true,
-//      "lib": ["ES2020"],
-//     "downlevelIteration": true,
-//   },
-//   "include": ["src"]
-// }
-
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "commonjs",
     "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "removeComments": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "resolveJsonModule": true
+    "sourceMap": false
   },
   "include": [
     "src/**/*"

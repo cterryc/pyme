@@ -33,9 +33,22 @@ export default async function authenticateSSE(
             origin: req.headers.origin,
         });
 
-       
-        const origin = req.headers.origin || "http://localhost:5173";
-        if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+        // Limpiar URLs removiendo barras finales
+        const cleanUrl = (url: string | undefined) => {
+            if (!url) return null;
+            return url.replace(/\/$/, '');
+        };
+
+        // Asegurar headers CORS dinámicos según entorno
+        const allowedOrigins =
+            process.env.NODE_ENV === "production"
+                ? [cleanUrl(process.env.FRONTEND_URL)].filter(Boolean)
+                : ["http://localhost:5173", "http://localhost:5174"];
+
+        const origin = req.headers.origin || "";
+        const cleanOrigin = cleanUrl(origin);
+        
+        if (allowedOrigins.includes(cleanOrigin)) {
             res.setHeader("Access-Control-Allow-Origin", origin);
         }
         res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -54,9 +67,22 @@ export default async function authenticateSSE(
     } catch (error) {
         console.error("[SSE Auth] ❌ Token inválido:", error);
 
+        // Limpiar URLs removiendo barras finales
+        const cleanUrl = (url: string | undefined) => {
+            if (!url) return null;
+            return url.replace(/\/$/, '');
+        };
+
+        // Asegurar headers CORS dinámicos según entorno
+        const allowedOrigins =
+            process.env.NODE_ENV === "production"
+                ? [cleanUrl(process.env.FRONTEND_URL)].filter(Boolean)
+                : ["http://localhost:5173", "http://localhost:5174"];
+
+        const origin = req.headers.origin || "";
+        const cleanOrigin = cleanUrl(origin);
         
-        const origin = req.headers.origin || "http://localhost:5173";
-        if (origin === "http://localhost:5173" || origin === "http://localhost:5174") {
+        if (allowedOrigins.includes(cleanOrigin)) {
             res.setHeader("Access-Control-Allow-Origin", origin);
         }
         res.setHeader("Access-Control-Allow-Credentials", "true");

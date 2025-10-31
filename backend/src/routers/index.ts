@@ -5,7 +5,7 @@ import companyRouter from "../api/company/routes";
 import documentRouter from "../api/document/routes";
 import loanRouter from "../api/loan/routes";
 import adminRouter from "../api/admin/routes";
-import { subscribeLoanStatus } from "../api/sse/controller";
+import { subscribeLoanStatus, handleSSEPreflight } from "../api/sse/controller";
 import authenticateSSE from "../middlewares/authenticate.sse.middleware";
 
 
@@ -17,6 +17,9 @@ apiRouter.use("/companies", companyRouter);
 apiRouter.use("/documents", documentRouter);
 apiRouter.use("/loanRequest", loanRouter);
 apiRouter.use("/admin", adminRouter);
+
+// ✅ SSE Routes - OPTIONS primero (sin autenticación), luego GET (con autenticación)
+apiRouter.options("/events", handleSSEPreflight);
 apiRouter.get("/events", authenticateSSE, subscribeLoanStatus);
 
 apiRouter.use("/" /* path */, (req, res) => {
