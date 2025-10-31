@@ -133,6 +133,12 @@ export default class MiddlewareConfig {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
+    const docsPath = process.env.NODE_ENV === "production" 
+      ? path.join(process.cwd(), "dist", "docs", "**/*.yaml")
+      : `${rootPath}/docs/**/*.yaml`;
+
+    console.log(`📚 Swagger docs path: ${docsPath}`);
+
     const swaggerOptions = {
       definition: {
         openapi: "3.0.1",
@@ -157,7 +163,7 @@ export default class MiddlewareConfig {
           },
         ],
       },
-      apis: [`${rootPath}/docs/**/*.yaml`],
+      apis: [docsPath],
     };
 
     const specs = swaggerJSDoc(swaggerOptions);

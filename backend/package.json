@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon --watch src -e ts,tsx --exec node -r ts-node/register/transpile-only src/index.ts",
-    "build": "tsc",
+    "build": "tsc && node -e \"const fs=require('fs');const path=require('path');function copyDir(src,dest){fs.mkdirSync(dest,{recursive:true});const entries=fs.readdirSync(src,{withFileTypes:true});for(const entry of entries){const srcPath=path.join(src,entry.name);const destPath=path.join(dest,entry.name);if(entry.isDirectory()){copyDir(srcPath,destPath)}else{fs.copyFileSync(srcPath,destPath)}}}copyDir('src/docs','dist/docs');console.log('✅ Docs copied to dist/docs')\"",
     "start": "node dist/index.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "npm run typeorm -- migration:generate -d src/config/data-source.ts",
