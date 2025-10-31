@@ -30,6 +30,7 @@ import { broadcastLoanStatusUpdate } from "../sse/controller";
 import config from "../../config/enviroment.config";
 import { Signature } from "../../entities/Signature.entity";
 import { User } from "../../entities/User.entity";
+import { htmlLoanStatusUpdate } from "../auth/helpers";
 
 export default class LoanService {
   private readonly loanRepo: Repository<CreditApplication>;
@@ -517,11 +518,37 @@ export default class LoanService {
 
     // Notificar al usuario sobre el cambio de estado
     if (application.company.ownerId) {
+      // Enviar notificación SSE en tiempo real
       broadcastLoanStatusUpdate(application.company.ownerId, {
         id: application.id,
         newStatus: application.status,
         updatedAt: application.updatedAt,
       });
+
+      // Enviar email de notificación
+      try {
+        const user = await this.userRepo.findOne({
+          where: { id: application.company.ownerId }
+        });
+
+        if (user?.email) {
+          const amount = application.selectedAmount || application.approvedAmount || 0;
+          const reasonText = rejectionReason || userNotes || undefined;
+          
+          await this.sendLoanStatusEmail(
+            user.email,
+            user.firstName || "Usuario",
+            application.company.tradeName,
+            application.applicationNumber,
+            newStatus,
+            amount,
+            reasonText
+          );
+        }
+      } catch (emailError) {
+        console.error("Error al enviar email de notificación:", emailError);
+        // No afectar el flujo principal si falla el email
+      }
     }
 
     return {
@@ -718,6 +745,66 @@ export default class LoanService {
   private getValidStatusTransitions(currentStatus: CreditApplicationStatus): CreditApplicationStatus[] {
     // Usar las transiciones definidas centralmente en CreditStatus.ts
     return ALLOWED_STATUS_TRANSITIONS[currentStatus] || [];
+  }
+
+  /**
+   * Envía un email al usuario notificando el cambio de estado del crédito
+   */
+  private async sendLoanStatusEmail(
+    userEmail: string,
+    userName: string,
+    companyName: string,
+    applicationNumber: string,
+    newStatus: string,
+    amount: number,
+    statusReason?: string
+  ): Promise<void> {
+    try {
+      const htmlContent = htmlLoanStatusUpdate(
+        userName,
+        companyName,
+        applicationNumber,
+        newStatus,
+        amount,
+        statusReason,
+        config.FRONTEND_URL || 'http://localhost:5173'
+      );
+
+      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": config.BREVO_API_KEY,
+        },
+        body: JSON.stringify({
+          sender: {
+            name: "Pyme - Créditos",
+            email: "nc.equipo21@gmail.com",
+          },
+          replyTo: {
+            email: "nc.equipo21@gmail.com",
+            name: "Pyme Soporte",
+          },
+          to: [
+            {
+              email: userEmail,
+              name: userName,
+            },
+          ],
+          subject: `Actualización: Tu crédito ${applicationNumber} - Estado: ${newStatus}`,
+          htmlContent,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Error al enviar email de cambio de estado:", errorData);
+        // No lanzamos error para que no afecte el flujo principal
+      }
+    } catch (error) {
+      console.error("Error al enviar email de cambio de estado:", error);
+      // No lanzamos error para que no afecte el flujo principal
+    }
   }
 
   async calculateLoanOptions(company: Company): Promise<LoanCalculationResult> {

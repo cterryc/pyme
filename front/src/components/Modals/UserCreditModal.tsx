@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { LoanRequestPayload } from '@/interfaces/loan.interface'
 import { getSecureIdUrlSafe } from '@/config/SecureIdUrl'
 
@@ -7,11 +8,17 @@ interface UserCreditModalProps {
 }
 
 export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalProps) => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
   const formatCurrency = (amount: number): string => {
     if (amount === null) return 'N/A'
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency: 'ARS',
+      currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount)
@@ -36,8 +43,8 @@ export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalPr
 
   console.log(getCredit)
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-      <div className='max-w-3xl w-full bg-white rounded-2xl shadow-2xl animate-[fadeIn_0.2s_ease-out,scaleIn_0.2s_ease-out] overflow-hidden'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto'>
+      <div className='max-w-3xl w-full bg-white rounded-2xl shadow-2xl animate-[fadeIn_0.2s_ease-out,scaleIn_0.2s_ease-out] my-auto'>
         <div className='bg-gradient-to-r from-[#1193d4] to-[#0d7ab8] p-6 md:p-8 rounded-t-2xl'>
           <div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4'>
             <div className='flex-1'>
@@ -74,7 +81,7 @@ export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalPr
             </h3>
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl'>
               <InfoItem label='Nombre Legal' value={getCredit?.legalName} />
-              <InfoItem label='Ingreso Anual' value={getCredit?.annualRevenue} />
+              <InfoItem label='Ingreso Anual' value={`$ ${getCredit?.annualRevenue}`} />
             </div>
           </section>
 

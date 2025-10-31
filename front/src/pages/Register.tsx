@@ -39,7 +39,7 @@ export const Register = () => {
           'Tu cuenta ha sido creada. Ahora puedes registrar una MYPE para realizar una solicitud de crédito.',
         duration: 4000
       })
-      navigate('/panel')
+      navigate('/verify-email')
     },
     onError: (dataError) => {
       toast.error('Error al registrarse', {
@@ -55,6 +55,7 @@ export const Register = () => {
   const IconEye = hidePassword ? FaEye : FaEyeSlash
   const onSubmit = (data: RegisterFormData) => {
     console.log(data)
+    localStorage.setItem('userEmail', data.email)
     authRegister(data)
   }
 

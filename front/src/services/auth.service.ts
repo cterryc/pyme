@@ -9,6 +9,12 @@ export const authRegister = async (data: RegisterFormData): Promise<AuthSucessRe
       body: JSON.stringify(data)
     })
 
+    // Manejar rate limiting (429) que devuelve texto plano
+    if (response.status === 429) {
+      const text = await response.text()
+      throw new Error(text || 'Demasiados intentos. Por favor, intenta más tarde.')
+    }
+
     const result = await response.json()
     if (!response.ok) throw result
     return result
@@ -25,6 +31,13 @@ export const authLogin = async (data: LoginFormData): Promise<AuthSucessResponse
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
+
+    // Manejar rate limiting (429) que devuelve texto plano
+    if (response.status === 429) {
+      const text = await response.text()
+      throw new Error(text || 'Demasiados intentos. Por favor, intenta más tarde.')
+    }
+
     const result = await response.json()
     if (!response.ok) throw result
     return result
