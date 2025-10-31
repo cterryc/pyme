@@ -133,9 +133,9 @@ export const UserCreditRequests = () => {
                           cr.status === 'Rechazado'
                       )
                       .map((credit: CreditAppplication) => {
-                        const amount = new Intl.NumberFormat('es-PE', {
+                        const amount = new Intl.NumberFormat('es-AR', {
                           style: 'currency',
-                          currency: 'PEN'
+                          currency: 'USD'
                         }).format(Number(credit.requestAmonut))
 
                         return (
