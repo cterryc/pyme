@@ -50,6 +50,8 @@ export const UserCreditRequests = () => {
         return 'bg-purple-400 text-white shadow-sm'
       case 'Rechazado':
         return 'bg-red-500 text-white shadow-sm'
+      case 'Documentos requeridos':
+        return 'bg-orange-500 text-white shadow-sm'
       case 'No confirmado':
         return 'bg-gray-200 text-gray-700'
       default:
@@ -102,7 +104,8 @@ export const UserCreditRequests = () => {
                   cr.status === 'Enviado' ||
                   cr.status === 'Aprobado' ||
                   cr.status === 'En revisión' ||
-                  cr.status === 'Rechazado'
+                  cr.status === 'Rechazado' ||
+                  cr.status === 'Documentos requeridos'
               ).length === 0 ? (
                 <tbody>
                   <tr>
@@ -125,13 +128,7 @@ export const UserCreditRequests = () => {
                 <tbody className='divide-y divide-gray-200'>
                   {loansByUser &&
                     loansByUser.payload
-                      .filter(
-                        (cr) =>
-                          cr.status === 'Enviado' ||
-                          cr.status === 'Aprobado' ||
-                          cr.status === 'En revisión' ||
-                          cr.status === 'Rechazado'
-                      )
+                    
                       .map((credit: CreditAppplication) => {
                         const amount = new Intl.NumberFormat('es-AR', {
                           style: 'currency',
@@ -196,12 +193,7 @@ export const UserCreditRequests = () => {
                   </th>
                 </tr>
               </thead>
-              {loansByUser?.payload.filter((cr) => 
-                cr.status === 'Enviado' || 
-                cr.status === 'Aprobado' || 
-                cr.status === 'En revisión' || 
-                cr.status === 'Rechazado'
-              ).length === 0 ? (
+              {loansByUser?.payload.length === 0 ? (
                 <tbody>
                   <tr>
                     <td colSpan={5} className='text-center text-gray-500 py-12'>
@@ -223,12 +215,6 @@ export const UserCreditRequests = () => {
                 <tbody className='divide-y divide-gray-200'>
                   {loansByUser &&
                     loansByUser.payload
-                      .filter((cr) => 
-                        cr.status === 'Enviado' || 
-                        cr.status === 'Aprobado' || 
-                        cr.status === 'En revisión' || 
-                        cr.status === 'Rechazado'
-                      )
                       .map((credit: CreditAppplication) => {
                         const amount = new Intl.NumberFormat('es-PE', {
                           style: 'currency',
