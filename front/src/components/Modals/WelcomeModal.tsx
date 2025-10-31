@@ -3,13 +3,49 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
-const welcomeSchema = z.object({
+// Phone validation patterns por país
+const getPhoneRegexForCountry = (countryCode: number) => {
+  const patterns = {
+    0: /^[9]\d{7}$/, // Uruguay - 9X XXX XXX
+    1: /^[9]\d{9,10}$/, // Argentina - 9 XXX XXX XXX
+    2: /^[9]\d{8}$/, // Paraguay - 9 XX XXX XXX
+    3: /^[9]\d{8}$/ // Perú - 9 XX XX XX XX
+  }
+  return patterns[countryCode as keyof typeof patterns] || patterns[3]
+}
+
+const getCountryFormatMessage = (countryCode: number) => {
+  const formats = {
+    0: 'Para Uruguay: 9X XXX XXX',
+    1: 'Para Argentina: 9 XXX XXX XXX',
+    2: 'Para Paraguay: 9 XX XXX XXX',
+    3: 'Para Perú: 9 XX XX XX XX'
+  }
+  return formats[countryCode as keyof typeof formats] || formats[3]
+}
+
+const baseWelcomeSchema = z.object({
   firstName: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   lastName: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
-  phone: z.string().min(7, 'El teléfono debe tener al menos 7 caracteres')
+  countryCode: z.number().int().min(0).max(3),
+  phone: z
+    .string()
+    .min(1, 'El teléfono es obligatorio')
+    .transform((val) => val.replaceAll(' ', ''))
 })
 
-type WelcomeFormData = z.infer<typeof welcomeSchema>
+const welcomeSchema = baseWelcomeSchema.superRefine((data, ctx) => {
+  const regex = getPhoneRegexForCountry(data.countryCode)
+  if (!regex.test(data.phone)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Formato inválido. ${getCountryFormatMessage(data.countryCode)}`,
+      path: ['phone']
+    })
+  }
+})
+
+type WelcomeFormData = z.infer<typeof baseWelcomeSchema>
 
 interface WelcomeModalProps {
   isOpen: boolean
@@ -17,14 +53,28 @@ interface WelcomeModalProps {
   isPending?: boolean
 }
 
+const countries = [
+  { code: 3, name: 'Perú', flag: '🇵🇪', placeholder: '999 999 999' },
+  { code: 1, name: 'Argentina', flag: '🇦🇷', placeholder: '9 11 1234 5678' },
+  { code: 2, name: 'Paraguay', flag: '🇵🇾', placeholder: '9 61 123 456' },
+  { code: 0, name: 'Uruguay', flag: '🇺🇾', placeholder: '94 123 456' }
+]
+
 export const WelcomeModal = ({ isOpen, onSubmit, isPending = false }: WelcomeModalProps) => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors }
   } = useForm<WelcomeFormData>({
-    resolver: zodResolver(welcomeSchema)
+    resolver: zodResolver(welcomeSchema),
+    defaultValues: {
+      countryCode: 3 // Perú por defecto
+    }
   })
+
+  const selectedCountryCode = watch('countryCode')
+  const selectedCountry = countries.find((c) => c.code === Number(selectedCountryCode)) || countries[0]
 
   useEffect(() => {
     if (isOpen) {
@@ -151,6 +201,33 @@ export const WelcomeModal = ({ isOpen, onSubmit, isPending = false }: WelcomeMod
               )}
             </div>
 
+            {/* Country Code */}
+            <div>
+              <label htmlFor='countryCode' className='block text-sm font-medium text-gray-700 mb-2'>
+                País <span className='text-red-500'>*</span>
+              </label>
+              <div className='relative'>
+                <select
+                  id='countryCode'
+                  {...register('countryCode')}
+                  disabled={isPending}
+                  className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 bg-white disabled:bg-gray-50 disabled:cursor-not-allowed appearance-none cursor-pointer'
+                >
+                  {countries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.flag} {country.name}
+                    </option>
+                  ))}
+                </select>
+                <div className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none'>
+                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Phone */}
             <div>
               <label htmlFor='phone' className='block text-sm font-medium text-gray-700 mb-2'>
                 Teléfono <span className='text-red-500'>*</span>
@@ -162,7 +239,7 @@ export const WelcomeModal = ({ isOpen, onSubmit, isPending = false }: WelcomeMod
                   {...register('phone')}
                   disabled={isPending}
                   className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder:text-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed'
-                  placeholder='+51 999 999 999'
+                  placeholder={selectedCountry.placeholder}
                 />
                 <div className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400'>
                   <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -187,6 +264,9 @@ export const WelcomeModal = ({ isOpen, onSubmit, isPending = false }: WelcomeMod
                   {errors.phone.message}
                 </p>
               )}
+              <p className='mt-1.5 text-xs text-gray-500'>
+                {getCountryFormatMessage(Number(selectedCountryCode))}
+              </p>
             </div>
 
             <div className='pt-4'>
