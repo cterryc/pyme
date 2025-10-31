@@ -31,11 +31,11 @@ export const UserCreditRequests = () => {
     if (loansByUser?.payload) {
       const hasApprovedLoan = loansByUser.payload.some((loan) => loan.status === 'Aprobado')
       if (hasApprovedLoan) {
-        //const hasShownCongrats = localStorage.getItem('hasShownCongratsModal');
-        //if (!hasShownCongrats) {
+        const hasShownCongrats = localStorage.getItem('hasShownCongratsModal');
+        if (!hasShownCongrats) {
         setShowCongratsModal(true)
-        //localStorage.setItem('hasShownCongratsModal', 'true');
-        //}
+        localStorage.setItem('hasShownCongratsModal', 'true');
+        }
       }
     }
   }, [loansByUser])
