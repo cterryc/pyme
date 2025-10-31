@@ -6,7 +6,6 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import compression from "compression";
 import hpp from "hpp";
 import { rootPath } from "../utils/path.utils";
 
@@ -29,22 +28,18 @@ export default class MiddlewareConfig {
    * - Serving the Swagger UI for API documentation
    */
   static config(app: express.Application): void {
-    // 🔧 Trust proxy - PRIMERO
     app.set('trust proxy', 1);
 
-    // 🌐 CORS - DEBE IR ANTES de helmet y rate-limit para manejar preflight
-    // Limpiar URLs removiendo barras finales
     const cleanUrl = (url: string | undefined) => {
       if (!url) return null;
-      return url.replace(/\/$/, ''); // Remover barra final
+      return url.replace(/\/$/, ''); 
     };
 
     const allowedOrigins =
       process.env.NODE_ENV === "production"
         ? [
             cleanUrl(process.env.FRONTEND_URL),
-            // Agregar más dominios permitidos aquí si es necesario
-          ].filter(Boolean) // Filtrar undefined/null
+          ].filter(Boolean) 
         : [
             "http://localhost:5173",
             "http://localhost:5174",
@@ -54,17 +49,15 @@ export default class MiddlewareConfig {
     app.use(
       cors({
         origin: (origin, callback) => {
-          // Log para debugging en producción
+       
           console.log(`🌐 CORS Request from: ${origin || "NO ORIGIN"}`);
           console.log(`📋 Allowed origins:`, allowedOrigins);
 
-          // Permitir requests sin origin (SSR, mobile apps, same-origin, Health checks)
           if (!origin) {
             console.log("✅ Allowing request without origin");
             return callback(null, true);
           }
 
-          // Verificar si el origin está permitido
           if (allowedOrigins.includes(origin)) {
             console.log(`✅ Origin ${origin} is allowed`);
             callback(null, true);
@@ -91,7 +84,6 @@ export default class MiddlewareConfig {
       })
     );
 
-    // 🔒 Helmet - Security HTTP Headers (DESPUÉS de CORS)
     app.use(
       helmet({
         crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -105,31 +97,34 @@ export default class MiddlewareConfig {
       })
     );
 
-    // 🚦 Rate Limiting (DESPUÉS de CORS, para que no bloquee preflight)
-    const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutos
-      max: 100, // límite de 100 requests por windowMs
-      message: "Too many requests from this IP, please try again later",
-      standardHeaders: true,
-      legacyHeaders: false,
-      skip: (req) => req.method === "OPTIONS", // ✅ Skip preflight requests
-    });
+    if (process.env.NODE_ENV === "production") {
+      const limiter = rateLimit({
+        windowMs: 15 * 60 * 1000, 
+        max: 100, 
+        message: "Too many requests from this IP, please try again later",
+        standardHeaders: true,
+        legacyHeaders: false,
+        skip: (req) => req.method === "OPTIONS",
+      });
 
-    const authLimiter = rateLimit({
-      windowMs: 15 * 60 * 1000,
-      max: 5, // solo 5 intentos de login
-      message: "Too many login attempts, please try again later",
-      standardHeaders: true,
-      legacyHeaders: false,
-      skip: (req) => req.method === "OPTIONS", // ✅ Skip preflight requests
-    });
+      const authLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 10, 
+        message: "Too many login attempts, please try again later",
+        standardHeaders: true,
+        legacyHeaders: false,
+        skip: (req) => req.method === "OPTIONS",
+      });
 
-    app.use("/api/" as any, limiter as any);
-    app.use("/api/auth/login" as any, authLimiter as any);
-    app.use("/api/auth/register" as any, authLimiter as any);
+      app.use("/api/" as any, limiter as any);
+      app.use("/api/auth/login" as any, authLimiter as any);
+      app.use("/api/auth/register" as any, authLimiter as any);
 
-    // 📦 Compression y HPP (DESPUÉS de CORS)
-    app.use(compression());
+      console.log("🚦 Rate limiting enabled (production mode)");
+    } else {
+      console.log("⚠️  Rate limiting DISABLED (development mode)");
+    }
+
     app.use(hpp());
 
     app.use(express.static(path.join(process.cwd(), "src", "public")));
