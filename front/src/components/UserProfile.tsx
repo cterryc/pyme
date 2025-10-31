@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useGetPymesByUser } from '@/hooks/usePyme'
 import { useDisconnectSSE } from '@/hooks/useSSENotifications'
+import { WelcomeModal } from './Modals/WelcomeModal'
 
 type EditMode = 'none' | 'profile' | 'email' | 'password'
 
@@ -18,6 +19,7 @@ export const UserProfile = () => {
   // State
   const [editMode, setEditMode] = useState<EditMode>('none')
   const [originalProfile, setOriginalProfile] = useState<UserProfileFormData | null>(null)
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false)
 
   // Hooks
   const queryClient = useQueryClient()
@@ -70,6 +72,12 @@ export const UserProfile = () => {
       }
       setOriginalProfile(initialValues)
       reset(initialValues)
+      
+      // Check if user has no name - show welcome moda
+      const hasNoName = !userProfile.payload.firstName?.trim() || !userProfile.payload.lastName?.trim()
+      if (hasNoName) {
+        setShowWelcomeModal(true)
+      }
     }
   }, [userProfile, reset])
 
@@ -137,13 +145,29 @@ export const UserProfile = () => {
     }
   }
 
+  const handleWelcomeSubmit = (data: { firstName: string; lastName: string; phone: string }) => {
+    updateProfile({ 
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phone,
+      profileImage: imageDefault 
+    })
+    setShowWelcomeModal(false)
+  }
+
   return (
-    <div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
-      {/* Header */}
-      <div className='mb-8'>
-        <h2 className='text-2xl sm:text-3xl font-bold text-gray-900'>Mi Perfil</h2>
-        <p className='mt-1 text-sm text-gray-500'>Gestiona tu información personal</p>
-      </div>
+    <>
+      <WelcomeModal
+        isOpen={showWelcomeModal}
+        onSubmit={handleWelcomeSubmit}
+        isPending={isPending}
+      />
+
+      <div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
+        <div className='mb-8'>
+          <h2 className='text-2xl sm:text-3xl font-bold text-gray-900'>Mi Perfil</h2>
+          <p className='mt-1 text-sm text-gray-500'>Gestiona tu información personal</p>
+        </div>
 
       {isLoading && <UserProfileSkeleton />}
       {isError && (
@@ -154,9 +178,7 @@ export const UserProfile = () => {
 
       {!isLoading && !isError && (
         <div className='space-y-6'>
-          {/* Profile Card */}
           <div className='bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden'>
-            {/* Avatar Section */}
             <div className='bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-8 sm:px-8'>
               <div className='flex flex-col sm:flex-row items-center gap-6'>
                 <div className='relative'>
@@ -532,6 +554,7 @@ export const UserProfile = () => {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
