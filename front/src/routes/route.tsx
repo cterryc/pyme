@@ -14,6 +14,7 @@ import { LoanRequest } from '@/pages/LoanRequest'
 import { LoanRequestSuccess } from '@/pages/LoanRequestSuccess'
 import { ProtectedRoute } from '@/pages/ProtectedRoute'
 import { ResetPasword } from '@/pages/ResetPassword'
+import EmailVerification from '@/pages/EmailVerification'
 
 export const mainRouter = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export const mainRouter = createBrowserRouter([
   {
     path: '/reset-password',
     element: <ResetPasword />
+  },
+  {
+    path: '/verify-email',
+    element: <EmailVerification />
   },
 
   {
