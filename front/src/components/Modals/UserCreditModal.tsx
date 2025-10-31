@@ -42,6 +42,79 @@ export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalPr
   }
 
   console.log(getCredit)
+
+  // Renderizar skeleton mientras se cargan los datos
+  if (!getCredit) {
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto'>
+        <div className='max-w-3xl w-full bg-white rounded-2xl shadow-2xl animate-[fadeIn_0.2s_ease-out,scaleIn_0.2s_ease-out] my-auto'>
+          <div className='bg-gradient-to-r from-[#1193d4] to-[#0d7ab8] p-6 md:p-8 rounded-t-2xl'>
+            <div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4'>
+              <div className='flex-1'>
+                <div className='h-8 w-64 bg-white/20 rounded-lg animate-pulse'></div>
+                <div className='mt-2 h-8 w-48 bg-white/20 rounded-lg animate-pulse'></div>
+              </div>
+              <button
+                onClick={setToggleModal}
+                className='self-end sm:self-start text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 rounded-lg p-2 -m-2'
+                aria-label='Cerrar modal'
+              >
+                <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className='p-6 space-y-8'>
+            {/* Skeleton para Información de la Empresa */}
+            <section>
+              <div className='flex items-center gap-2 mb-3'>
+                <span className='w-1 h-5 bg-gray-300 rounded animate-pulse'></span>
+                <div className='h-6 w-56 bg-gray-300 rounded animate-pulse'></div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl'>
+                <SkeletonInfoItem />
+                <SkeletonInfoItem />
+              </div>
+            </section>
+
+            {/* Skeleton para Oferta del Sistema */}
+            <section>
+              <div className='flex items-center gap-2 mb-3'>
+                <span className='w-1 h-5 bg-gray-300 rounded animate-pulse'></span>
+                <div className='h-6 w-48 bg-gray-300 rounded animate-pulse'></div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl'>
+                <SkeletonInfoItem />
+                <SkeletonInfoItem />
+                <SkeletonInfoItem />
+              </div>
+            </section>
+
+            {/* Skeleton para Detalles del Crédito */}
+            <section>
+              <div className='flex items-center gap-2 mb-3'>
+                <span className='w-1 h-5 bg-gray-300 rounded animate-pulse'></span>
+                <div className='h-6 w-52 bg-gray-300 rounded animate-pulse'></div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl'>
+                <SkeletonInfoItem />
+                <SkeletonInfoItem />
+              </div>
+            </section>
+
+            {/* Skeleton para botones */}
+            <div className='flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200'>
+              <div className='flex-1 h-12 bg-gray-200 rounded-xl animate-pulse'></div>
+              <div className='flex-1 h-12 bg-gray-200 rounded-xl animate-pulse'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto'>
       <div className='max-w-3xl w-full bg-white rounded-2xl shadow-2xl animate-[fadeIn_0.2s_ease-out,scaleIn_0.2s_ease-out] my-auto'>
@@ -121,7 +194,7 @@ export const UserCreditModal = ({ getCredit, setToggleModal }: UserCreditModalPr
                 strong
               />
               <InfoItem
-                label='Monto Aprobado'
+                label='Monto Solicitado'
                 value={formatCurrency(Number(getCredit?.selectedDetails.amount) || 0)}
                 valueClass='text-green-600 font-semibold text-lg'
               />
@@ -176,5 +249,12 @@ const InfoItem = ({
     <p className={`mt-0.5 ${strong ? 'font-semibold text-gray-900' : 'font-medium text-gray-800'} ${valueClass ?? ''}`}>
       {value ?? 'N/A'}
     </p>
+  </div>
+)
+
+const SkeletonInfoItem = () => (
+  <div>
+    <div className='h-4 w-24 bg-gray-300 rounded animate-pulse mb-2'></div>
+    <div className='h-5 w-32 bg-gray-300 rounded animate-pulse'></div>
   </div>
 )

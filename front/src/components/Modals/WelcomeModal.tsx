@@ -76,6 +76,14 @@ export const WelcomeModal = ({ isOpen, onSubmit, isPending = false }: WelcomeMod
   const selectedCountryCode = watch('countryCode')
   const selectedCountry = countries.find((c) => c.code === Number(selectedCountryCode)) || countries[0]
 
+  const handleFormSubmit = handleSubmit((data) => {
+    const formattedData = {
+      ...data,
+      countryCode: Number(data.countryCode) 
+    }
+    onSubmit(formattedData)
+  })
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -122,7 +130,7 @@ export const WelcomeModal = ({ isOpen, onSubmit, isPending = false }: WelcomeMod
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
+          <form onSubmit={handleFormSubmit} className='space-y-5'>
             {/* First Name */}
             <div>
               <label htmlFor='firstName' className='block text-sm font-medium text-gray-700 mb-2'>
@@ -209,7 +217,7 @@ export const WelcomeModal = ({ isOpen, onSubmit, isPending = false }: WelcomeMod
               <div className='relative'>
                 <select
                   id='countryCode'
-                  {...register('countryCode')}
+                  {...register('countryCode', { valueAsNumber: true })}
                   disabled={isPending}
                   className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 bg-white disabled:bg-gray-50 disabled:cursor-not-allowed appearance-none cursor-pointer'
                 >
